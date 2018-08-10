@@ -1,0 +1,25 @@
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { Home, About } from './components/home';
+import { Login, SignUp, SignUpComplete } from './components/auth';
+import { Dashboard } from './components/dashboard';
+import './App.less';
+
+ReactDOM.render(
+  <Router>
+    <div className="app">
+      <Switch>
+        <Route exact path="/" component={Home} />
+        <Route path="/home" component={Home} />
+        <Route path="/login" component={Login} />
+        <Route path="/signup" component={SignUp} />
+        <Route path="/about" component={About} />
+        <Route path="/signup-complete" component={SignUpComplete} />
+        <Route path="/dashboard" component={Dashboard} />
+      </Switch>
+    </div>
+  </Router>,
+  document.getElementById('app')
+);

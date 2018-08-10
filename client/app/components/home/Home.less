@@ -1,0 +1,84 @@
+@import '../../styles/variables.less';
+
+.splash-container {
+  background-color: @white;
+  display: flex;
+
+  .nav-container {
+    .nav-list {
+      display: flex;
+      height: 60px;
+      list-style: none;
+      margin: 0;
+      padding: 0px 70px;
+      justify-content: flex-end;
+      align-items: flex-end;
+    }
+
+    .nav-item {
+      padding-left: 24px;
+
+      > a {
+        color: @dark-gray;
+        font-family: @font-bold;
+      }
+    }
+  }
+
+  .sidebar-container {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    padding: 70px;
+  }
+
+  .sidebar-logo {
+    max-width: 200px;
+    margin-bottom: 40px;
+    margin-top: 80px;
+  }
+
+  .sidebar-text {
+    color: @splash-gray;
+    font-size: 20px;
+    line-height: 30px;
+    margin-top: 18px;
+    margin-bottom: 30px;
+  }
+
+  .signup-btn {
+    max-width: 180px;
+  }
+
+  .main-wrapper {
+    background-color: @background-gray;
+    width: 60%;
+  }
+
+  .about-container {
+    padding: 70px;
+  }
+
+  .about-section {
+    display: flex;
+    margin-bottom: 50px;
+  }
+
+  .about-graphic {
+    background-color: rgba(216, 216, 216, 0.2);
+    border-radius: 8px;
+    height: 200px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .about-logo {
+    margin-right: 8px;
+  }
+
+  .about-content {
+    padding-top: 12px;
+  }
+}

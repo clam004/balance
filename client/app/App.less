@@ -1,0 +1,279 @@
+/* Fonts */
+@font-face {
+  font-family: 'GoogleSans-Regular';
+  src: url('/assets/fonts/GoogleSans-Regular.ttf');
+  src: url('/assets/fonts/GoogleSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'GoogleSans-Medium';
+  src: url('/assets/fonts/GoogleSans-Medium.ttf');
+  src: url('/assets/fonts/GoogleSans-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'GoogleSans-Bold';
+  src: url('/assets/fonts/GoogleSans-Bold.ttf');
+  src: url('/assets/fonts/GoogleSans-Bold.ttf') format('truetype');
+}
+
+@font-regular: 'GoogleSans-Regular', 'Helvetica Neue', Arial, san-serif;
+@font-medium: 'GoogleSans-Medium', 'Helvetica Neue', Arial, san-serif;
+@font-bold: 'GoogleSans-Bold', 'Helvetica Neue', Arial, san-serif;
+@font-light: 'Helvetica Neue', Arial, san-serif;
+
+/* Colors */
+// DEPRECATE
+@light-gray: #eee;
+@light-gray-2: #d8d8d8;
+@light-gray-3: #eaeaea;
+@inactive-gray: #d2d2d2;
+@gray-2: #bbbbbb;
+@black: #2b2b2b;
+@red: #da2a54;
+// NEW
+@white: #fff;
+@green: #20c9b2;
+@dark-gray: #5d5d5d;
+@gray: #747474;
+@splash-gray: #979797;
+@about-gray: #7e7e7e;
+@border-gray: #e6e6e6;
+@side-nav-gray: #d2d2d2;
+@background-gray: #f7f7f7;
+
+/* Spacing */
+@margin-default: 16px;
+
+/* Base CSS */
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#app,
+.app {
+  height: 100%;
+  color: @gray;
+  font-family: @font-regular;
+  font-size: 18px;
+  font-weight: 300;
+  margin: 0;
+}
+
+input,
+textarea {
+  font-family: @font-regular;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  color: @dark-gray;
+  font-family: @font-bold;
+  margin: 0px;
+  // font-family: @font-bold;
+  // margin-top: 8px;
+  // margin-bottom: @margin-default;
+}
+
+h1 {
+  line-height: normal;
+  font-family: @font-bold;
+  font-size: 72px;
+}
+
+h2 {
+  font-size: 36px;
+  font-weight: 300;
+}
+
+h3 {
+  font-size: 28px;
+  font-weight: 400;
+}
+
+h4 {
+  font-size: 24px;
+  font-weight: 500;
+}
+
+h5 {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+a {
+  color: @green;
+  text-decoration: none;
+}
+
+p {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  line-height: 30px;
+  font-size: 18px;
+}
+
+.btn-default,
+.btn-primary,
+.btn-link {
+  border-radius: 8px;
+  box-shadow: none;
+  font-family: @font-regular;
+  font-weight: 300;
+  line-height: 30px;
+  font-size: 20px;
+  padding: 10px 20px;
+
+  &.-sm {
+    font-size: 16px;
+    font-weight: 300;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: 0;
+  }
+
+  &:disabled {
+    border-color: @gray-2;
+    background-color: @gray-2;
+    cursor: not-allowed;
+  }
+}
+
+.btn-default {
+  background: @light-gray-3;
+  border: 1px solid @light-gray-3;
+  color: @dark-gray;
+
+  &:hover {
+    background: @light-gray;
+  }
+
+  &:active {
+    border-color: @light-gray;
+  }
+}
+
+.btn-primary {
+  background: @green;
+  border: 1px solid @green;
+  color: @white;
+}
+
+.btn-link {
+  background: transparent;
+  border: none;
+  color: @gray-2;
+
+  &.-primary {
+    color: @green;
+  }
+}
+
+.label-default {
+  font-family: @font-regular;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+}
+
+.input-default {
+  border: 1px solid @gray;
+  border-radius: 4px;
+  display: block;
+  font-size: 18px;
+  font-weight: 300;
+  margin-bottom: @margin-default;
+  padding: 12px 24px;
+
+  &.-wide {
+    width: 100%;
+  }
+
+  &.-inline {
+    display: inline-block;
+    margin-right: @margin-default;
+  }
+
+  &.-lg {
+    font-size: 24px;
+  }
+
+  &:focus {
+    border-color: @black;
+    outline: 0;
+  }
+}
+
+.unselectable {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+
+.clearfix {
+  &::after {
+    display: block;
+    content: '';
+    clear: both;
+  }
+}
+
+.pull-left {
+  float: left;
+}
+
+.pull-right {
+  float: right;
+}
+
+.default-container {
+  max-width: 840px;
+  margin: 40px auto;
+  padding: 0px 40px;
+}
+
+.text-light {
+  font-weight: 100;
+}
+
+.text-bold {
+  font-family: @font-bold;
+  font-weight: 500;
+}
+
+.text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-red {
+  color: @red;
+}
+
+.text-center {
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .default-container {
+    padding: 0px 16px;
+  }
+}
