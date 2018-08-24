@@ -2,10 +2,9 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { get } from 'lodash';
 import { signup } from '../../helpers/auth';
-import '../../App.less';
+import './Auth.less';
 
 interface SignUpState {
-  username: string;
   email: string;
   password: string;
   passwordConfirmation: string;
@@ -17,7 +16,6 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
     super(props);
 
     this.state = {
-      username: '',
       email: '',
       password: '',
       passwordConfirmation: '',
@@ -26,29 +24,31 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
   }
 
   onUpdateInput(e: any) {
+    const { name, value } = e.target;
+
     return this.setState({
-      [e.target.name]: e.target.value
-    });
+      [name]: value
+    } as Pick<SignUpState, keyof SignUpState>);
   }
 
   handleSubmit(e: React.FormEvent<HTMLInputElement>) {
     e.preventDefault();
 
     const { history } = this.props;
-    const { username, email, password, passwordConfirmation } = this.state;
+    const { email, password, passwordConfirmation } = this.state;
 
-    if (!username) {
-      return this.setState({ error: 'A valid username is required!' });
-    } else if (!email) {
+    if (!email) {
       return this.setState({ error: 'A valid email is required!' });
     } else if (!password) {
       return this.setState({ error: 'A password is required!' });
     } else if (password !== passwordConfirmation) {
-      return this.setState({ error: 'Password does not match password confirmation!' });
+      return this.setState({
+        error: 'Password does not match password confirmation!'
+      });
     }
 
-    return signup({ username, email, password })
-      .then(() => history.push('/signup-complete'))
+    return signup({ email, password })
+      .then(() => history.push('/login'))
       .catch(err => {
         const error = get(err, 'message', 'Invalid credentials!');
 
@@ -58,52 +58,62 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
 
   render() {
     return (
-      <div>
-        <div className='default-container'>
-          <form onSubmit={this.handleSubmit.bind(this)}>
-            <input
-              type='text'
-              className='input-default -large'
-              placeholder='Username'
-              name='username'
-              value={this.state.username}
-              onChange={this.onUpdateInput.bind(this)} />
+      <div className="sign-in-wrapper">
+        <div className="sign-in-container">
+          <div className="sign-in-box">
+            <div className="sign-in-header">
+              <h4>Create Balance Account</h4>
+            </div>
 
-            <input
-              type='email'
-              className='input-default -large'
-              placeholder='Email'
-              name='email'
-              value={this.state.email}
-              onChange={this.onUpdateInput.bind(this)} />
+            <form
+              className="sign-in-form"
+              onSubmit={this.handleSubmit.bind(this)}
+            >
+              <div className="form-group">
+                <label className="label-default">Enter Email</label>
 
-            <input
-              type='password'
-              className='input-default -large'
-              placeholder='Password'
-              name='password'
-              value={this.state.password}
-              onChange={this.onUpdateInput.bind(this)} />
+                <input
+                  type="email"
+                  className="input-default full-width"
+                  placeholder="Email Address"
+                  name="email"
+                  value={this.state.email}
+                  onChange={this.onUpdateInput.bind(this)}
+                />
+              </div>
 
-            <input
-              type='password'
-              className='input-default -large'
-              placeholder='Confirm Password'
-              name='passwordConfirmation'
-              value={this.state.passwordConfirmation}
-              onChange={this.onUpdateInput.bind(this)} />
+              <div className="form-group">
+                <label className="label-default">Enter Password</label>
 
-            <button
-              className='btn-default btn-sm'
-              type='submit'>
-              Sign Up
-            </button>
+                <input
+                  style={{ marginBottom: 8 }}
+                  type="password"
+                  className="input-default full-width"
+                  placeholder="Password"
+                  name="password"
+                  value={this.state.password}
+                  onChange={this.onUpdateInput.bind(this)}
+                />
 
-            <small className='text-red'
-              style={{ marginLeft: 16 }}>
-              {this.state.error || ''}
-            </small>
-          </form>
+                <input
+                  type="password"
+                  className="input-default full-width"
+                  placeholder="Confirm Password"
+                  name="passwordConfirmation"
+                  value={this.state.passwordConfirmation}
+                  onChange={this.onUpdateInput.bind(this)}
+                />
+              </div>
+            </form>
+          </div>
+
+          <button
+            className="btn-primary btn-sign-in"
+            type="submit"
+            onClick={this.handleSubmit.bind(this)}
+          >
+            Create Account
+          </button>
         </div>
       </div>
     );

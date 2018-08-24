@@ -1,8 +1,10 @@
 @import '../../styles/variables.less';
 
+// TODO: DRY up similar classes
 .dashboard-container {
   background-color: @white;
   display: flex;
+  min-height: 100%;
 
   .side-nav-header {
     display: flex;
@@ -17,11 +19,12 @@
   }
 
   .side-nav-logo {
-    margin-right: 24px;
+    margin-right: 16px;
   }
 
   .side-nav-container {
-    width: 330px;
+    min-width: 280px; // TODO
+    max-width: 330px; // TODO
     padding: 30px;
 
     .side-nav-list {
@@ -78,7 +81,7 @@
   .balance-participants-card {
     background-color: @white;
     border-radius: 8px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.179857);
+    box-shadow: 0px 2px 4px @shadow-gray;
     width: 40vw;
     max-width: 440px;
     min-height: 193px;
@@ -90,7 +93,7 @@
   .balance-agreement-container {
     background-color: @white;
     border-radius: 8px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.179857);
+    box-shadow: 0px 2px 4px @shadow-gray;
     padding: 20px 30px;
     max-width: 230px;
     min-height: 193px;
