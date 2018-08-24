@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps, Link } from 'react-router-dom';
 import './Dashboard.less';
 
 const SideNav = () => {
@@ -12,16 +12,16 @@ const SideNav = () => {
 
       <ul className="side-nav-list">
         <li className="nav-item active">
-          <a href="/dashboard">Current Balances</a>
+          <Link to="/dashboard">Current Balances</Link>
         </li>
         <li className="nav-item">
-          <a href="/dashboard">History</a>
+          <Link to="/dashboard">History</Link>
         </li>
         <li className="nav-item">
-          <a href="/dashboard">Arbitrations</a>
+          <Link to="/dashboard">Arbitrations</Link>
         </li>
         <li className="nav-item">
-          <a href="/dashboard">Support</a>
+          <Link to="/dashboard">Support</Link>
         </li>
       </ul>
     </nav>
@@ -161,10 +161,12 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             />
 
             <section className="create-balance-container">
-              <button className="btn-primary create-balance-btn">
-                <img src="assets/btn-logo-1.svg" />
-                Create Balance
-              </button>
+              <Link to="/create">
+                <button className="btn-primary create-balance-btn">
+                  <img src="assets/btn-logo-1.svg" />
+                  Create Balance
+                </button>
+              </Link>
             </section>
           </div>
         </main>

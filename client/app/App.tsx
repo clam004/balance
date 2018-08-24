@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { Home, About } from './components/home';
 import { Login, SignUp, SignUpComplete } from './components/auth';
 import { Dashboard } from './components/dashboard';
+import { BalanceCreator } from './components/balance';
 import './App.less';
 
 ReactDOM.render(
@@ -18,6 +19,7 @@ ReactDOM.render(
         <Route path="/about" component={About} />
         <Route path="/signup-complete" component={SignUpComplete} />
         <Route path="/dashboard" component={Dashboard} />
+        <Route path="/create" component={BalanceCreator} />
       </Switch>
     </div>
   </Router>,

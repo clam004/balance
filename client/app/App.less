@@ -1,49 +1,4 @@
-/* Fonts */
-@font-face {
-  font-family: 'GoogleSans-Regular';
-  src: url('/assets/fonts/GoogleSans-Regular.ttf');
-  src: url('/assets/fonts/GoogleSans-Regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'GoogleSans-Medium';
-  src: url('/assets/fonts/GoogleSans-Medium.ttf');
-  src: url('/assets/fonts/GoogleSans-Medium.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'GoogleSans-Bold';
-  src: url('/assets/fonts/GoogleSans-Bold.ttf');
-  src: url('/assets/fonts/GoogleSans-Bold.ttf') format('truetype');
-}
-
-@font-regular: 'GoogleSans-Regular', 'Helvetica Neue', Arial, san-serif;
-@font-medium: 'GoogleSans-Medium', 'Helvetica Neue', Arial, san-serif;
-@font-bold: 'GoogleSans-Bold', 'Helvetica Neue', Arial, san-serif;
-@font-light: 'Helvetica Neue', Arial, san-serif;
-
-/* Colors */
-// DEPRECATE
-@light-gray: #eee;
-@light-gray-2: #d8d8d8;
-@light-gray-3: #eaeaea;
-@inactive-gray: #d2d2d2;
-@gray-2: #bbbbbb;
-@black: #2b2b2b;
-@red: #da2a54;
-// NEW
-@white: #fff;
-@green: #20c9b2;
-@dark-gray: #5d5d5d;
-@gray: #747474;
-@splash-gray: #979797;
-@about-gray: #7e7e7e;
-@border-gray: #e6e6e6;
-@side-nav-gray: #d2d2d2;
-@background-gray: #f7f7f7;
-
-/* Spacing */
-@margin-default: 16px;
+@import './styles/variables.less';
 
 /* Base CSS */
 * {
@@ -69,6 +24,22 @@ textarea {
   font-family: @font-regular;
 }
 
+/* Chrome, Firefox, Opera, Safari 10.1+ */
+::placeholder {
+  color: @placeholder-gray;
+  opacity: 1; /* Firefox */
+}
+
+/* Internet Explorer 10-11 */
+:-ms-input-placeholder {
+  color: @placeholder-gray;
+}
+
+/* Microsoft Edge */
+::-ms-input-placeholder {
+  color: @placeholder-gray;
+}
+
 h1,
 h2,
 h3,
@@ -77,9 +48,6 @@ h5 {
   color: @dark-gray;
   font-family: @font-bold;
   margin: 0px;
-  // font-family: @font-bold;
-  // margin-top: 8px;
-  // margin-bottom: @margin-default;
 }
 
 h1 {
@@ -130,6 +98,9 @@ p {
   line-height: 30px;
   font-size: 20px;
   padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &.-sm {
     font-size: 16px;
@@ -145,23 +116,21 @@ p {
   }
 
   &:disabled {
-    border-color: @gray-2;
-    background-color: @gray-2;
+    background-color: @border-gray;
     cursor: not-allowed;
   }
 }
 
 .btn-default {
-  background: @light-gray-3;
-  border: 1px solid @light-gray-3;
+  background: @border-gray;
   color: @dark-gray;
 
   &:hover {
-    background: @light-gray;
+    background: @background-gray;
   }
 
   &:active {
-    border-color: @light-gray;
+    border-color: @background-gray;
   }
 }
 
@@ -174,7 +143,7 @@ p {
 .btn-link {
   background: transparent;
   border: none;
-  color: @gray-2;
+  color: @gray;
 
   &.-primary {
     color: @green;
@@ -182,37 +151,40 @@ p {
 }
 
 .label-default {
-  font-family: @font-regular;
-  font-size: 12px;
-  letter-spacing: 0.4px;
+  display: block;
+  color: @gray;
+  font-family: @font-bold;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.form-group {
+  margin-bottom: 20px;
 }
 
 .input-default {
-  border: 1px solid @gray;
-  border-radius: 4px;
+  border: 1px solid @white;
+  border-radius: 8px;
   display: block;
-  font-size: 18px;
-  font-weight: 300;
-  margin-bottom: @margin-default;
-  padding: 12px 24px;
-
-  &.-wide {
-    width: 100%;
-  }
+  font-size: 14px;
+  padding: 12px 18px;
 
   &.-inline {
     display: inline-block;
-    margin-right: @margin-default;
+    margin-right: 16px;
   }
 
   &.-lg {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   &:focus {
-    border-color: @black;
     outline: 0;
   }
+}
+
+.full-width {
+  width: 100%;
 }
 
 .unselectable {
@@ -249,6 +221,26 @@ p {
   padding: 0px 40px;
 }
 
+.balance-alert {
+  padding: 16px;
+  background-color: @green;
+  border-radius: 8px;
+  color: @white;
+  margin-bottom: 18px;
+
+  .alert-text {
+  }
+
+  .alert-description {
+    line-height: 18px;
+    margin-bottom: 8px;
+    margin-top: 8px;
+  }
+
+  .alert-action {
+  }
+}
+
 .text-light {
   font-weight: 100;
 }
@@ -264,12 +256,20 @@ p {
   text-overflow: ellipsis;
 }
 
-.text-red {
-  color: @red;
-}
-
 .text-center {
   text-align: center;
+}
+
+.text-lg {
+  font-size: 20px;
+}
+
+.text-sm {
+  font-size: 14px;
+}
+
+.text-xs {
+  font-size: 10px;
 }
 
 @media (max-width: 480px) {

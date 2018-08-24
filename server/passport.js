@@ -2,12 +2,12 @@ const passport = require('passport');
 const { Strategy } = require('passport-local');
 const { User } = require('./db');
 
-const { findByUsername, verifyUser, findById } = User;
+const { findByEmail, verifyUser, findById } = User;
 
 const DEFAULT_REDIRECT = '/';
 
-const verify = (username, password, cb) => {
-  return findByUsername(username)
+const verify = (email, password, cb) => {
+  return findByEmail(email)
     .then(user => {
       if (!user) return cb(null, false);
       if (!verifyUser(user, password)) {
@@ -19,7 +19,9 @@ const verify = (username, password, cb) => {
     .catch(err => cb(err));
 };
 
-const strategy = new Strategy(verify);
+const fields = { usernameField: 'email', passwordField: 'password' };
+
+const strategy = new Strategy(fields, verify);
 
 const serialize = (user, done) => done(null, user.id);
 
