@@ -6,6 +6,7 @@ import { Home, About } from './components/home';
 import { Login, SignUp, SignUpComplete } from './components/auth';
 import { Dashboard } from './components/dashboard';
 import { BalanceCreator } from './components/balance';
+import { Test } from './components/test';
 import './App.less';
 
 ReactDOM.render(
@@ -20,6 +21,7 @@ ReactDOM.render(
         <Route path="/signup-complete" component={SignUpComplete} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/create" component={BalanceCreator} />
+        <Route path="/test" component={Test} />
       </Switch>
     </div>
   </Router>,

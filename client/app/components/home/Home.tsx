@@ -17,7 +17,7 @@ class Home extends React.Component<HomeProps, HomeState> {
     // TODO
     const { history } = this.props;
 
-    return history.push('/dashboard');
+    return history.push('/signup');
   }
 
   render() {
@@ -28,7 +28,7 @@ class Home extends React.Component<HomeProps, HomeState> {
           <img className="sidebar-logo" src="assets/logo-green-large.svg" />
           <h1 className="sidebar-header">Balance</h1>
           <p className="sidebar-text">
-            Balance makes it easy to create small trustworthy contracts between
+            Balance makes it easy to create trustworthy contracts between
             businesses and freelancers
           </p>
           <button
@@ -49,7 +49,7 @@ class Home extends React.Component<HomeProps, HomeState> {
                 <a href="#">Support</a>
               </li>
               <li className="nav-item">
-                <a href="/dashboard">Sign In</a>
+                <a href="/login">Sign In</a>
               </li>
             </ul>
           </nav>

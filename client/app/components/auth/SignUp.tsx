@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { get } from 'lodash';
-import { signup } from '../../helpers/auth';
+import { signup, insert_user_table } from '../../helpers/auth';
 import './Auth.less';
 
 interface SignUpState {
@@ -32,8 +32,8 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
   }
 
   handleSubmit(e: React.FormEvent<HTMLInputElement>) {
+    
     e.preventDefault();
-
     const { history } = this.props;
     const { email, password, passwordConfirmation } = this.state;
 
@@ -42,16 +42,18 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
     } else if (!password) {
       return this.setState({ error: 'A password is required!' });
     } else if (password !== passwordConfirmation) {
+      alert('Password does not match password confirmation!')
       return this.setState({
         error: 'Password does not match password confirmation!'
       });
     }
-
+    
     return signup({ email, password })
+      .then(insert_user_table({ email, password }))
+      .then(history.push('/login'))
       .then(() => history.push('/login'))
       .catch(err => {
         const error = get(err, 'message', 'Invalid credentials!');
-
         this.setState({ error });
       });
   }
@@ -110,6 +112,7 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
           <button
             className="btn-primary btn-sign-in"
             type="submit"
+
             onClick={this.handleSubmit.bind(this)}
           >
             Create Account
