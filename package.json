@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/reichert621/balance.git"
+    "url": "https://github.com/clam004/balance.git"
   },
   "keywords": [
     "balance"

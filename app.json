@@ -1,0 +1,8 @@
+{
+	"name":"balance",
+	"description":"balance",
+	"repository":"https://github.com/clam004/balance.git",
+	"logo":"http://appbalance.herokuapp.com/client/assets/logo-green.svg",
+	"keywords":["balance"],
+	"image":"heroku/nodejs"
+}
