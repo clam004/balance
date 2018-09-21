@@ -49,7 +49,6 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
     }
     
     return signup({ email, password })
-      .then(insert_user_table({ email, password }))
       .then(history.push('/login'))
       .then(() => history.push('/login'))
       .catch(err => {
