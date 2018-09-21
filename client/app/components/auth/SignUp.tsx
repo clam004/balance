@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { get } from 'lodash';
-import { signup, insert_user_table } from '../../helpers/auth';
+import { signup } from '../../helpers/auth';
 import './Auth.less';
 
 interface SignUpState {

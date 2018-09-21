@@ -25,6 +25,3 @@ export const logout = (): Promise<HttpResponse> => {
   return del('/api/logout');
 };
 
-export const insert_user_table = (params: object): Promise<email_password> => {
-  alert(params.email + params.password);
-};
