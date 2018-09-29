@@ -37,13 +37,13 @@ api.post('/get_balances', get_balances);
 
 api.get('/balances/:id', (req,res)=>{
 	if(req.isAuthenticated()) {
-		knex('balances').where('buyer_id', req.params.id)
+		knex('balances').where('buyer_id', req.params.id).orWhere('seller_id', req.params.id)
 		.then(balances => {
 		res.json(balances);
 		console.log("authenticated")
 		});
 	} else {
-		knex('balances').where('buyer_id', req.params.id)
+		knex('balances').where('buyer_id', req.params.id).orWhere('seller_id', req.params.id)
 		.then(balances => {
 		res.json(balances);
 		console.log("authenticated")
