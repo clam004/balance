@@ -25,6 +25,7 @@ const strategy = new Strategy(fields, verify);
 
 const serialize = (user, done) => done(null, user.id);
 
+
 const deserialize = (id, done) => {
   return findById(id)
     .then(user => done(null, user))

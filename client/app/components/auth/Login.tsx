@@ -42,9 +42,18 @@ class Login extends React.Component<
     };
 
     return login(credentials)
-      .then(() => history.push('/dashboard'))
+      .then(result => {
+        let user_id = result.id;
+        let user_email = result.email;
+        localStorage.setItem("user_id", JSON.stringify(user_id));
+        localStorage.setItem("user_email", JSON.stringify(user_email));
+        return user_id
+      })
+      .then(user_id  => {history.push('/dashboard')})
       .catch(err => {
         this.setState({ error: 'Invalid credentials' });
+        alert("Invalid Email Password Combination")
+        //console.log(req.session.passport.user)
       });
   }
 
@@ -91,7 +100,7 @@ class Login extends React.Component<
             onClick={this.handleSubmit.bind(this)}
           >
             Log in
-          </button>
+          </button>    
         </div>
       </div>
     );

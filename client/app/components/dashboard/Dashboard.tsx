@@ -3,13 +3,13 @@ import { RouteComponentProps, Link } from 'react-router-dom';
 import './Dashboard.less';
 
 const SideNav = () => {
+
   return (
     <nav className="side-nav-container">
       <div className="side-nav-header">
         <img className="side-nav-logo" src="assets/logo-green.svg" />
         <h3>Balance</h3>
       </div>
-
       <ul className="side-nav-list">
         <li className="nav-item active">
           <Link to="/dashboard">Current Balances</Link>
@@ -29,136 +29,149 @@ const SideNav = () => {
 };
 
 interface IBalance {
-  createdAt: string;
-  buyer: {
-    name: string;
-    stake: number;
-    goods: string;
-  };
-  seller: {
-    name: string;
-    stake: number;
-    goods: string;
-  };
-  agreement: {
-    description: string;
-    date: string;
-    price: number;
-  };
+    title:string,
+    balance_description:string,
+    buyer_expectation:string,
+    seller_deliverable:string,
+    buyer_name: string,
+    seller_name:string,
+    buyer_stake_amount:number,
+    seller_stake_amount:number,
+    balance_price:number,
+    completed:boolean,
+    buyer_id:number,
+    seller_id:number,
+    created_at:string,
+    updated_at:string,
+    due_date:string 
 }
 
 const BalanceDetails = ({ balance }: { balance: IBalance }) => {
-  const { createdAt, agreement, buyer, seller } = balance;
 
   return (
-    <section className="balance-section">
-      <div className="balance-created-date">Created {createdAt}</div>
+        <section className="balance-section">
+          <div className="balance-created-date">Created {balance.created_at}</div>
 
-      <div className="balance-cards-container">
-        <div className="balance-participants-card">
-          <div className="balance-participant-container">
-            <div className="balance-participant-photo">{/* TODO */}</div>
+          <div className="balance-cards-container">
+            <div className="balance-participants-card">
+              <div className="balance-participant-container">
+                <div className="balance-participant-photo">{/* TODO */}</div>
 
-            <div className="balance-participant-details">
-              <div className="balance-stake">
-                {buyer.name} has staked ${buyer.stake}
+                <div className="balance-participant-details">
+                  <div className="balance-stake">
+                    {balance.buyer_name} has staked ${balance.buyer_stake_amount}
+                  </div>
+                  <div className="balance-goods">{balance.buyer_expectation}</div>
+                </div>
               </div>
-              <div className="balance-goods">{buyer.goods}</div>
+
+              <div className="balance-participant-container">
+                <div className="balance-participant-photo">{/* TODO */}</div>
+
+                <div className="balance-participant-details">
+                  <div className="balance-stake">
+                    {balance.seller_name} has staked ${balance.seller_stake_amount}
+                  </div>
+                  <div className="balance-goods">{balance.seller_deliverable}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="balance-agreement-container">
+              <h5 className="balance-agreement-header">Balance Agreement</h5>
+
+              <div className="balance-agreement-text">
+                {balance.balance_description} by{' '}
+                <span className="text-bold">{balance.due_date}</span>…
+              </div>
+
+              <div className="balance-agreement-price">${balance.balance_price}</div>
             </div>
           </div>
-
-          <div className="balance-participant-container">
-            <div className="balance-participant-photo">{/* TODO */}</div>
-
-            <div className="balance-participant-details">
-              <div className="balance-stake">
-                {seller.name} has staked ${seller.stake}
-              </div>
-              <div className="balance-goods">{seller.goods}</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="balance-agreement-container">
-          <h5 className="balance-agreement-header">Balance Agreement</h5>
-
-          <div className="balance-agreement-text">
-            {agreement.description} by{' '}
-            <span className="text-bold">{agreement.date}</span>…
-          </div>
-
-          <div className="balance-agreement-price">${agreement.price}</div>
-        </div>
-      </div>
-    </section>
+        </section>
   );
 };
 
 interface DashboardProps extends RouteComponentProps<{}> {}
 
-interface DashboardState {}
+interface DashboardState {
+  data: Object,
+  isLoading: boolean
+}
 
 class Dashboard extends React.Component<DashboardProps, DashboardState> {
+
   constructor(props: DashboardProps) {
+
     super(props);
 
-    this.state = {};
+    this.state = {
+      data: [],
+      isLoading: false
+    }
+
+  }
+ 
+  
+  componentDidMount() {
+    
+    this.setState({ isLoading: true });
+    const API_URL = 'http://localhost:8000/api/balances/'+localStorage.getItem('user_id');
+    fetch(API_URL)
+      .then(response => response.json())
+      .then(data => this.setState( {data:data, isLoading: false} ));
   }
 
   render() {
+
+    
+    const { data, isLoading } = this.state;
+
+    if (isLoading) {
+      return <p>Loading ...</p>;
+    } else {
+      console.log(data);
+    }
+
     // TODO: try out styled components
+    var user_email = JSON.parse(localStorage.getItem("user_email"));
+    var user_alias = user_email.substr(0, user_email.indexOf('@')); 
+    
+
     return (
       <div className="dashboard-container">
         <SideNav />
-
         <main className="main-container">
           <div className="main-header">
             <img className="main-logo" src="assets/logo-white.svg" />
-            <h3>Current Balances</h3>
+            <h3>Current Balances for {user_alias}  </h3>
           </div>
 
           <div className="balances-container">
-            <BalanceDetails
-              balance={{
-                createdAt: 'Last Tuesday',
-                buyer: {
-                  name: 'Josh',
-                  stake: 1000,
-                  goods: 'For 4 solar panel installations'
-                },
-                seller: {
-                  name: 'Toro',
-                  stake: 500,
-                  goods: 'To install 4 solar panels'
-                },
-                agreement: {
-                  description: `Toro the Solar Panel technian has agreed to install 4 solar panels on Josh’s roof`,
-                  date: 'May 25th 2018',
-                  price: 4000
-                }
-              }}
-            />
 
-            <BalanceDetails
-              balance={{
-                createdAt: 'Last Month',
-                buyer: {
-                  name: 'Josh',
-                  stake: 800,
-                  goods: 'For 3 solar panel installations'
-                },
-                seller: {
-                  name: 'Toro',
-                  stake: 300,
-                  goods: 'To install 3 solar panels'
-                },
-                agreement: {
-                  description: `Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof`,
-                  date: 'May 21th 2018',
-                  price: 3600
-                }
-              }}
-            />
+          {data.map(bal =>
+            <BalanceDetails balance={bal}/>
+          )}
+
+          <BalanceDetails 
+            balance = {{
+              title:'Solar Panels',
+              balance_description:`Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof`,
+              buyer_expectation:'For 3 solar panel installations',
+              seller_deliverable:'To install 3 solar panels',
+              buyer_name: 'Josh',
+              seller_name:'Toro',
+              buyer_stake_amount:800,
+              seller_stake_amount:300,
+              balance_price:3600,
+              completed:false,
+              buyer_id:1,
+              seller_id:2,
+              created_at:'Last Month',
+              updated_at:'Last Month',
+              due_date:'Next Month'
+            }}
+          />
 
             <section className="create-balance-container">
               <Link to="/create">
@@ -176,3 +189,23 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 }
 
 export default Dashboard;
+
+/*
+    //console.log(this.state.data);
+    if (Array.isArray(this.state.data)) {
+      const data  = this.state.data;
+    }
+
+    if (Array.isArray(this.state.data)) {
+      const bal = this.state.data;
+    }
+    //const url = 'http://localhost:8000/api/balances/'+localStorage.getItem('user_id');
+    //fetch(url).then(response => response.json()).then(data => console.log(data));
+
+              {bals.map(bal =>
+            <BalanceDetails balance=bal/>
+          )}
+*/
+
+
+

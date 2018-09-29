@@ -42,7 +42,6 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
     } else if (!password) {
       return this.setState({ error: 'A password is required!' });
     } else if (password !== passwordConfirmation) {
-      alert('Password does not match password confirmation!')
       return this.setState({
         error: 'Password does not match password confirmation!'
       });

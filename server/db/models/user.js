@@ -82,7 +82,7 @@ const register = params => {
 
   return findByEmail(email).then(existingEmail => {
     if (existingEmail) throw new Error('That email address is taken!');
-
+    //alert('That email address is taken!');
     return create(params);
   });
 };

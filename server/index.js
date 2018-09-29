@@ -26,15 +26,24 @@ app.use(session({
   store: new KnexSessionStore({ knex })
 }));
 
+
 const {
   strategy,
   serialize,
   deserialize
 } = require('./passport');
 
+
 passport.use(strategy);
+
 passport.serializeUser(serialize);
 passport.deserializeUser(deserialize);
+
+/*
+passport.deserializeUser(function(obj, done) {
+  done(null, false);  // invalidates the existing login session.
+});
+*/
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -45,3 +54,4 @@ app.use('/api', api);
 app.get('*', home);
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
+
