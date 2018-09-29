@@ -138,6 +138,12 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     var user_email = JSON.parse(localStorage.getItem("user_email"));
     var user_alias = user_email.substr(0, user_email.indexOf('@')); 
 
+    /*
+          {data.map(bal =>
+            <BalanceDetails balance={bal}/>
+          )}
+    */
+
     // TODO: try out styled components
     return (
       <div className="dashboard-container">
@@ -169,10 +175,6 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
               due_date:'Next Month'
             }}
           />
-
-          {data.map(bal =>
-            <BalanceDetails balance={bal}/>
-          )}
 
             <section className="create-balance-container">
               <Link to="/create">
