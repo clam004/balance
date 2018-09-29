@@ -3,7 +3,7 @@ import { RouteComponentProps, Link } from 'react-router-dom';
 //import { get_balances } from '../../helpers/transactions';
 import './Dashboard.less';
 
-const API_URL = 'https://appbalance.herokuapp.com'// 'http://localhost:8000' // 
+const API_URL =   'https://appbalance.herokuapp.com' //'http://localhost:8000' //
 
 const SideNav = () => {
 
@@ -173,7 +173,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
           {data.map(bal =>
             <BalanceDetails balance={bal}/>
           )}
-          
+
             <section className="create-balance-container">
               <Link to="/create">
                 <button className="btn-primary create-balance-btn">
