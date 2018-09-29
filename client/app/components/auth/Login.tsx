@@ -45,9 +45,9 @@ class Login extends React.Component<
       .then(result => {
         console.log(result);
         //let user_id = result.id;
-        //let user_email = result.email;
+        let user_email = result.email;
         //localStorage.setItem("user_id", JSON.stringify(user_id));
-        //localStorage.setItem("user_email", JSON.stringify(user_email));
+        localStorage.setItem("user_email", JSON.stringify(user_email));
       })
       .then(() => history.push('/dashboard'))
       .catch(err => {
