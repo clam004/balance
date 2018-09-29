@@ -129,10 +129,11 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
     const { data, isLoading } = this.state;
 
-    if (isLoading) {
+    if (isLoading || !Array.isArray(data)) {
       return <p>Loading ...</p>;
     } else {
-      console.log(data)
+      console.log(data);
+      console.log(Array.isArray(data))
     }
     
     var user_email = JSON.parse(localStorage.getItem("user_email"));
