@@ -115,11 +115,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
   }
  
-  /*
+  
   componentDidMount() {
     
     this.setState({ isLoading: true });
-    
     const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
     console.log(BAL_API_URL)
     fetch(BAL_API_URL)
@@ -127,12 +126,13 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
       .then(data => this.setState( {data:data, isLoading: false} ));
     
   }
-  */
+  
 
   render() {
-    /*
-    const { data, isLoading } = this.state;
     
+    const { data, isLoading } = this.state;
+    console.log(data)
+    /*
     if (isLoading) {
       return <p>Loading ...</p>;
     } else {
