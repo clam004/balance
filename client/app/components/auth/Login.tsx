@@ -43,7 +43,6 @@ class Login extends React.Component<
 
     return login(credentials)
       .then(result => {
-        console.log(result);
         let user_id = result.id;
         let user_email = result.email;
         localStorage.setItem("user_id", JSON.stringify(user_id));

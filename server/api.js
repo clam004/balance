@@ -19,7 +19,7 @@ const logout = (req, res) => {
 
 const get_balances = (req, res) => {
 	//res.json(req.isAuthenticated())
-	knex('balances').where('buyer_id', req.body.user_id)
+	knex('balances').where('buyer_id', req.body.user_id).orWhere('seller_id', req.body.user_id)
 	.then(balances => {
 		res.json(balances);
 	});
