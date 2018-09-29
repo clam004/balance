@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
-import { get_balances } from '../../helpers/transactions';
+//import { get_balances } from '../../helpers/transactions';
 import './Dashboard.less';
 
 const API_URL = 'https://appbalance.herokuapp.com'//'http://localhost:8000'
