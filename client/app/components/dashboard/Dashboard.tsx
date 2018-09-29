@@ -170,6 +170,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             }}
           />
 
+          {data.map(bal =>
+            <BalanceDetails balance={bal}/>
+          )}
+          
             <section className="create-balance-container">
               <Link to="/create">
                 <button className="btn-primary create-balance-btn">
