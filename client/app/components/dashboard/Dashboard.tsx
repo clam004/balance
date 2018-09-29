@@ -115,7 +115,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
   }
  
-  
+  /*
   componentDidMount() {
     
     this.setState({ isLoading: true });
@@ -127,23 +127,22 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
       .then(data => this.setState( {data:data, isLoading: false} ));
     
   }
+  */
 
   render() {
-
-    console.log(data);
+    /*
     const { data, isLoading } = this.state;
-
+    
     if (isLoading) {
       return <p>Loading ...</p>;
     } else {
       //console.log(data);
     }
-
-    // TODO: try out styled components
+    
     var user_email = JSON.parse(localStorage.getItem("user_email"));
     var user_alias = user_email.substr(0, user_email.indexOf('@')); 
-    
-
+    */
+    // TODO: try out styled components
     return (
       <div className="dashboard-container">
         <SideNav />

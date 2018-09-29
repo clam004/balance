@@ -40,21 +40,13 @@ class Login extends React.Component<
       password,
       email: email.trim()
     };
-    //console.log(credentials) //{password: "Josh@balance.com", email: "Josh@balance.com"}
+
     return login(credentials)
-      .then(result => {
-        let user_id = result.id;
-        let user_email = result.email;
-        localStorage.setItem("user_id", JSON.stringify(user_id));
-        localStorage.setItem("user_email", JSON.stringify(user_email));
-        return user_id
-      })
-      .then(user_id  => {history.push('/dashboard')})
+      .then(() => history.push('/dashboard'))
       .catch(err => {
         this.setState({ error: 'Invalid credentials' });
-        alert("Invalid Email Password Combination")
-        //console.log(req.session.passport.user)
       });
+      
   }
 
   render() {
@@ -108,3 +100,21 @@ class Login extends React.Component<
 }
 
 export default Login;
+
+/*
+    //console.log(credentials) //{password: "Josh@balance.com", email: "Josh@balance.com"}
+    return login(credentials)
+      .then(result => {
+        let user_id = result.id;
+        let user_email = result.email;
+        localStorage.setItem("user_id", JSON.stringify(user_id));
+        localStorage.setItem("user_email", JSON.stringify(user_email));
+        return user_id
+      })
+      .then(user_id  => {history.push('/dashboard')})
+      .catch(err => {
+        this.setState({ error: 'Invalid credentials' });
+        alert("Invalid Email Password Combination")
+        //console.log(req.session.passport.user)
+      });
+*/
