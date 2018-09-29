@@ -40,9 +40,14 @@ api.get('/balances/:id', (req,res)=>{
 		knex('balances').where('buyer_id', req.params.id)
 		.then(balances => {
 		res.json(balances);
+		console.log("authenticated")
 		});
 	} else {
-		console.log("not authenticated")
+		knex('balances').where('buyer_id', req.params.id)
+		.then(balances => {
+		res.json(balances);
+		console.log("authenticated")
+		});
 	}
 });
 
