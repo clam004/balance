@@ -42,11 +42,18 @@ class Login extends React.Component<
     };
 
     return login(credentials)
+      .then(result => {
+        let user_id = result.id;
+        let user_email = result.email;
+        localStorage.setItem("user_id", JSON.stringify(user_id));
+        localStorage.setItem("user_email", JSON.stringify(user_email));
+        return user_id
+      })
       .then(() => history.push('/dashboard'))
       .catch(err => {
         this.setState({ error: 'Invalid credentials' });
       });
-      
+
   }
 
   render() {
