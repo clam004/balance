@@ -126,25 +126,21 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
       .then(data => this.setState( {data:data, isLoading: false} ));
     
   }
-  
 
   render() {
-    
+
     const { data, isLoading } = this.state;
-    console.log(data)
-    /*
+    
     if (isLoading) {
       return <p>Loading ...</p>;
     } else {
-      //console.log(data);
+      
+      console.log(data)
     }
     
     var user_email = JSON.parse(localStorage.getItem("user_email"));
     var user_alias = user_email.substr(0, user_email.indexOf('@')); 
 
-    {user_alias} 
-
-    */
     // TODO: try out styled components
     return (
       <div className="dashboard-container">
@@ -152,7 +148,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         <main className="main-container">
           <div className="main-header">
             <img className="main-logo" src="assets/logo-white.svg" />
-            <h3>Current Balances for  </h3>
+            <h3>Current Balances for {user_alias} </h3>
           </div>
 
           <div className="balances-container">
