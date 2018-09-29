@@ -7,6 +7,7 @@ export interface IUser {
 }
 
 export interface email_password {
+  id: number;
   email: string;
   password: string;
 }
