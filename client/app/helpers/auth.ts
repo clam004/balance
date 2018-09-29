@@ -7,7 +7,6 @@ export interface IUser {
 }
 
 export interface email_password {
-  id: number;
   email: string;
   password: string;
 }
@@ -27,7 +26,3 @@ export const logout = (): Promise<HttpResponse> => {
   return del('/api/logout');
 };
 
-export const get_balances = (credentials: object): Promise<email_password> => {
-  return post('/api/get_balances',credentials)
-    .then((res: HttpResponse) => res.user);
-};

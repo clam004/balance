@@ -18,16 +18,22 @@ const logout = (req, res) => {
 };
 
 const get_balances = (req, res) => {
-	res.json(req.isAuthenticated())
+	//res.json(req.isAuthenticated())
+	knex('balances').where('buyer_id', req.body.user_id)
+	.then(balances => {
+		res.json(balances);
+	});
 };
 
 
 // For testing
-api.post('/get_balances', get_balances);
 api.get('/ping', (req, res) => res.json({ message: 'pong'}));
+
 api.post('/signup', users.signup);
 api.post('/login', auth, users.login);
 api.all('/logout', logout);
+
+api.post('/get_balances', get_balances);
 
 api.get('/balances/:id', (req,res)=>{
 	if(req.isAuthenticated()) {

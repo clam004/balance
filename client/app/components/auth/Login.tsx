@@ -40,7 +40,7 @@ class Login extends React.Component<
       password,
       email: email.trim()
     };
-
+    //console.log(credentials) //{password: "Josh@balance.com", email: "Josh@balance.com"}
     return login(credentials)
       .then(result => {
         let user_id = result.id;
