@@ -141,6 +141,9 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     
     var user_email = JSON.parse(localStorage.getItem("user_email"));
     var user_alias = user_email.substr(0, user_email.indexOf('@')); 
+
+    {user_alias} 
+
     */
     // TODO: try out styled components
     return (
@@ -149,14 +152,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         <main className="main-container">
           <div className="main-header">
             <img className="main-logo" src="assets/logo-white.svg" />
-            <h3>Current Balances for {user_alias}  </h3>
+            <h3>Current Balances for  </h3>
           </div>
 
           <div className="balances-container">
-
-          {data.map(bal =>
-            <BalanceDetails balance={bal}/>
-          )}
 
           <BalanceDetails 
             balance = {{
@@ -196,6 +195,12 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 export default Dashboard;
 
 /*
+
+          {data.map(bal =>
+            <BalanceDetails balance={bal}/>
+          )}
+
+
     //console.log(this.state.data);
     if (Array.isArray(this.state.data)) {
       const data  = this.state.data;
