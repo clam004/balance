@@ -184,9 +184,52 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
           </main>
         </div>
       );
+      
     } else {
 
-      return <p>Loading ...</p>;
+      return (
+        <div className="dashboard-container">
+          <SideNav />
+          <main className="main-container">
+            <div className="main-header">
+              <img className="main-logo" src="assets/logo-white.svg" />
+              <h3>Current Balances for {user_alias} </h3>
+            </div>
+
+            <div className="balances-container">
+
+            <BalanceDetails 
+              balance = {{
+                title:'Solar Panels',
+                balance_description:`Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof`,
+                buyer_expectation:'For 3 solar panel installations',
+                seller_deliverable:'To install 3 solar panels',
+                buyer_name: 'Josh',
+                seller_name:'Toro',
+                buyer_stake_amount:800,
+                seller_stake_amount:300,
+                balance_price:3600,
+                completed:false,
+                buyer_id:1,
+                seller_id:2,
+                created_at:'Last Month',
+                updated_at:'Last Month',
+                due_date:'Next Month'
+              }}
+            />
+
+              <section className="create-balance-container">
+                <Link to="/create">
+                  <button className="btn-primary create-balance-btn">
+                    <img src="assets/btn-logo-1.svg" />
+                    Create Balance
+                  </button>
+                </Link>
+              </section>
+            </div>
+          </main>
+        </div>
+      );
 
     }
   }
