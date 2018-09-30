@@ -3,7 +3,7 @@ import { RouteComponentProps, Link } from 'react-router-dom';
 //import { get_balances } from '../../helpers/transactions';
 import './Dashboard.less';
 
-const API_URL =   'https://appbalance.herokuapp.com' //'http://localhost:8000' //
+const API_URL =    'https://appbalance.herokuapp.com' // 'http://localhost:8000' //
 
 const SideNav = () => {
 
@@ -146,7 +146,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     */
     
     // TODO: try out styled components
-    if (Array.isArray(data) && data.length >0) {
+    //if (Array.isArray(data) && data.length >0) {
 
       return (
         <div className="dashboard-container">
@@ -195,7 +195,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
           </main>
         </div>
       );
-    }
+    //}
   }
 }
 
