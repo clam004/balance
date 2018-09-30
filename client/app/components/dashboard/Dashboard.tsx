@@ -98,7 +98,7 @@ const BalanceDetails = ({ balance }: { balance: IBalance }) => {
 interface DashboardProps extends RouteComponentProps<{}> {}
 
 interface DashboardState {
-  data: Array,
+  data: Object,
   isLoading: boolean
 }
 
