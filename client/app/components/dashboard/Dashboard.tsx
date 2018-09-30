@@ -2,6 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
 import { API_URL } from '../../helpers/transactions';
 import './Dashboard.less';
+import * as moment from 'moment';
 
 
 const SideNav = () => {
@@ -134,8 +135,14 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     // TODO: try out styled components
     if (Array.isArray(data) && data.length >0) {
 
-      console.log(data);
       console.log(Array.isArray(data))
+      const balances_array = data.slice();
+      console.log(balances_array)
+      for (let balance of balances_array) {
+        balance.created_at = moment(balance.created_at).fromNow()//.format('LLL')
+        console.log(balance.created_at); // 1, "string", false
+      }
+
 
       return (
         <div className="dashboard-container">
@@ -148,8 +155,8 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
             <div className="balances-container">
 
-          {data.map(bal =>
-            <BalanceDetails balance={bal}/>
+          {balances_array.map(balance =>
+            <BalanceDetails balance={balance}/>
           )}
 
             <BalanceDetails 
@@ -184,7 +191,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
           </main>
         </div>
       );
-      
+
     } else {
 
       return (

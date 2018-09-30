@@ -35,7 +35,7 @@ exports.seed = function(knex, Promise) {
           completed: false,
           buyer_id: 1,
           seller_id: 2,
-          created_at: new Date(),
+          created_at: "2018-09-14 17:29:24.505-07",
           updated_at: new Date(),
           due_date: new Date()
          }
