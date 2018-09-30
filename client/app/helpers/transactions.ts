@@ -4,6 +4,8 @@ export interface Iuser_id {
   user_id: string;
 }
 
+export const API_URL =     'https://appbalance.herokuapp.com' // 'http://localhost:8000' //
+
 /*
 
 export const get_balances = (credentials: object): Promise<Iuser_id> => {

@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
-//import { get_balances } from '../../helpers/transactions';
+import { API_URL } from '../../helpers/transactions';
 import './Dashboard.less';
 
-const API_URL =    'https://appbalance.herokuapp.com' // 'http://localhost:8000' //
 
 const SideNav = () => {
 
@@ -128,25 +127,15 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
   render() {
 
     const { data, isLoading } = this.state;
-
-    if (isLoading || !Array.isArray(data)) {
-      return <p>Loading ...</p>;
-    } else {
-      console.log(data);
-      console.log(Array.isArray(data))
-    }
     
     var user_email = JSON.parse(localStorage.getItem("user_email"));
     var user_alias = user_email.substr(0, user_email.indexOf('@')); 
-
-    /*
-          {data.map(bal =>
-            <BalanceDetails balance={bal}/>
-          )}
-    */
     
     // TODO: try out styled components
-    //if (Array.isArray(data) && data.length >0) {
+    if (Array.isArray(data) && data.length >0) {
+
+      console.log(data);
+      console.log(Array.isArray(data))
 
       return (
         <div className="dashboard-container">
@@ -195,7 +184,11 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
           </main>
         </div>
       );
-    //}
+    } else {
+
+      return <p>Loading ...</p>;
+
+    }
   }
 }
 
