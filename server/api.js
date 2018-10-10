@@ -17,7 +17,7 @@ const logout = (req, res) => {
   return res.status(200).send({ status: 200 });
 };
 
-const get_balances = (req, res) => {
+const get_balances = (req, res, ) => {
 	//res.json(req.isAuthenticated())
 	knex('balances').where('buyer_id', req.body.user_id).orWhere('seller_id', req.body.user_id)
 	.then(balances => {
@@ -52,7 +52,7 @@ api.get('/balances/:id', (req,res)=>{
 });
 
 api.get('/getusers', (req,res)=>{
-
+    //console.log(req)
 	knex('users').select(['id','email','username','num_completed_balances'])
 		.then(users => {
 			res.json(users);
@@ -61,7 +61,20 @@ api.get('/getusers', (req,res)=>{
 	if(req.isAuthenticated()) {
 		console.log("get user authenticated")
 	}
+});
 
+
+api.post('/get_users', (req, res, next) => {
+ 	console.log(req.body)
+	knex('users').select(['id','email','username','num_completed_balances'])
+	.whereNot('id',req.body.id)
+		.then(users => {
+			res.json(users);
+		});
+
+	if(req.isAuthenticated()) {
+		console.log("get user authenticated")
+	}	
 });
 
 module.exports = api;

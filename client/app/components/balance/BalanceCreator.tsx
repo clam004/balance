@@ -47,6 +47,7 @@ const BalanceStepCard = ({
 };
 
 interface IBalanceUser {
+  id:number,
   username: string;
   stake?: number;
   goods?: string;
@@ -82,11 +83,14 @@ class BalanceCreator extends React.Component<
   constructor(props: BalanceCreatorProps) {
     super(props);
 
+    var user_id = JSON.parse(localStorage.getItem("user_id"));
     var user_email = JSON.parse(localStorage.getItem("user_email"));
     var user_alias = user_email.substr(0, user_email.indexOf('@')); 
     var num_completed_balances = JSON.parse(localStorage.getItem("num_completed_balances"));
     
-    const currentUser = { username: user_alias, num_completed_balances: num_completed_balances };
+    const currentUser = { id:user_id,
+                          username: user_alias, 
+                          num_completed_balances: num_completed_balances };
 
     this.state = {
       balance: {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { getusers } from '../../helpers/transactions';
+import { getusers, get_users } from '../../helpers/transactions';
 
 interface State {
   email: string;
@@ -28,7 +28,10 @@ class BalanceUserDetails extends React.Component<Props, State> {
   componentDidMount() {
     
     this.setState({ isLoading: true });
-    getusers()
+
+    var user_id ={id: JSON.parse(localStorage.getItem("user_id"))};
+
+    get_users(user_id)
       .then(user_data => {
         this.setState({search_users:user_data, isLoading: false}), console.log(user_data)
       });

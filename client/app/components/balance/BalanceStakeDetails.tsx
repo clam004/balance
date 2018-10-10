@@ -2,6 +2,7 @@ import * as React from 'react';
 
 
 interface IBalanceUser {
+  id:number,
   username: string;
   stake?: number;
   goods?: string;
