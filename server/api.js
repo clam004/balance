@@ -46,9 +46,22 @@ api.get('/balances/:id', (req,res)=>{
 		knex('balances').where('buyer_id', req.params.id).orWhere('seller_id', req.params.id)
 		.then(balances => {
 		res.json(balances);
-		console.log("authenticated")
+		console.log("not authenticated")
 		});
 	}
+});
+
+api.get('/getusers', (req,res)=>{
+
+	knex('users').select(['id','email','username','num_completed_balances'])
+		.then(users => {
+			res.json(users);
+		});
+
+	if(req.isAuthenticated()) {
+		console.log("get user authenticated")
+	}
+
 });
 
 module.exports = api;

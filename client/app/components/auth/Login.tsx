@@ -45,8 +45,10 @@ class Login extends React.Component<
       .then(result => {
         let user_id = result.id;
         let user_email = result.email;
+        let num_completed_balances = result.num_completed_balances;
         localStorage.setItem("user_id", JSON.stringify(user_id));
         localStorage.setItem("user_email", JSON.stringify(user_email));
+        localStorage.setItem("num_completed_balances", JSON.stringify(num_completed_balances));
       })
       .then(() => history.push('/dashboard'))
       .catch(err => {

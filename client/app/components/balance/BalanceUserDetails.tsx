@@ -1,8 +1,11 @@
 import * as React from 'react';
+import { getusers } from '../../helpers/transactions';
 
 interface State {
   email: string;
   phone: string;
+  isLoading: boolean;
+  search_users: Object;
 }
 
 interface Props {
@@ -16,18 +19,30 @@ class BalanceUserDetails extends React.Component<Props, State> {
 
     this.state = {
       email: '',
-      phone: ''
+      phone: '',
+      isLoading: false,
+      search_users: []
     };
   }
 
+  componentDidMount() {
+    
+    this.setState({ isLoading: true });
+    getusers()
+      .then(user_data => {
+        this.setState({search_users:user_data, isLoading: false}), console.log(user_data)
+      });
+  }
+
   render() {
+
+    const { search_users, isLoading } = this.state;
     const { email, phone } = this.state;
     const { onSelectUser, onInvite } = this.props;
-    const users = [
-      { name: 'Toro the Shiba', successes: 12 },
-      { name: 'Boro the Shizu', successes: 8 },
-      { name: 'Bobo the Corgi', successes: 10 }
-    ];
+
+   if (Array.isArray(search_users) && search_users.length >0) {
+      const users = search_users;
+
 
     return (
       <div>
@@ -57,9 +72,9 @@ class BalanceUserDetails extends React.Component<Props, State> {
               >
                 <div className="favorite-user-photo">{/* TODO */}</div>
                 <div>
-                  <div className="favorite-user-name">{user.name}</div>
+                  <div className="favorite-user-name">{user.username}</div>
                   <div className="favorite-user-details">
-                    {user.successes} successful contracts
+                    {user.num_completed_balances} successful contracts
                   </div>
                 </div>
                 <div className="favorite-user-selector">Select</div>
@@ -104,7 +119,33 @@ class BalanceUserDetails extends React.Component<Props, State> {
         </div>
       </div>
     );
+
+    } else {
+      return (<div> Loading ... </div>)
+    }
+
   }
 }
 
 export default BalanceUserDetails;
+
+
+    /*
+    if (Array.isArray(search_users) && search_users.length >0) {
+      const users = search_users;
+    } else {
+      // test data
+      const users = [
+        { username: 'Toro the Shiba', num_completed_balances: 12 },
+        { username: 'Boro the Shizu', num_completed_balances: 8 },
+        { username: 'Bobo the Corgi', num_completed_balances: 10 }
+      ]
+    }
+
+    const users = [
+      { name: 'Toro the Shiba', successes: 12 },
+      { name: 'Boro the Shizu', successes: 8 },
+      { name: 'Bobo the Corgi', successes: 10 }
+    ]
+
+    */

@@ -1,10 +1,21 @@
 import { HttpResponse, get, post, del } from './http';
 
-export interface Iuser_id {
-  user_id: string;
+
+
+export const API_URL =      'http://localhost:8000' // 'https://appbalance.herokuapp.com' //
+
+
+export interface IUser {
+  id: number;
+  email: string;
+  num_completed_balances?:number;
+  username?: string;
 }
 
-export const API_URL =     'https://appbalance.herokuapp.com' // 'http://localhost:8000' // 
+export const getusers = (): Promise<HttpResponse> => {
+  return get('/api/getusers');
+};
+
 
 /*
 

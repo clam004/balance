@@ -46,14 +46,15 @@ interface IBalance {
     seller_id:number,
     created_at:string,
     updated_at:string,
-    due_date:string 
+    due_date:string,
+    id:number 
 }
 
 const BalanceDetails = ({ balance }: { balance: IBalance }) => {
 
   return (
         <section className="balance-section">
-          <div className="balance-created-date">Created {balance.created_at}</div>
+          <div className="balance-created-date"> Created {balance.created_at} </div>
 
           <div className="balance-cards-container">
             <div className="balance-participants-card">
@@ -154,30 +155,15 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             </div>
 
             <div className="balances-container">
-
-          {balances_array.map(balance =>
-            <BalanceDetails balance={balance}/>
-          )}
-
-            <BalanceDetails 
-              balance = {{
-                title:'Solar Panels',
-                balance_description:`Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof`,
-                buyer_expectation:'For 3 solar panel installations',
-                seller_deliverable:'To install 3 solar panels',
-                buyer_name: 'Josh',
-                seller_name:'Toro',
-                buyer_stake_amount:800,
-                seller_stake_amount:300,
-                balance_price:3600,
-                completed:false,
-                buyer_id:1,
-                seller_id:2,
-                created_at:'Last Month',
-                updated_at:'Last Month',
-                due_date:'Next Month'
-              }}
-            />
+        
+            {
+              balances_array.map((balance,key) =>
+              <BalanceDetails
+                key={key} 
+                balance={balance}
+              />
+              )
+            }
 
               <section className="create-balance-container">
                 <Link to="/create">
@@ -206,23 +192,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             <div className="balances-container">
 
             <BalanceDetails 
-              balance = {{
-                title:'Solar Panels',
-                balance_description:`Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof`,
-                buyer_expectation:'For 3 solar panel installations',
-                seller_deliverable:'To install 3 solar panels',
-                buyer_name: 'Josh',
-                seller_name:'Toro',
-                buyer_stake_amount:800,
-                seller_stake_amount:300,
-                balance_price:3600,
-                completed:false,
-                buyer_id:1,
-                seller_id:2,
-                created_at:'Last Month',
-                updated_at:'Last Month',
-                due_date:'Next Month'
-              }}
+              balance = {example_balance}
             />
 
               <section className="create-balance-container">
@@ -244,12 +214,49 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
 export default Dashboard;
 
+var example_balance = {
+  title:'Solar Panels',
+  balance_description:`Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof`,
+  buyer_expectation:'For 3 solar panel installations',
+  seller_deliverable:'To install 3 solar panels',
+  buyer_name: 'Josh',
+  seller_name:'Toro',
+  buyer_stake_amount:800,
+  seller_stake_amount:300,
+  balance_price:3600,
+  completed:false,
+  buyer_id:1,
+  seller_id:2,
+  created_at:'Last Month',
+  updated_at:'Last Month',
+  due_date:'Next Month',
+  id:0
+  }
+
 /*
 
-          {data.map(bal =>
-            <BalanceDetails balance={bal}/>
+            {
+              balances_array.map(balance =>
+              <BalanceDetails 
+                balance={balance}
+              />
+              )
+            }
+
+          {balances_array.map(balance =>
+            <BalanceDetails 
+              key = 
+              balance={balance}
+            />
           )}
 
+
+            {balances_array.forEach(function(value,i) {
+              console.log(value);
+              return <BalanceDetails 
+                       balance={value}
+                      />
+            })}
 
     //console.log(this.state.data);
     if (Array.isArray(this.state.data)) {

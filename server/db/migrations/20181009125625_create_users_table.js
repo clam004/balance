@@ -1,3 +1,4 @@
+
 exports.up = (knex, Promise) => {
 
   return knex.schema.createTable('users', table => {
@@ -6,6 +7,7 @@ exports.up = (knex, Promise) => {
     table.string('password').notNullable();
     table.string('salt').notNullable();
     table.string('username');
+    table.integer('num_completed_balances');
   })
   
 };
@@ -13,4 +15,3 @@ exports.up = (knex, Promise) => {
 exports.down = (knex, Promise) => {
   return knex.schema.dropTable('users');
 };
-

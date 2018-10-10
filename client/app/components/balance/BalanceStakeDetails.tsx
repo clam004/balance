@@ -1,10 +1,11 @@
 import * as React from 'react';
 
+
 interface IBalanceUser {
-  name: string;
+  username: string;
   stake?: number;
   goods?: string;
-  successes?: number;
+  num_completed_balances?: number;
   failures?: number;
 }
 

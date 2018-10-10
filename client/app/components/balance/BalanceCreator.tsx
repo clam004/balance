@@ -6,6 +6,7 @@ import BalanceUserDetails from './BalanceUserDetails';
 import BalanceContractDetails from './BalanceContractDetails';
 import BalanceStakeDetails from './BalanceStakeDetails';
 import './Balance.less';
+import { API_URL } from '../../helpers/transactions';
 
 enum BalanceStep {
   SELECT_USER = 'SELECT_USER',
@@ -46,10 +47,10 @@ const BalanceStepCard = ({
 };
 
 interface IBalanceUser {
-  name: string;
+  username: string;
   stake?: number;
   goods?: string;
-  successes?: number;
+  num_completed_balances?: number;
   failures?: number;
 }
 
@@ -81,8 +82,11 @@ class BalanceCreator extends React.Component<
   constructor(props: BalanceCreatorProps) {
     super(props);
 
-    // Test data
-    const currentUser = { name: 'Alex Reichert', successes: 15 };
+    var user_email = JSON.parse(localStorage.getItem("user_email"));
+    var user_alias = user_email.substr(0, user_email.indexOf('@')); 
+    var num_completed_balances = JSON.parse(localStorage.getItem("num_completed_balances"));
+    
+    const currentUser = { username: user_alias, num_completed_balances: num_completed_balances };
 
     this.state = {
       balance: {
@@ -96,7 +100,7 @@ class BalanceCreator extends React.Component<
 
   handleUpdateBalance(updates: any) {
     const { balance } = this.state;
-
+    console.log(updates)
     // TODO: connect to API
     this.setState({
       balance: merge({}, balance, updates),
@@ -162,8 +166,8 @@ class BalanceCreator extends React.Component<
 
               <div className="new-balance-action-container">
                 <BalanceStepCard
-                  text={buyer.name}
-                  subtext={`${buyer.successes} successful contracts`}
+                  text={buyer.username}
+                  subtext={`${buyer.num_completed_balances} successful contracts`}
                   isSelectable={false}
                 />
 
@@ -172,10 +176,10 @@ class BalanceCreator extends React.Component<
                 </div>
 
                 <BalanceStepCard
-                  text={seller.name || 'Select someone to make a Balance with'}
+                  text={seller.username || 'Select someone to make a Balance with'}
                   subtext={
-                    seller.successes
-                      ? `${seller.successes} successful contracts`
+                    seller.num_completed_balances
+                      ? `${seller.num_completed_balances} successful contracts`
                       : 'Select or invite someone to Balance'
                   }
                   isSelected={selected === BalanceStep.SELECT_USER}
@@ -183,6 +187,7 @@ class BalanceCreator extends React.Component<
                     this.setState({ selected: BalanceStep.SELECT_USER })
                   }
                 />
+
               </div>
 
               <div className="new-balance-header-container">
@@ -195,8 +200,8 @@ class BalanceCreator extends React.Component<
               <div className="new-balance-action-container">
                 <BalanceStepCard
                   text={
-                    agreement.title && seller.name
-                      ? `${agreement.title} from ${seller.name}`
+                    agreement.title && seller.username
+                      ? `${agreement.title} from ${seller.username}`
                       : 'Add an agreement to the contract'
                   }
                   subtext={
@@ -222,12 +227,12 @@ class BalanceCreator extends React.Component<
                 <BalanceStepCard
                   text={
                     buyer.stake
-                      ? `${buyer.name} staked $${buyer.stake}`
+                      ? `${buyer.username} staked $${buyer.stake}`
                       : 'Decide how much you want to stake'
                   }
                   subtext={
-                    seller.name && seller.stake
-                      ? `${seller.name} staked $${seller.stake}`
+                    seller.username && seller.stake
+                      ? `${seller.username} staked $${seller.stake}`
                       : 'Stakes help build trust and mutual intention'
                   }
                   isSelected={selected === BalanceStep.SET_STAKE}
