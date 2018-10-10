@@ -2,7 +2,7 @@ import { HttpResponse, get, post, del } from './http';
 
 
 
-export const API_URL =      'http://localhost:8000' // 'https://appbalance.herokuapp.com' //
+export const API_URL = 'https://appbalance.herokuapp.com' //  'http://localhost:8000' // 
 
 
 export interface IUser {
