@@ -55,7 +55,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
               className="input-default full-width"
               type="text"
               placeholder="Contract Title"
-              value={title}
+              value={title || ""}
               onChange={e => this.setState({ title: e.target.value })}
             />
           </div>
@@ -66,7 +66,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
               className="input-default full-width"
               rows={8}
               placeholder="Describe the work that you want to have done here. Once you both agree on the terms of the contract the balance will be made."
-              value={description}
+              value={description || ""}
               onChange={e => this.setState({ description: e.target.value })}
             />
           </div>
@@ -78,7 +78,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
               type="number"
               min="0"
               placeholder="Payment Amount"
-              value={payment}
+              value={payment || ""}
               onChange={e => this.setState({ payment: Number(e.target.value) })}
             />
           </div>

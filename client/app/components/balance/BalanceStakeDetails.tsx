@@ -33,8 +33,10 @@ class BalanceStakeDetails extends React.Component<Props, State> {
   }
 
   render() {
+
     const { buyerStake, sellerStake } = this.state;
     const { onUpdate } = this.props;
+    //console.log("stakes: ",this.state)
 
     return (
       <div>
@@ -59,7 +61,7 @@ class BalanceStakeDetails extends React.Component<Props, State> {
               className="input-default full-width"
               type="number"
               placeholder="$50"
-              value={buyerStake}
+              value={buyerStake || ''}
               onChange={e =>
                 this.setState({ buyerStake: Number(e.target.value) })
               }
@@ -72,8 +74,9 @@ class BalanceStakeDetails extends React.Component<Props, State> {
             </label>
             <input
               className="input-default full-width"
+              type="number"
               placeholder="$25"
-              value={sellerStake}
+              value={sellerStake || ''}
               onChange={e =>
                 this.setState({ sellerStake: Number(e.target.value) })
               }

@@ -59,22 +59,44 @@ api.get('/getusers', (req,res)=>{
 		});
 
 	if(req.isAuthenticated()) {
-		console.log("get user authenticated")
+		console.log("get getuser authenticated")
 	}
 });
 
 
 api.post('/get_users', (req, res, next) => {
  	console.log(req.body)
-	knex('users').select(['id','email','username','num_completed_balances'])
-	.whereNot('id',req.body.id)
+	knex('users').select(['id','email','username','num_completed_balances']).whereNot('id',req.body.id)
 		.then(users => {
 			res.json(users);
 		});
 
 	if(req.isAuthenticated()) {
-		console.log("get user authenticated")
+		console.log("post get_user authenticated")
 	}	
+});
+
+
+
+api.post('/submit_balance', (req, res, next) => {
+ 	//console.log(" data received ", req.body)
+ 	return knex('balances')
+ 	.select()
+ 	.insert({
+ 		title:req.body.agreement.title,
+ 		balance_description:req.body.agreement.description,
+ 		buyer_expectation:req.body.agreement.description,
+ 		seller_deliverable:req.body.agreement.description,
+ 		buyer_name:req.body.buyer.username,
+ 		seller_name:req.body.seller.username,
+ 		completed:false,
+ 		buyer_id:req.body.buyer.id,
+ 		seller_id:req.body.seller.id,
+ 		buyer_stake_amount:req.body.buyer.stake,
+ 		seller_stake_amount:req.body.seller.stake,
+ 		balance_price:req.body.agreement.payment
+ 	})
+ 	.then(response => {console.log(response)});
 });
 
 module.exports = api;

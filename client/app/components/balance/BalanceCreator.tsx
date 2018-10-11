@@ -6,7 +6,7 @@ import BalanceUserDetails from './BalanceUserDetails';
 import BalanceContractDetails from './BalanceContractDetails';
 import BalanceStakeDetails from './BalanceStakeDetails';
 import './Balance.less';
-import { API_URL } from '../../helpers/transactions';
+import { API_URL, submitBalance } from '../../helpers/transactions';
 
 enum BalanceStep {
   SELECT_USER = 'SELECT_USER',
@@ -104,7 +104,7 @@ class BalanceCreator extends React.Component<
 
   handleUpdateBalance(updates: any) {
     const { balance } = this.state;
-    console.log(updates)
+    // console.log(updates)
     // TODO: connect to API
     this.setState({
       balance: merge({}, balance, updates),
@@ -144,9 +144,22 @@ class BalanceCreator extends React.Component<
     }
   }
 
+  handleSubmitBalance(e: React.FormEvent<HTMLInputElement>) {
+    e.preventDefault();
+
+    const balanceInfo = this.state.balance;
+
+    return submitBalance(balanceInfo)
+    .then(result => {console.log("submitted")})
+
+  }
+
   render() {
     const { balance, selected } = this.state;
     const { buyer, seller, agreement } = balance;
+    //console.log("seller:",seller)
+    //console.log("agreement:", agreement)
+    console.log(this.state)
 
     // TODO: try out styled components
     return (
@@ -254,7 +267,10 @@ class BalanceCreator extends React.Component<
 
           <section className="create-balance-container">
             {/* TODO: update button logo */}
-            <button className="btn-primary create-balance-btn">
+            <button className="btn-primary create-balance-btn"
+              type="submit"
+              onClick={this.handleSubmitBalance.bind(this)}
+            >
               <img src="assets/btn-logo-1.svg" />
               Send Balance
             </button>

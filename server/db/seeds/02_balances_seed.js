@@ -5,7 +5,7 @@ exports.seed = function(knex, Promise) {
     .then(function () {
       // Inserts seed entries
       return knex('balances').insert([
-        {id: 1, 
+        {//id: 1, 
           title: 'Toro the Solar Panel technian has agreed to install 4 solar panels on Josh’s roof',
           balance_description: 'Toro the Solar Panel technian has agreed to install 4 solar panels on Josh’s roof ',
           buyer_expectation: 'For 4 solar panel installations',
@@ -22,7 +22,7 @@ exports.seed = function(knex, Promise) {
           updated_at: new Date(),
           due_date: new Date()
          },
-        {id: 2, 
+        {//id: 2, 
           title: 'Toro the Solar Panel technician has agreed to install 3 solar panels on Josh’s roof',
           balance_description: 'Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof ',
           buyer_expectation: 'For 3 solar panel installations',
@@ -39,7 +39,7 @@ exports.seed = function(knex, Promise) {
           updated_at: new Date(),
           due_date: new Date()
          },
-        {id: 3, 
+        {//id: 3, 
           title: 'Alex buys food from Josh',
           balance_description: 'Alex buys yakitori from Josh',
           buyer_expectation: 'Josh cooks 5 yakitori for Alex',
@@ -56,16 +56,16 @@ exports.seed = function(knex, Promise) {
           updated_at: "2018-09-14 17:29:24.505-07",
           due_date: "2018-09-14 17:29:24.505-07",
          },
-        {id: 4, 
-          title: 'Josh buys something from Alex',
-          balance_description: 'Josh buys game from Alex',
+        {//id: 4, 
+          title: 'Josh buys a game from Alex',
+          balance_description: 'Josh buys a game from Alex, Alex makes a game',
           buyer_expectation: 'Josh gets a game',
           seller_deliverable: 'Alex hands over game',
           buyer_name: 'Josh',
           seller_name: 'Alex',
           buyer_stake_amount: 800.00,
           seller_stake_amount: 300.00, 
-          balance_price: 1000.00,
+          balance_price: 9000.00,
           completed: true,
           buyer_id: 1,
           seller_id: 3,

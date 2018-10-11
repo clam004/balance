@@ -9,6 +9,14 @@ export interface IUser {
   username?: string;
 }
 
+export interface IBalanceInfo {
+  balance: {
+    buyer?: object,
+    seller?: object,
+    agreement?: object
+  }
+}
+
 export const getusers = (): Promise<HttpResponse> => {
   return get('/api/getusers');
 };
@@ -17,7 +25,28 @@ export const get_users = (user_id: object): Promise<HttpResponse> => {
   return post('/api/get_users', user_id);
 };
 
+export const submitBalance = (IBalanceInfo: object): Promise<HttpResponse> => {
+  return post('/api/submit_balance', IBalanceInfo);
+};
+
+
 /*
+
+interface IBalanceUser {
+  id:number,
+  username: string;
+  stake?: number;
+  goods?: string;
+  num_completed_balances?: number;
+  failures?: number;
+}
+
+interface IBalanceAgreement {
+  title?: string;
+  description?: string;
+  date?: string;
+  price?: number;
+}
 
 export const getusers = (): Promise<HttpResponse> => {
   return get('/api/getusers');
