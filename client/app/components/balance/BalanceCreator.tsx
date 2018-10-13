@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps} from 'react-router-dom';
 import { merge } from 'lodash';
 import { SideNav } from '../nav';
 import BalanceUserDetails from './BalanceUserDetails';
@@ -60,6 +60,8 @@ interface IBalanceAgreement {
   description?: string;
   date?: string;
   price?: number;
+  duration?:number;
+  duration_units?:string;
 }
 
 interface IBalance {
@@ -77,10 +79,10 @@ interface BalanceCreatorState {
 }
 
 class BalanceCreator extends React.Component<
-  BalanceCreatorProps,
+  BalanceCreatorProps & RouteComponentProps<{}>,
   BalanceCreatorState
 > {
-  constructor(props: BalanceCreatorProps) {
+  constructor(props: BalanceCreatorProps & RouteComponentProps<{}>) {
     super(props);
 
     var user_id = JSON.parse(localStorage.getItem("user_id"));
@@ -147,11 +149,13 @@ class BalanceCreator extends React.Component<
   handleSubmitBalance(e: React.FormEvent<HTMLInputElement>) {
     e.preventDefault();
 
+    const { history } = this.props;
     const balanceInfo = this.state.balance;
 
     return submitBalance(balanceInfo)
-    .then(result => {console.log("submitted")})
-
+    .then(result => {console.log("returned to BC:", result)})
+    //.then(<Redirect to='/dashboard' />)
+    .then(() => history.push('/dashboard'))
   }
 
   render() {

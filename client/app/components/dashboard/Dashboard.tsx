@@ -85,8 +85,8 @@ const BalanceDetails = ({ balance }: { balance: IBalance }) => {
               <h5 className="balance-agreement-header">Balance Agreement</h5>
 
               <div className="balance-agreement-text">
-                {balance.balance_description} by{' '}
-                <span className="text-bold">{balance.due_date}</span>…
+                {balance.balance_description} due {' '}
+                <span className="text-bold">{moment(balance.due_date).fromNow()}</span>…
               </div>
 
               <div className="balance-agreement-price">${balance.balance_price}</div>

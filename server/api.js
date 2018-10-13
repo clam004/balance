@@ -9,7 +9,7 @@ const api = Router();
 const env = process.env.NODE_ENV || 'dev';
 const config = require('./db/knexfile.js')[env];
 const knex = require('knex')(config);
-
+const moment = require('moment');
 
 const logout = (req, res) => {
   req.logout(); // not sure if this is working
@@ -24,7 +24,6 @@ const get_balances = (req, res, ) => {
 		res.json(balances);
 	});
 };
-
 
 // For testing
 api.get('/ping', (req, res) => res.json({ message: 'pong'}));
@@ -79,9 +78,10 @@ api.post('/get_users', (req, res, next) => {
 
 
 api.post('/submit_balance', (req, res, next) => {
- 	//console.log(" data received ", req.body)
+ 	console.log(" data received ", req.body)
+ 	// milliseconds, seconds, minutes, hours, days, weeks, months, quarters, years 
+    var due_date = moment().add(req.body.agreement.duration, req.body.agreement.duration_units);
  	return knex('balances')
- 	.select()
  	.insert({
  		title:req.body.agreement.title,
  		balance_description:req.body.agreement.description,
@@ -94,9 +94,10 @@ api.post('/submit_balance', (req, res, next) => {
  		seller_id:req.body.seller.id,
  		buyer_stake_amount:req.body.buyer.stake,
  		seller_stake_amount:req.body.seller.stake,
- 		balance_price:req.body.agreement.payment
+ 		balance_price:req.body.agreement.payment,
+ 		due_date:due_date
  	})
- 	.then(response => {console.log(response)});
+ 	.then(response => {res.json(response)});
 });
 
 module.exports = api;

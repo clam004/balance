@@ -5,6 +5,8 @@ interface Props {
     title?: string;
     description?: string;
     payment?: number;
+    duration?: number;
+    duration_units?:string
   };
   onUpdate: (updates: any) => void;
 }
@@ -13,6 +15,8 @@ interface State {
   title: string;
   description: string;
   payment: number;
+  duration: number;
+  duration_units:string
 }
 
 class BalanceContractDetails extends React.Component<Props, State> {
@@ -20,17 +24,21 @@ class BalanceContractDetails extends React.Component<Props, State> {
     super(props);
 
     const { agreement = {} } = props;
-    const { title = '', description = '', payment = null } = agreement;
+    const { title = '', description = '', payment = null, duration = null, duration_units = 'hours' } = agreement;
 
     this.state = {
       title,
       description,
-      payment
+      payment,
+      duration,
+      duration_units
     };
   }
 
   render() {
-    const { title, description, payment } = this.state;
+
+    console.log("state: ",this.state)
+    const { title, description, payment, duration, duration_units } = this.state;
     const { onUpdate } = this.props;
 
     return (
@@ -83,10 +91,33 @@ class BalanceContractDetails extends React.Component<Props, State> {
             />
           </div>
 
+          <div className="form-group">
+
+            <label className="label-default">Time to complete Balance</label>
+            <input
+              type="number"
+              min="0"
+              placeholder="Time to complete agreement"
+              value={duration || ""}
+              onChange={e => this.setState({ duration: Number(e.target.value) })}
+            />
+
+            <select 
+              placeholder="days"
+              onChange={e => this.setState({ duration_units: e.target.value })}
+            >
+              <option value="minutes">minutes</option>
+              <option value="hours">hours</option>
+              <option value="days">days</option>
+              <option value="months">months</option>
+            </select>
+
+          </div>
+
           <button
             className="btn-primary full-width"
             onClick={() =>
-              onUpdate({ agreement: { title, description, payment } })
+              onUpdate({ agreement: { title, description, payment, duration, duration_units } })
             }
           >
             <img src="assets/btn-logo-1.svg" style={{ marginRight: 16 }} />
