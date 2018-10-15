@@ -34,7 +34,7 @@ const verifyUser = (user, password) => {
   if (isValidUser(user, password)) {
     return user;
   } else {
-    throw new Error('Invalid password!');
+    throw new Error('Invalid password');
   }
 };
 
@@ -77,11 +77,11 @@ const create = params => {
 const register = params => {
   const { email, password } = params;
 
-  if (!email) return reject('Email is required!');
-  if (!password) return reject('Password is required!');
+  if (!email) return reject('Email is required');
+  if (!password) return reject('Password is required');
 
   return findByEmail(email).then(existingEmail => {
-    if (existingEmail) throw new Error('That email address is taken!');
+    if (existingEmail) throw new Error('email address has already signed up');
     //alert('That email address is taken!');
     return create(params);
   });

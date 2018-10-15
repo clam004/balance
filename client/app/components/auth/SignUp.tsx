@@ -38,12 +38,12 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
     const { email, password, passwordConfirmation } = this.state;
 
     if (!email) {
-      return this.setState({ error: 'A valid email is required!' });
+      return this.setState({ error: 'A valid email is required' });
     } else if (!password) {
-      return this.setState({ error: 'A password is required!' });
+      return this.setState({ error: 'A password is required' });
     } else if (password !== passwordConfirmation) {
       return this.setState({
-        error: 'Password does not match password confirmation!'
+        error: 'Password does not match password confirmation'
       });
     }
     
@@ -52,10 +52,28 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
       .catch(err => {
         const error = get(err, 'message', 'Invalid credentials!');
         this.setState({ error });
+        console.log(err);
       });
   }
+  
+
 
   render() {
+
+    console.log("state", this.state)
+
+    const error_state = this.state.error;
+    let error_message;
+
+    if (error_state == "email address has already signed up") {
+      error_message = <a href="/login"> This email has already signed up. Click here to Log In</a>
+    } else if (error_state) {
+      error_message = <h4>{error_state}</h4>
+    } else {
+      error_message = <h4>{}</h4>
+    }
+
+
     return (
       <div className="sign-in-wrapper">
         <div className="sign-in-container">
@@ -103,6 +121,9 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
                   onChange={this.onUpdateInput.bind(this)}
                 />
               </div>
+              <div className="output-if-error">
+                {error_message}
+              </div>
             </form>
           </div>
 
@@ -116,6 +137,7 @@ class SignUp extends React.Component<RouteComponentProps<{}>, SignUpState> {
           </button>
         </div>
       </div>
+
     );
   }
 }

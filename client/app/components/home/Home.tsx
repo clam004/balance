@@ -49,7 +49,7 @@ class Home extends React.Component<HomeProps, HomeState> {
                 <a href="#">Support</a>
               </li>
               <li className="nav-item">
-                <a href="/login">Sign In</a>
+                <a href="/login">Log In</a>
               </li>
             </ul>
           </nav>
