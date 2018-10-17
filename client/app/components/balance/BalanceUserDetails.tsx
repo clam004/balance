@@ -66,6 +66,7 @@ class BalanceUserDetails extends React.Component<Props, State> {
           </div>
 
           {users.map((user, key) => {
+
             return (
               <div
                 key={key}
@@ -75,7 +76,7 @@ class BalanceUserDetails extends React.Component<Props, State> {
               
                 <div className="favorite-user-photo">{/* TODO */}</div>
                 <div>
-                  <div className="favorite-user-name">{user.username}</div>
+                  <div className="favorite-user-name">{user.email}</div>
                   <div className="favorite-user-details">
                     {user.num_completed_balances} successful contracts
                   </div>
@@ -85,6 +86,7 @@ class BalanceUserDetails extends React.Component<Props, State> {
 
               </div>
             );
+
           })}
 
         </div>

@@ -1,6 +1,6 @@
 import { HttpResponse, get, post, del } from './http';
 
-export const API_URL =  'https://appbalance.herokuapp.com' // 'http://localhost:8000' // 
+export const API_URL =   'https://appbalance.herokuapp.com' // 'http://localhost:8000' // 
 
 export interface IUser {
   id: number;
@@ -28,7 +28,6 @@ export const get_users = (user_id: object): Promise<HttpResponse> => {
 export const submitBalance = (IBalanceInfo: object): Promise<HttpResponse> => {
   return post('/api/submit_balance', IBalanceInfo);
 };
-
 
 export const toggleConfirm = (balance_id:object): Promise<HttpResponse> => {
   return post('/api/toggle_confirm', balance_id);

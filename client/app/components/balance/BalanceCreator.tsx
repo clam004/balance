@@ -201,7 +201,7 @@ class BalanceCreator extends React.Component<
                 </div>
 
                 <BalanceStepCard
-                  text={seller.username || 'Select your seller'}
+                  text={seller.email || 'Select your seller'}
                   subtext={
                     seller.num_completed_balances
                       ? `${seller.num_completed_balances} successful contracts`

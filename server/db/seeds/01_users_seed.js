@@ -18,8 +18,8 @@ exports.seed = function(knex, Promise) {
           email: 'Emily@balance.com', password: '644e39a7c3c259f50243923ef97375344e9d901be21858c1174bbc2da7b6f7f13ef25fbf1f596961fd3b0f0d0f4d040cbf466a94a8da2a8805cb77088d782da2',
          salt:'6e11c5264acd9c0ec31d71a224161d866f7638f4', username:'Emily', num_completed_balances:1},
         {//id: 5, 
-          email: 'Vicki@balance.com', password: '644e39a7c3c259f50243923ef97375344e9d901be21858c1174bbc2da7b6f7f13ef25fbf1f596961fd3b0f0d0f4d040cbf466a94a8da2a8805cb77088d782da2',
-         salt:'6e11c5264acd9c0ec31d71a224161d866f7638f4', username:'Vicki', num_completed_balances:3},
+          email: 'Chloe@balance.com', password: '644e39a7c3c259f50243923ef97375344e9d901be21858c1174bbc2da7b6f7f13ef25fbf1f596961fd3b0f0d0f4d040cbf466a94a8da2a8805cb77088d782da2',
+         salt:'6e11c5264acd9c0ec31d71a224161d866f7638f4', username:'Chloe', num_completed_balances:3},
       ]);
     });
 };
