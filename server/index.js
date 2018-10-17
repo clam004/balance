@@ -39,11 +39,11 @@ passport.use(strategy);
 passport.serializeUser(serialize);
 passport.deserializeUser(deserialize);
 
-/*
+
 passport.deserializeUser(function(obj, done) {
   done(null, false);  // invalidates the existing login session.
 });
-*/
+
 
 app.use(passport.initialize());
 app.use(passport.session());

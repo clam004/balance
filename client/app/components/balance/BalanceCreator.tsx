@@ -49,6 +49,7 @@ const BalanceStepCard = ({
 interface IBalanceUser {
   id:number,
   username: string;
+  email?:string;
   stake?: number;
   goods?: string;
   num_completed_balances?: number;
@@ -94,6 +95,7 @@ class BalanceCreator extends React.Component<
     
     const currentUser = { id:user_id,
                           username: user_alias, 
+                          email:user_email,
                           num_completed_balances: num_completed_balances };
 
     this.state = {

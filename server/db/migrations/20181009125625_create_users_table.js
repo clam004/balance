@@ -7,7 +7,7 @@ exports.up = (knex, Promise) => {
     table.string('password').notNullable();
     table.string('salt').notNullable();
     table.string('username');
-    table.integer('num_completed_balances');
+    table.integer('num_completed_balances').defaultTo(0);
   })
   
 };

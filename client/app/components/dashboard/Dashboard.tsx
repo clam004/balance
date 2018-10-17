@@ -43,7 +43,7 @@ const BalanceDetails = ({ balance }: { balance: IBalance}) => {
 
                 <div className="balance-participant-details">
                   <div className="balance-stake">
-                    {balance.buyer_name} has staked ${balance.buyer_stake_amount}
+                    {balance.buyer_email} has staked ${balance.buyer_stake_amount}
                   </div>
                   <div className="balance-goods">{balance.buyer_obligation}</div>
                 </div>
@@ -54,7 +54,7 @@ const BalanceDetails = ({ balance }: { balance: IBalance}) => {
 
                 <div className="balance-participant-details">
                   <div className="balance-stake">
-                    {balance.seller_name} has staked ${balance.seller_stake_amount}
+                    {balance.seller_email} has staked ${balance.seller_stake_amount}
                   </div>
                   <div className="balance-goods">{balance.seller_obligation}</div>
                 </div>
@@ -94,8 +94,8 @@ interface IBalance {
     balance_description:string,
     buyer_obligation:string,
     seller_obligation:string,
-    buyer_name: string,
-    seller_name:string,
+    buyer_email: string,
+    seller_email:string,
     buyer_stake_amount:number,
     seller_stake_amount:number,
     balance_price:number,
@@ -181,7 +181,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
                   <div className="balance-participant-details">
                     <div className="balance-stake">
-                      {balance.buyer_name} has staked ${balance.buyer_stake_amount}
+                      {balance.buyer_email} has staked ${balance.buyer_stake_amount}
                     </div>
                     <div className="balance-goods">{balance.buyer_obligation}</div>
                   </div>
@@ -192,7 +192,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
                   <div className="balance-participant-details">
                     <div className="balance-stake">
-                      {balance.seller_name} has staked ${balance.seller_stake_amount}
+                      {balance.seller_email} has staked ${balance.seller_stake_amount}
                     </div>
                     <div className="balance-goods">{balance.seller_obligation}</div>
                   </div>
@@ -304,14 +304,14 @@ var example_balance = {
   balance_description:`Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof`,
   buyer_obligation:'have a roof and let in toro on time',
   seller_obligation:'To install 3 solar panels',
-  buyer_name: 'Josh',
-  seller_name:'Toro',
+  buyer_email: 'Josh@balance.com',
+  seller_email:'Toro@balance.com',
   buyer_stake_amount:800,
   seller_stake_amount:300,
   balance_price:3600,
   completed:false,
   agreement_confirmed:true,
-  agreement_status:"confirmed",
+  agreement_status:"confirm",
   buyer_id:1,
   seller_id:2,
   created_at:'Last Month',
