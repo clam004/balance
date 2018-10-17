@@ -152,61 +152,72 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
   public renderBalance(): JSX.Element[] {
     console.log(this.state.data)
+    var user_id = JSON.parse(localStorage.getItem("user_id"));
     return this.state.data.map((balance,key) => {
-          return (
-                <section key={key} className="balance-section">
-                  <div className="balance-created-date"> Created {moment(balance.created_at, moment.ISO_8601).fromNow()} </div>
 
-                  <div className="balance-cards-container">
-                    <div className="balance-participants-card">
-                      <div className="balance-participant-container">
-                        <div className="balance-participant-photo">{}</div>
+        if (balance.seller_id == user_id) {
+          var agreement_button = (
+            <button
+            onClick={() => {
+              toggleConfirm({id:balance.id, confirm:balance.agreement_confirmed});
+              this.toggleConfirmState(key);
+            }}
+            >
+             {balance.agreement_confirmed? "Unconfirm" : "Confirm" }
+            </button>
+          )
+        } else {
+          var agreement_button = <span className="text-bold">Awaiting seller confirmation</span>
+        }
 
-                        <div className="balance-participant-details">
-                          <div className="balance-stake">
-                            {balance.buyer_name} has staked ${balance.buyer_stake_amount}
-                          </div>
-                          <div className="balance-goods">{balance.buyer_obligation}</div>
-                        </div>
-                      </div>
+        return (
+          <section key={key} className="balance-section">
+            <div className="balance-created-date"> Created {moment(balance.created_at, moment.ISO_8601).fromNow()} </div>
 
-                      <div className="balance-participant-container">
-                        <div className="balance-participant-photo">{}</div>
+            <div className="balance-cards-container">
+              <div className="balance-participants-card">
+                <div className="balance-participant-container">
+                  <div className="balance-participant-photo">{}</div>
 
-                        <div className="balance-participant-details">
-                          <div className="balance-stake">
-                            {balance.seller_name} has staked ${balance.seller_stake_amount}
-                          </div>
-                          <div className="balance-goods">{balance.seller_obligation}</div>
-                        </div>
-                      </div>
+                  <div className="balance-participant-details">
+                    <div className="balance-stake">
+                      {balance.buyer_name} has staked ${balance.buyer_stake_amount}
                     </div>
-
-                    <div className="balance-agreement-container">
-                      <h5 className="balance-agreement-header">{balance.title}</h5>
-
-                      <div className="balance-agreement-text">
-                        {balance.balance_description} due {' '}
-                        <span className="text-bold">{moment(balance.due_date, moment.ISO_8601).fromNow()}</span>
-                      </div>
-                      <div className="balance-agreement-price">${balance.balance_price}</div>
-                      
-                      <div
-                      onClick={() => {
-                        toggleConfirm({id:balance.id, confirm:balance.agreement_confirmed});
-                        this.toggleConfirmState(key);
-                      }}
-                      className="balance-agreement-text"
-                      >
-                      <button>
-                       {balance.agreement_confirmed? "Confirm" : "Unconfirm"}
-                      </button>
-                      </div>
-
-                    </div>
+                    <div className="balance-goods">{balance.buyer_obligation}</div>
                   </div>
-                </section>
-          );
+                </div>
+
+                <div className="balance-participant-container">
+                  <div className="balance-participant-photo">{}</div>
+
+                  <div className="balance-participant-details">
+                    <div className="balance-stake">
+                      {balance.seller_name} has staked ${balance.seller_stake_amount}
+                    </div>
+                    <div className="balance-goods">{balance.seller_obligation}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="balance-agreement-container">
+                <h5 className="balance-agreement-header">{balance.title}</h5>
+
+                <div className="balance-agreement-text">
+                  {balance.balance_description} due {' '}
+                  <span className="text-bold">{moment(balance.due_date, moment.ISO_8601).fromNow()}</span>
+                </div>
+                <div className="balance-agreement-price">${balance.balance_price}</div>
+                
+                <div className="balance-agreement-text">
+
+                  <h5 className="balance-agreement-header">{balance.agreement_confirmed? "balance confirmed" : "not yet confirmed"}</h5>
+                  {agreement_button}
+                </div>
+
+              </div>
+            </div>
+          </section>
+        );
     });
   }
 
@@ -214,7 +225,6 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
     const { data, isLoading } = this.state;
     
-    var user_id = JSON.parse(localStorage.getItem("user_id"));
     var user_email = JSON.parse(localStorage.getItem("user_email"));
     var user_alias = user_email.substr(0, user_email.indexOf('@')); 
     
