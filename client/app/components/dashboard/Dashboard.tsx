@@ -167,7 +167,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             </button>
           )
         } else {
-          var agreement_button = <span className="text-bold">Awaiting seller confirmation</span>
+          var agreement_button = <span></span>
         }
 
         return (
