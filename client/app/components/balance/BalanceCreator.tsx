@@ -57,6 +57,8 @@ interface IBalanceUser {
 
 interface IBalanceAgreement {
   title?: string;
+  buyer_obligation?: string;
+  seller_obligation?: string;
   description?: string;
   date?: string;
   price?: number;
@@ -187,8 +189,10 @@ class BalanceCreator extends React.Component<
 
               <div className="new-balance-action-container">
                 <BalanceStepCard
-                  text={buyer.username}
-                  subtext={`${buyer.num_completed_balances} successful contracts`}
+                  text={`${buyer.username} as buyer`} //{buyer.username} 
+                  subtext={//`${buyer.num_completed_balances} successful contracts. 
+                            `The buyer sets the initial terms of the balance.
+                             Once Balance is sent and you both agree on the terms, the balance will be made`}
                   isSelectable={false}
                 />
 
@@ -197,11 +201,11 @@ class BalanceCreator extends React.Component<
                 </div>
 
                 <BalanceStepCard
-                  text={seller.username || 'Select someone to make a Balance with'}
+                  text={seller.username || 'Select your seller'}
                   subtext={
                     seller.num_completed_balances
                       ? `${seller.num_completed_balances} successful contracts`
-                      : 'Select or invite someone to Balance'
+                      : 'choose existing balancer or invite someone to make a Balance with'
                   }
                   isSelected={selected === BalanceStep.SELECT_USER}
                   onSelect={() =>

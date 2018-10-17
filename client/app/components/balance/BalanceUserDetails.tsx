@@ -46,7 +46,6 @@ class BalanceUserDetails extends React.Component<Props, State> {
    if (Array.isArray(search_users) && search_users.length >0) {
       const users = search_users;
 
-
     return (
       <div>
         <h4 className="new-balance-detail-header">Favorites</h4>
@@ -73,6 +72,7 @@ class BalanceUserDetails extends React.Component<Props, State> {
                 className="favorite-user-card"
                 onClick={() => onSelectUser({ seller: user })}
               >
+              
                 <div className="favorite-user-photo">{/* TODO */}</div>
                 <div>
                   <div className="favorite-user-name">{user.username}</div>
@@ -82,9 +82,11 @@ class BalanceUserDetails extends React.Component<Props, State> {
                 </div>
                 <div className="favorite-user-selector">Select</div>
                 {/* TODO: arrow icon */}
+
               </div>
             );
           })}
+
         </div>
 
         <h4 className="new-balance-detail-header">Invite someone new</h4>

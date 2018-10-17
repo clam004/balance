@@ -85,8 +85,8 @@ api.post('/submit_balance', (req, res, next) => {
  	.insert({
  		title:req.body.agreement.title,
  		balance_description:req.body.agreement.description,
- 		buyer_expectation:req.body.agreement.description,
- 		seller_deliverable:req.body.agreement.description,
+ 		buyer_obligation:req.body.agreement.buyer_obligation,
+ 		seller_obligation:req.body.agreement.seller_obligation,
  		buyer_name:req.body.buyer.username,
  		seller_name:req.body.seller.username,
  		completed:false,
@@ -98,6 +98,19 @@ api.post('/submit_balance', (req, res, next) => {
  		due_date:due_date
  	})
  	.then(response => {res.json(response)});
+});
+
+api.post('/toggle_confirm', (req, res, next) => {
+	console.log("data received ", req.body)
+	
+	return knex('balances')
+	.where('id',req.body.id)
+	.update({
+		agreement_confirmed:!req.body.confirm,
+		updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
+	})
+	.then(response => {res.json(response)});
+	
 });
 
 module.exports = api;

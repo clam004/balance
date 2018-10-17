@@ -3,6 +3,8 @@ import * as React from 'react';
 interface Props {
   agreement?: {
     title?: string;
+    buyer_obligation?: string;
+    seller_obligation?: string;
     description?: string;
     payment?: number;
     duration?: number;
@@ -13,6 +15,8 @@ interface Props {
 
 interface State {
   title: string;
+  buyer_obligation: string;
+  seller_obligation: string;
   description: string;
   payment: number;
   duration: number;
@@ -24,10 +28,13 @@ class BalanceContractDetails extends React.Component<Props, State> {
     super(props);
 
     const { agreement = {} } = props;
-    const { title = '', description = '', payment = null, duration = null, duration_units = 'hours' } = agreement;
+    const { title = '', description = '', buyer_obligation = '', seller_obligation = '',
+            payment = null, duration = null, duration_units = 'hours' } = agreement;
 
     this.state = {
       title,
+      buyer_obligation,
+      seller_obligation,
       description,
       payment,
       duration,
@@ -38,7 +45,8 @@ class BalanceContractDetails extends React.Component<Props, State> {
   render() {
 
     console.log("state: ",this.state)
-    const { title, description, payment, duration, duration_units } = this.state;
+    const { title, buyer_obligation, seller_obligation, 
+            description, payment, duration, duration_units } = this.state;
     const { onUpdate } = this.props;
 
     return (
@@ -69,11 +77,33 @@ class BalanceContractDetails extends React.Component<Props, State> {
           </div>
 
           <div className="form-group">
-            <label className="label-default">Contract Description</label>
+            <label className="label-default">Buyer Obligations</label>
             <textarea
               className="input-default full-width"
-              rows={8}
-              placeholder="Describe the work that you want to have done here. Once you both agree on the terms of the contract the balance will be made."
+              rows={1}
+              placeholder="responsibilities of payer"
+              value={buyer_obligation || ""}
+              onChange={e => this.setState({ buyer_obligation: e.target.value })}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="label-default">Seller Obligations</label>
+            <textarea
+              className="input-default full-width"
+              rows={2}
+              placeholder="responsibilities of receiver of payment"
+              value={seller_obligation || ""}
+              onChange={e => this.setState({ seller_obligation: e.target.value })}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="label-default">Additional Contract Details</label>
+            <textarea
+              className="input-default full-width"
+              rows={3}
+              placeholder="add a summary or details of the agreement"
               value={description || ""}
               onChange={e => this.setState({ description: e.target.value })}
             />
@@ -85,7 +115,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
               className="input-default full-width"
               type="number"
               min="0"
-              placeholder="Payment Amount"
+              placeholder=" $ agreed upon price "
               value={payment || ""}
               onChange={e => this.setState({ payment: Number(e.target.value) })}
             />
@@ -93,11 +123,11 @@ class BalanceContractDetails extends React.Component<Props, State> {
 
           <div className="form-group">
 
-            <label className="label-default">Time to complete Balance</label>
+            <label className="label-default">Time given to complete balance from this moment</label>
             <input
               type="number"
               min="0"
-              placeholder="Time to complete agreement"
+              placeholder="(Number)"
               value={duration || ""}
               onChange={e => this.setState({ duration: Number(e.target.value) })}
             />
@@ -117,7 +147,8 @@ class BalanceContractDetails extends React.Component<Props, State> {
           <button
             className="btn-primary full-width"
             onClick={() =>
-              onUpdate({ agreement: { title, description, payment, duration, duration_units } })
+              onUpdate({ agreement: { title, buyer_obligation, seller_obligation, description, 
+                                      payment, duration, duration_units } })
             }
           >
             <img src="assets/btn-logo-1.svg" style={{ marginRight: 16 }} />
