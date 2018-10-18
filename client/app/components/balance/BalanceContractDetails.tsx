@@ -114,9 +114,9 @@ class BalanceContractDetails extends React.Component<Props, State> {
             <input
               className="input-default full-width"
               type="number"
-              min="0"
-              placeholder=" $ agreed upon price "
-              value={payment || ""}
+              //min="0"
+              placeholder="$ agreed upon price"
+              //value={payment || '$ 0.0'}
               onChange={e => this.setState({ payment: Number(e.target.value) })}
             />
           </div>
@@ -126,7 +126,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
             <label className="label-default">Time given to complete balance from this moment</label>
             <input
               type="number"
-              min="0"
+              //min="0"
               placeholder="(Number)"
               value={duration || ""}
               onChange={e => this.setState({ duration: Number(e.target.value) })}
