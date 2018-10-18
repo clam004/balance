@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
-import { API_URL, toggleConfirm } from '../../helpers/transactions';
+import { API_URL, toggleConfirm, toggleComplete, balanceDone } from '../../helpers/transactions';
 import './Dashboard.less';
 import * as moment from 'moment';
 
@@ -10,7 +10,7 @@ const SideNav = () => {
     <nav className="side-nav-container">
       <div className="side-nav-header">
         <img className="side-nav-logo" src="assets/logo-green.svg" />
-        <h3>Balance</h3>
+        <h3><Link to="/">Balance</Link></h3>
       </div>
       <ul className="side-nav-list">
         <li className="nav-item active">
@@ -150,25 +150,69 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     this.setState({data:balances});
   }
 
+  public toggleCompleteState(index: number): void {
+    let balance: IBalance[] = this.state.data.splice(index,1); // remove this entry
+    balance[0].completed = !balance[0].completed; // set it to its opposite
+    const balances: IBalance[] = [...this.state.data,...balance]
+    this.setState({data:balances});
+  }
+
+  public completeBalance(index: number): void {
+    let balance: IBalance[] = this.state.data.splice(index,1); // remove this entry
+    const balances: IBalance[] = [...this.state.data]
+    this.setState({data:balances});
+  }
+
   public renderBalance(): JSX.Element[] {
+
     console.log(this.state.data)
     var user_id = JSON.parse(localStorage.getItem("user_id"));
+
     return this.state.data.map((balance,key) => {
 
         if (balance.seller_id == user_id) {
+
           var agreement_button = (
-            <button
-            onClick={() => {
-              toggleConfirm({id:balance.id, confirm:balance.agreement_confirmed});
-              this.toggleConfirmState(key);
-            }}
-            >
-             {balance.agreement_confirmed? "Unconfirm" : "Confirm" }
-            </button>
+            
+              <button
+              onClick={() => {
+                toggleConfirm({id:balance.id, confirm:balance.agreement_confirmed});
+                this.toggleConfirmState(key);
+              }}
+              >
+               {balance.agreement_confirmed? "Unconfirm" : "Confirm" }
+              </button>
+          )
+
+          var completed_button = (
+
+              <button
+              onClick={() => {
+                toggleComplete({id:balance.id, completed:balance.completed});
+                this.toggleCompleteState(key);
+              }}
+              >
+               {balance.completed? "not complete" : "completed"}
+              </button>
+          )
+
+        } else if (balance.buyer_id == user_id && balance.completed) { 
+
+          var completed_button = (
+              <button
+              onClick={() => {
+                balanceDone({balance});
+                this.completeBalance(key);
+              }}
+              >
+               satisfactory balance delivered complete contract 
+              </button>
           )
         } else {
           var agreement_button = <span></span>
+          var completed_button = <span></span>
         }
+
 
         return (
           <section key={key} className="balance-section">
@@ -212,6 +256,8 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
                   <h5 className="balance-agreement-header">{balance.agreement_confirmed? "balance confirmed" : "not yet confirmed"}</h5>
                   {agreement_button}
+                  <h5 className="balance-agreement-header">{balance.completed? "balance completed" : "balance in progress"}</h5>
+                  {completed_button}
                 </div>
 
               </div>
@@ -319,6 +365,12 @@ var example_balance = {
   due_date:'Next Month',
   id:0
   }
+
+
+
+
+
+
 
 /*
 

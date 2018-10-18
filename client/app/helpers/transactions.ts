@@ -33,6 +33,14 @@ export const toggleConfirm = (balance_id:object): Promise<HttpResponse> => {
   return post('/api/toggle_confirm', balance_id);
 };
 
+export const toggleComplete = (balance_id:object): Promise<HttpResponse> => {
+  return post('/api/toggle_complete', balance_id);
+};
+
+export const balanceDone = (balance:object): Promise<HttpResponse> => {
+  return post('/api/balance_done', balance);
+};
+
 /*
 
 export const toggleConfirm = (balance_id:object) => {

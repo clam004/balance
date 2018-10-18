@@ -113,6 +113,53 @@ api.post('/toggle_confirm', (req, res, next) => {
 	
 });
 
+api.post('/toggle_complete', (req, res, next) => {
+	console.log("data received ", req.body)
+	
+	return knex('balances')
+	.where('id',req.body.id)
+	.update({
+		completed:!req.body.completed,
+		updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
+	})
+	.then(response => {res.json(response)});
+	
+});
+
+api.post('/balance_done', (req, res, next) => {
+	console.log("data received ", req.body)
+ 	return knex('history')
+ 	.insert({
+ 		balance_id:req.body.balance.id,
+ 		title:req.body.balance.title,
+ 		balance_description:req.body.balance.balance_description,
+ 		buyer_obligation:req.body.balance.buyer_obligation,
+ 		seller_obligation:req.body.balance.seller_obligation,
+ 		buyer_email:req.body.balance.buyer_email,
+ 		seller_email:req.body.balance.seller_email,
+ 		completed:req.body.balance.completed,
+ 		agreement_confirmed:req.body.balance.agreement_confirmed,
+ 		buyer_id:req.body.balance.buyer_id,
+ 		seller_id:req.body.balance.seller_id,
+ 		buyer_stake_amount:req.body.balance.buyer_stake_amount,
+ 		seller_stake_amount:req.body.balance.seller_stake_amount,
+ 		balance_price:req.body.balance.balance_price,
+ 		created_at:req.body.balance.created_at,
+ 		updated_at:req.body.balance.updated_at,
+ 		due_date:req.body.balance.updated_at,
+ 		completed_date:moment().format("YYYY-MM-DDTHH:mm:ss")
+ 	})	
+ 	.then(() => {
+ 		return knex('balances')
+		.where('id',req.body.balance.id)
+		.del()
+
+ 	})
+	
+});
+
+
+
 module.exports = api;
 
 
