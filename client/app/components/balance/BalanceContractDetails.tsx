@@ -116,7 +116,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
               type="number"
               //min="0"
               placeholder="$ agreed upon price"
-              value={payment || ""}
+              value={payment}
               onChange={e => this.setState({ payment: Number(e.target.value) })}
             />
           </div>

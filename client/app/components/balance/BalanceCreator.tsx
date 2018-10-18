@@ -152,12 +152,12 @@ class BalanceCreator extends React.Component<
 
   handleSubmitBalance(e: React.FormEvent<HTMLInputElement>) {
     e.preventDefault();
-
+    console.log("submit balance")
     const { history } = this.props;
     const balanceInfo = this.state.balance;
 
     return submitBalance(balanceInfo)
-    .then(result => {console.log("returned to BC:", result)})
+    .then(result => {console.log("returned to Client:", result)})
     //.then(<Redirect to='/dashboard' />)
     .then(() => history.push('/dashboard'))
   }
