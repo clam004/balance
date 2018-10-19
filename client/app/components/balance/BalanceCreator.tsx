@@ -79,6 +79,7 @@ interface BalanceCreatorProps extends RouteComponentProps<{}> {}
 interface BalanceCreatorState {
   balance: IBalance;
   selected: BalanceStep;
+  error?: string;
 }
 
 class BalanceCreator extends React.Component<
@@ -104,7 +105,8 @@ class BalanceCreator extends React.Component<
         seller: {} as IBalanceUser,
         agreement: {} as IBalanceAgreement
       },
-      selected: null
+      selected: null,
+      error:null
     };
   }
 
@@ -152,22 +154,41 @@ class BalanceCreator extends React.Component<
 
   handleSubmitBalance(e: React.FormEvent<HTMLInputElement>) {
     e.preventDefault();
-    console.log("submit balance")
+
     const { history } = this.props;
     const balanceInfo = this.state.balance;
 
-    return submitBalance(balanceInfo)
-    .then(result => {console.log("returned to Client:", result)})
-    //.then(<Redirect to='/dashboard' />)
-    .then(() => history.push('/dashboard'))
+    console.log(balanceInfo.seller)
+
+    if (!balanceInfo.seller.hasOwnProperty('id')) {
+      return this.setState({ error: 'Select a seller',
+                             selected: BalanceStep.SELECT_USER });
+    } else if (balanceInfo.agreement.title && balanceInfo.agreement.buyer_obligation &&
+               balanceInfo.agreement.seller_obligation) {
+      return submitBalance(balanceInfo)
+      .then(result => {console.log("returned to Client:", result)})
+      .then(() => history.push('/dashboard'))
+    } else {
+      return this.setState({ error: 'The contract title, buyer and seller obligations are required',
+                             selected: BalanceStep.SET_AGREEMENT });
+    }
   }
 
   render() {
+
     const { balance, selected } = this.state;
     const { buyer, seller, agreement } = balance;
-    //console.log("seller:",seller)
-    //console.log("agreement:", agreement)
-    console.log(this.state)
+
+    console.log(this.state, this.state.balance.seller)
+
+    const error_state = this.state.error;
+    let error_message;
+
+    if (error_state) {
+      error_message = <h4>{error_state}</h4>
+    } else {
+      error_message = <h4>{}</h4>
+    }
 
     // TODO: try out styled components
     return (
@@ -284,6 +305,9 @@ class BalanceCreator extends React.Component<
               <img src="assets/btn-logo-1.svg" />
               Send Balance
             </button>
+              <div className="output-if-error">
+                {error_message}
+              </div>
           </section>
         </main>
       </div>
