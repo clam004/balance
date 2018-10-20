@@ -125,7 +125,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     this.state = {
       data: [],
       isLoading: false,
-      //confirmations:[]
+
     }
 
   }
@@ -134,31 +134,30 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     
     this.setState({ isLoading: true });
     const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
-    //console.log(BAL_API_URL)
+  
     fetch(BAL_API_URL)
       .then(response => response.json())
       .then(data => this.setState( {data:data, isLoading: false} ));
-
-    //const { data, isLoading } = this.state;
-    //if (Array.isArray(data) && data.length >0) {}
   }
 
   public toggleConfirmState(index: number): void {
-    let balance: IBalance[] = this.state.data.splice(index,1); // remove this entry
-    balance[0].agreement_confirmed = !balance[0].agreement_confirmed; // set it to its opposite
-    const balances: IBalance[] = [...this.state.data,...balance]
+    let balance: IBalance[] = this.state.data.splice(index,1); 
+    balance[0].agreement_confirmed = !balance[0].agreement_confirmed; 
+    let balances: IBalance[] = [...this.state.data];
+    balances.splice(index, 0, balance[0]);
     this.setState({data:balances});
   }
 
   public toggleCompleteState(index: number): void {
-    let balance: IBalance[] = this.state.data.splice(index,1); // remove this entry
-    balance[0].completed = !balance[0].completed; // set it to its opposite
-    const balances: IBalance[] = [...this.state.data,...balance]
+    let balance: IBalance[] = this.state.data.splice(index,1); 
+    balance[0].completed = !balance[0].completed; 
+    let balances: IBalance[] = [...this.state.data];
+    balances.splice(index, 0, balance[0]);
     this.setState({data:balances});
   }
 
   public completeBalance(index: number): void {
-    let balance: IBalance[] = this.state.data.splice(index,1); // remove this entry
+    let balance: IBalance[] = this.state.data.splice(index,1); 
     const balances: IBalance[] = [...this.state.data]
     this.setState({data:balances});
   }
@@ -168,7 +167,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     console.log(this.state.data)
     var user_id = JSON.parse(localStorage.getItem("user_id"));
 
-    return this.state.data.map((balance,key) => {
+    return this.state.data.map((balance, array_index) => {
 
         if (balance.seller_id == user_id) {
 
@@ -177,10 +176,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
               <button
               onClick={() => {
                 toggleConfirm({id:balance.id, confirm:balance.agreement_confirmed});
-                this.toggleConfirmState(key);
+                this.toggleConfirmState(array_index);
               }}
               >
-               {balance.agreement_confirmed? "Unconfirm" : "Confirm" }
+               {balance.agreement_confirmed? "undo confirm" : "confirm balance" }
               </button>
           )
 
@@ -189,10 +188,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
               <button
               onClick={() => {
                 toggleComplete({id:balance.id, completed:balance.completed});
-                this.toggleCompleteState(key);
+                this.toggleCompleteState(array_index);
               }}
               >
-               {balance.completed? "not complete" : "completed"}
+               {balance.completed? "undo complete" : "balance completed"}
               </button>
           )
 
@@ -202,10 +201,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
               <button
               onClick={() => {
                 balanceDone({balance});
-                this.completeBalance(key);
+                this.completeBalance(array_index);
               }}
               >
-               satisfactory balance delivered complete contract 
+               balance delivered complete contract 
               </button>
           )
         } else {
@@ -215,7 +214,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
 
         return (
-          <section key={key} className="balance-section">
+          <section key={balance.id} className="balance-section">
             <div className="balance-created-date"> Created {moment(balance.created_at, moment.ISO_8601).fromNow()} </div>
 
             <div className="balance-cards-container">
@@ -254,7 +253,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                 
                 <div className="balance-agreement-text">
 
-                  <h5 className="balance-agreement-header">{balance.agreement_confirmed? "balance confirmed" : "not yet confirmed"}</h5>
+                  <h5 className="balance-agreement-header">{balance.agreement_confirmed? "balance confirmed" : "not confirmed"}</h5>
                   {agreement_button}
                   <h5 className="balance-agreement-header">{balance.completed? "balance completed" : "balance in progress"}</h5>
                   {completed_button}
