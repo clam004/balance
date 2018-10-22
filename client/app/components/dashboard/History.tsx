@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
-import { getBalances, toggleConfirm, toggleComplete, balanceDone } from '../../helpers/transactions';
+import { API_URL, toggleConfirm, toggleComplete, balanceDone } from '../../helpers/transactions';
 import './Dashboard.less';
 import * as moment from 'moment';
 
@@ -133,12 +133,11 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
   componentDidMount() {
     
     this.setState({ isLoading: true });
-
-
-    var user_id = localStorage.getItem('user_id');
-    getBalances({user_id:user_id})
-    .then(balances => this.setState( {data:balances, isLoading: false} ));
-
+    const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
+  
+    fetch(BAL_API_URL)
+      .then(response => response.json())
+      .then(data => this.setState( {data:data, isLoading: false} ));
   }
 
   public toggleConfirmState(index: number): void {
@@ -261,7 +260,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                   <h5 className="balance-agreement-header">{balance.completed? "balance completed" : "balance in progress"}</h5>
                   
                   {completed_button}
-
+                  
                 </div>
 
               </div>
@@ -350,7 +349,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 export default Dashboard;
 
 var example_balance = {
-  title:'Example Balance',
+  title:'Solar Panels',
   balance_description:`Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof`,
   buyer_obligation:'have a roof and let in toro on time',
   seller_obligation:'To install 3 solar panels',
@@ -369,16 +368,3 @@ var example_balance = {
   due_date:'Next Month',
   id:0
   }
-
-
-
-
-
-
-
-    /*
-    const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
-    fetch(BAL_API_URL)
-      .then(response => response.json())
-      .then(data => this.setState( {data:data, isLoading: false} ));
-    */

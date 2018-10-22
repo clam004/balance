@@ -166,8 +166,10 @@ class BalanceCreator extends React.Component<
     } else if (balanceInfo.agreement.title && balanceInfo.agreement.buyer_obligation &&
                balanceInfo.agreement.seller_obligation) {
       return submitBalance(balanceInfo)
-      .then(result => {console.log("returned to Client:", result)})
-      .then(() => history.push('/dashboard'))
+      .then((balance_id) => {
+        localStorage.setItem("balance_id", JSON.stringify(balance_id.id));
+      })  
+      .then(() => history.push('/balancesummary'))
     } else {
       return this.setState({ error: 'The contract title, buyer and seller obligations are required',
                              selected: BalanceStep.SET_AGREEMENT });
@@ -303,7 +305,7 @@ class BalanceCreator extends React.Component<
               onClick={this.handleSubmitBalance.bind(this)}
             >
               <img src="assets/btn-logo-1.svg" />
-              Send Balance
+              Review and Send Balance 
             </button>
               <div className="output-if-error">
                 {error_message}

@@ -1,7 +1,5 @@
 import { HttpResponse, get, post, del } from './http';
 
-export const API_URL = 'https://appbalance.herokuapp.com' //  'http://localhost:8000' //
-
 export interface IUser {
   id: number;
   email: string;
@@ -41,6 +39,21 @@ export const balanceDone = (balance:object): Promise<HttpResponse> => {
   return post('/api/balance_done', balance);
 };
 
+export const get_balance_data = (balance_id:object): Promise<HttpResponse> => {
+  return post('/api/get_balance_data', balance_id);
+};
+
+export const balanceDelete = (balance:object): Promise<HttpResponse> => {
+  return post('/api/balance_delete', balance);
+};
+
+export const getBalances = (balance:object): Promise<HttpResponse> => {
+  return post('/api/get_balances', balance);
+};
+
+
+
+//export const API_URL = 'http://localhost:8000' // 'https://appbalance.herokuapp.com' // 
 
 /*
 

@@ -32,23 +32,20 @@ api.post('/signup', users.signup);
 api.post('/login', auth, users.login);
 api.all('/logout', logout);
 
-api.post('/get_balances', get_balances);
+api.post('/get_balances', (req, res, next) => {
+ 	console.log(req.body)
+ 	if(req.isAuthenticated()) {
 
-api.get('/balances/:id', (req,res)=>{
-	if(req.isAuthenticated()) {
-		knex('balances').where('buyer_id', req.params.id).orWhere('seller_id', req.params.id)
+		knex('balances')
+		.where('buyer_id',req.body.user_id).orWhere('seller_id',req.body.user_id)
 		.then(balances => {
-		res.json(balances);
-		console.log("authenticated")
+			res.json(balances);
 		});
-	} else {
-		knex('balances').where('buyer_id', req.params.id).orWhere('seller_id', req.params.id)
-		.then(balances => {
-		res.json(balances);
-		console.log("not authenticated")
-		});
-	}
+
+		console.log("post get_user authenticated")
+	}	
 });
+
 
 api.get('/getusers', (req,res)=>{
     //console.log(req)
@@ -97,7 +94,11 @@ api.post('/submit_balance', (req, res, next) => {
  		balance_price:req.body.agreement.payment,
  		due_date:due_date
  	})
- 	.then(response => {res.json(response)});
+ 	//.then(response => {res.json(response)});
+ 	.returning('id')
+	.then((id) => {
+	  res.json({id:id[0]})
+	});
 });
 
 api.post('/toggle_confirm', (req, res, next) => {
@@ -153,17 +154,59 @@ api.post('/balance_done', (req, res, next) => {
  		return knex('balances')
 		.where('id',req.body.balance.id)
 		.del()
-
  	})
-	
 });
 
+
+api.post('/get_balance_data', (req, res, next) => {
+
+ 	console.log(req.body)
+
+	knex('balances')
+		.where('id',req.body.balance_id)
+		.then(balance => {
+			res.json(balance);
+		});
+
+	if(req.isAuthenticated()) {
+		console.log("post get_user authenticated")
+	}	
+});
+
+
+api.post('/balance_delete', (req, res, next) => {
+	
+ 	return knex('balances')
+	.where('id',req.body.id)
+	.del()
+	.then(response =>{
+		console.log("delete", req.body.id, "response", response)
+	})
+ });
 
 
 module.exports = api;
 
 
 	/*
+
+api.get('/balances/:id', (req,res)=>{
+	if(req.isAuthenticated()) {
+		knex('balances').where('buyer_id', req.params.id).orWhere('seller_id', req.params.id)
+		.then(balances => {
+		res.json(balances);
+		console.log("authenticated")
+		});
+	} else {
+		knex('balances').where('buyer_id', req.params.id).orWhere('seller_id', req.params.id)
+		.then(balances => {
+		res.json(balances);
+		console.log("not authenticated")
+		});
+	}
+});
+
+	
 	req.session.cookie.id = req.params.id;
     res.send(req.isAuthenticated());
 	knex('balances').where('buyer_id', req.params.id)
