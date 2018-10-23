@@ -32,6 +32,22 @@ api.post('/signup', users.signup);
 api.post('/login', auth, users.login);
 api.all('/logout', logout);
 
+api.get('/balances/:id', (req,res)=>{
+	if(req.isAuthenticated()) {
+		knex('balances').where('buyer_id', req.params.id).orWhere('seller_id', req.params.id)
+		.then(balances => {
+		res.json(balances);
+		console.log("authenticated")
+		});
+	} else {
+		knex('balances').where('buyer_id', req.params.id).orWhere('seller_id', req.params.id)
+		.then(balances => {
+		res.json(balances);
+		console.log("not authenticated")
+		});
+	}
+});
+
 api.post('/get_balances', (req, res, next) => {
  	console.log(req.body)
  	if(req.isAuthenticated()) {
@@ -190,23 +206,9 @@ module.exports = api;
 
 	/*
 
-api.get('/balances/:id', (req,res)=>{
-	if(req.isAuthenticated()) {
-		knex('balances').where('buyer_id', req.params.id).orWhere('seller_id', req.params.id)
-		.then(balances => {
-		res.json(balances);
-		console.log("authenticated")
-		});
-	} else {
-		knex('balances').where('buyer_id', req.params.id).orWhere('seller_id', req.params.id)
-		.then(balances => {
-		res.json(balances);
-		console.log("not authenticated")
-		});
-	}
-});
 
-	
+
+
 	req.session.cookie.id = req.params.id;
     res.send(req.isAuthenticated());
 	knex('balances').where('buyer_id', req.params.id)

@@ -32,9 +32,21 @@ const SideNav = () => {
 
 interface DashboardProps extends RouteComponentProps<{}> {}
 
+interface Balance_Data {
+  title:string;
+  buyer_obligation:string;
+  seller_obligation:string;
+  balance_description:string;
+  buyer_email:string;
+  seller_email:string;
+  balance_price:number;
+  buyer_stake_amount:number;
+  seller_stake_amount:number;
+  due_date:Date;
+}
 
 interface DashboardState {
-  balance_data: Array<object>,
+  balance_data: Balance_Data,
   isLoading: boolean,
   balance_id: number
 }
@@ -47,7 +59,7 @@ class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
     super(props);
 
     this.state = {
-      balance_data: [],
+      balance_data: null,
       isLoading: false,
       balance_id: null
     }
@@ -61,8 +73,12 @@ class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
     var balance_id = JSON.parse(localStorage.getItem("balance_id"));
 
     get_balance_data({balance_id:balance_id})
+
       .then(balance_data => {
-        this.setState({isLoading: false, balance_data:balance_data[0]})
+     
+      this.setState({isLoading: false})
+      this.setState({balance_data:balance_data[0]})
+
       }); 
 
   }
@@ -74,13 +90,15 @@ class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
     
     const { balance_data, isLoading } = this.state;
 
-    console.log('balance_data',balance_data)
+    if (isLoading || balance_data == null) { 
 
-    if (isLoading && balance_data) { 
+      console.log('not yet', balance_data)
 
       return (<h3> Loading ... </h3>)
 
     } else {
+ 
+      console.log('now', balance_data)
 
       return (
 

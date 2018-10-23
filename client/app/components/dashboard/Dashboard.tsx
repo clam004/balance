@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
-import { getBalances, toggleConfirm, toggleComplete, balanceDone } from '../../helpers/transactions';
+import { API_URL, getBalances, toggleConfirm, toggleComplete, balanceDone } from '../../helpers/transactions';
+import { HttpResponse, get, post, del } from '../../helpers/http';
 import './Dashboard.less';
 import * as moment from 'moment';
 
@@ -17,7 +18,7 @@ const SideNav = () => {
           <Link to="/dashboard">Current Balances</Link>
         </li>
         <li className="nav-item">
-          <Link to="/history">History</Link>
+          <Link to="/dashboard">History</Link>
         </li>
         <li className="nav-item">
           <Link to="/dashboard">Arbitrations</Link>
@@ -27,63 +28,6 @@ const SideNav = () => {
         </li>
       </ul>
     </nav>
-  );
-};
-
-const BalanceDetails = ({ balance }: { balance: IBalance}) => {
-
-  return (
-        <section className="balance-section">
-          <div className="balance-created-date"> Created {balance.created_at} </div>
-
-          <div className="balance-cards-container">
-            <div className="balance-participants-card">
-              <div className="balance-participant-container">
-                <div className="balance-participant-photo">{/* TODO */}</div>
-
-                <div className="balance-participant-details">
-                  <div className="balance-stake">
-                    {balance.buyer_email} has staked ${balance.buyer_stake_amount}
-                  </div>
-                  <div className="balance-goods">{balance.buyer_obligation}</div>
-                </div>
-              </div>
-
-              <div className="balance-participant-container">
-                <div className="balance-participant-photo">{/* TODO */}</div>
-
-                <div className="balance-participant-details">
-                  <div className="balance-stake">
-                    {balance.seller_email} has staked ${balance.seller_stake_amount}
-                  </div>
-                  <div className="balance-goods">{balance.seller_obligation}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="balance-agreement-container">
-              <h5 className="balance-agreement-header">Balance Agreement</h5>
-
-              <div className="balance-agreement-text">
-                {balance.balance_description} due {' '}
-                <span className="text-bold">{moment(balance.due_date, moment.ISO_8601).fromNow()}</span>…
-              </div>
-              <div className="balance-agreement-price">${balance.balance_price}</div>
-              
-              <div
-              onClick={() => {
-                toggleConfirm({id:balance.id, confirm:balance.agreement_confirmed});
-              }}
-              className="balance-agreement-text"
-              >
-              <button>
-                <h5>{balance.agreement_status}</h5>
-              </button>
-              </div>
-
-            </div>
-          </div>
-        </section>
   );
 };
 
@@ -111,12 +55,11 @@ interface IBalance {
 }
 
 interface DashboardState {
-  data: Array<IBalance>,
+  data:  Array<IBalance>, // Array<HttpResponse>, //
   isLoading: boolean,
 }
 
 class Dashboard extends React.Component<DashboardProps, DashboardState> {
-
 
   constructor(props: DashboardProps) {
 
@@ -125,7 +68,6 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     this.state = {
       data: [],
       isLoading: false,
-
     }
 
   }
@@ -134,10 +76,28 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     
     this.setState({ isLoading: true });
 
+    /*  
+    const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
+    fetch(BAL_API_URL)
+      .then(response => response.json())
+      .then(data => {
+      console.log(typeof(data));
+      this.setState({data:data});
+      this.setState({isLoading: false}); 
+      });
+    */
 
     var user_id = localStorage.getItem('user_id');
     getBalances({user_id:user_id})
-    .then(balances => this.setState( {data:balances, isLoading: false} ));
+    .then(data => {
+      console.log(data);
+      //let balance: IBalance[] = data;
+      //this.setState({data:balance});
+      if (Array.isArray(data)) {
+        this.setState({data:data});
+        this.setState({isLoading:false});      
+      }
+    });
 
   }
 
@@ -165,9 +125,8 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
   public renderBalance(): JSX.Element[] {
 
-    console.log(this.state.data)
     var user_id = JSON.parse(localStorage.getItem("user_id"));
-
+    
     return this.state.data.map((balance, array_index) => {
 
         if (balance.seller_id == user_id) {
@@ -278,8 +237,11 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     var user_email = JSON.parse(localStorage.getItem("user_email"));
     var user_alias = user_email.substr(0, user_email.indexOf('@')); 
     
+    //console.log(this.state.data)
     // TODO: try out styled components
-    if (Array.isArray(data) && data.length >0) {
+    //if (Array.isArray(data) && data.length >0) {
+
+    if (!isLoading && data.length > 0) {
 
       return (
 
@@ -295,9 +257,6 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         
             {
               this.renderBalance()
-              //balances_array.map((balance,key) => {
-              //<BalanceDetails key={key} balance={balance}/>
-              //})
             }
 
               <section className="create-balance-container">
@@ -371,7 +330,62 @@ var example_balance = {
   }
 
 
+const BalanceDetails = ({ balance }: { balance: IBalance}) => {
 
+  return (
+        <section className="balance-section">
+          <div className="balance-created-date"> Created {balance.created_at} </div>
+
+          <div className="balance-cards-container">
+            <div className="balance-participants-card">
+              <div className="balance-participant-container">
+                <div className="balance-participant-photo">{/* TODO */}</div>
+
+                <div className="balance-participant-details">
+                  <div className="balance-stake">
+                    {balance.buyer_email} has staked ${balance.buyer_stake_amount}
+                  </div>
+                  <div className="balance-goods">{balance.buyer_obligation}</div>
+                </div>
+              </div>
+
+              <div className="balance-participant-container">
+                <div className="balance-participant-photo">{/* TODO */}</div>
+
+                <div className="balance-participant-details">
+                  <div className="balance-stake">
+                    {balance.seller_email} has staked ${balance.seller_stake_amount}
+                  </div>
+                  <div className="balance-goods">{balance.seller_obligation}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="balance-agreement-container">
+              <h5 className="balance-agreement-header">Balance Agreement</h5>
+
+              <div className="balance-agreement-text">
+                {balance.balance_description} due {' '}
+                <span className="text-bold">{moment(balance.due_date, moment.ISO_8601).fromNow()}</span>…
+              </div>
+              <div className="balance-agreement-price">${balance.balance_price}</div>
+              
+              <div
+              onClick={() => {
+                toggleConfirm({id:balance.id, confirm:balance.agreement_confirmed});
+              }}
+              className="balance-agreement-text"
+              >
+              <button>
+                <h5>{balance.agreement_status}</h5>
+              </button>
+              </div>
+
+            </div>
+          </div>
+        </section>
+  );
+};
 
 
 

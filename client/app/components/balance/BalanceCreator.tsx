@@ -6,7 +6,7 @@ import BalanceUserDetails from './BalanceUserDetails';
 import BalanceContractDetails from './BalanceContractDetails';
 import BalanceStakeDetails from './BalanceStakeDetails';
 import './Balance.less';
-import { API_URL, submitBalance } from '../../helpers/transactions';
+import { submitBalance } from '../../helpers/transactions';
 
 enum BalanceStep {
   SELECT_USER = 'SELECT_USER',

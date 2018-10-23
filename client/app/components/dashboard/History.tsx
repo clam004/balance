@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
-import { API_URL, toggleConfirm, toggleComplete, balanceDone } from '../../helpers/transactions';
+import {getBalances, toggleConfirm, toggleComplete, balanceDone } from '../../helpers/transactions';
 import './Dashboard.less';
 import * as moment from 'moment';
 
@@ -111,7 +111,7 @@ interface IBalance {
 }
 
 interface DashboardState {
-  data: Array<IBalance>,
+  data: Array<object>,//Array<IBalance>,Array<IBalance>,
   isLoading: boolean,
 }
 
@@ -133,11 +133,9 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
   componentDidMount() {
     
     this.setState({ isLoading: true });
-    const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
-  
-    fetch(BAL_API_URL)
-      .then(response => response.json())
-      .then(data => this.setState( {data:data, isLoading: false} ));
+    var user_id = localStorage.getItem('user_id');
+    getBalances({user_id:user_id})
+    .then(balances => this.setState( {data:balances, isLoading: false} ));
   }
 
   public toggleConfirmState(index: number): void {

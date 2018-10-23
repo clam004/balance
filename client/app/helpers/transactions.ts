@@ -15,6 +15,27 @@ export interface IBalanceInfo {
   }
 }
 
+interface IBalance {
+    title:string,
+    balance_description:string,
+    buyer_obligation:string,
+    seller_obligation:string,
+    buyer_email: string,
+    seller_email:string,
+    buyer_stake_amount:number,
+    seller_stake_amount:number,
+    balance_price:number,
+    completed:boolean,
+    agreement_confirmed:boolean,
+    agreement_status:string,
+    buyer_id:number,
+    seller_id:number,
+    created_at:string,
+    updated_at:string,
+    due_date:string,
+    id:number 
+}
+
 export const getusers = (): Promise<HttpResponse> => {
   return get('/api/getusers');
 };
@@ -51,11 +72,13 @@ export const getBalances = (balance:object): Promise<HttpResponse> => {
   return post('/api/get_balances', balance);
 };
 
-
-
-//export const API_URL = 'http://localhost:8000' // 'https://appbalance.herokuapp.com' // 
+export const API_URL = 'http://localhost:8000' // 'https://appbalance.herokuapp.com' // 
 
 /*
+
+export const getBalances = (balance:object): Promise<HttpResponse> => {
+  return post('/api/get_balances', balance);
+};
 
 export const toggleConfirm = (balance_id:object) => {
   console.log(balance_id);
