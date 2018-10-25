@@ -7,7 +7,7 @@ exports.seed = function(knex, Promise) {
     .then(function () {
       // Inserts seed entries
       return knex('balances').insert([
-        {//id: 1, 
+        { 
           title: 'Toro to install 4 solar panels on Josh’s roof',
           balance_description: 'Toro the Solar Panel technian has agreed to install 4 solar panels on Josh’s roof ',
           buyer_obligation: 'For 4 solar panel installations',
@@ -25,7 +25,7 @@ exports.seed = function(knex, Promise) {
           updated_at: moment("2018-10-01T05:06:07", "YYYY-MM-DDTHH:mm:ss"),
           due_date: moment("2018-11-01T05:06:07", "YYYY-MM-DDTHH:mm:ss")
          },
-        {//id: 2, 
+        {
           title: 'Toro to install 3 solar panels on Josh’s roof',
           balance_description: 'Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof ',
           buyer_obligation: 'For 3 solar panel installations',
@@ -43,7 +43,25 @@ exports.seed = function(knex, Promise) {
           updated_at: moment("2018-01-01T05:06:07", "YYYY-MM-DDTHH:mm:ss"),
           due_date: moment("2018-02-01T05:06:07", "YYYY-MM-DDTHH:mm:ss")
          },
-        {//id: 3, 
+        {
+          title: 'Toro to install 2 solar panels on Josh’s roof',
+          balance_description: 'Toro the Solar Panel technian has agreed to install 2 solar panels on Josh’s roof ',
+          buyer_obligation: 'For 2 solar panel installations',
+          seller_obligation: 'To install 3 solar panels',
+          buyer_email: 'Josh@balance.com',
+          seller_email: 'Toro@balance.com',
+          buyer_stake_amount: 8.00,
+          seller_stake_amount: 3.00, 
+          balance_price: 100.50,
+          completed: true,
+          agreement_confirmed:true,
+          buyer_id: 1,
+          seller_id: 2,
+          created_at: moment("2018-01-01T05:06:07", "YYYY-MM-DDTHH:mm:ss"),
+          updated_at: moment("2018-01-01T05:06:07", "YYYY-MM-DDTHH:mm:ss"),
+          due_date: moment("2018-12-10T05:06:07", "YYYY-MM-DDTHH:mm:ss")
+         },
+        {
           title: 'Alex buys food from Josh',
           balance_description: 'Alex buys yakitori from Josh',
           buyer_obligation: 'Josh cooks 5 yakitori for Alex',

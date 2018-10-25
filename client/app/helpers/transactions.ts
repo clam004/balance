@@ -15,12 +15,12 @@ export interface IBalanceInfo {
   }
 }
 
-export const getusers = (): Promise<HttpResponse> => {
-  return get('/api/getusers');
+export const get_init_users = (user_id: object): Promise<HttpResponse> => {
+  return post('/api/get_init_users', user_id);
 };
 
-export const get_users = (user_id: object): Promise<HttpResponse> => {
-  return post('/api/get_users', user_id);
+export const update_search_users = (search_input: object): Promise<HttpResponse> => {
+  return post('/api/update_search_users', search_input);
 };
 
 export const submitBalance = (IBalanceInfo: object): Promise<HttpResponse> => {

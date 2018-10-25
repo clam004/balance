@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { getusers, get_users } from '../../helpers/transactions';
+import { get_init_users, update_search_users } from '../../helpers/transactions';
 
 interface State {
+  user_id:number;
+  searchcharacters:string;
   email: string;
   phone: string;
   isLoading: boolean;
@@ -18,6 +20,8 @@ class BalanceUserDetails extends React.Component<Props, State> {
     super(props);
 
     this.state = {
+      user_id: null,
+      searchcharacters: '',
       email: '',
       phone: '',
       isLoading: false,
@@ -27,43 +31,49 @@ class BalanceUserDetails extends React.Component<Props, State> {
 
   componentDidMount() {
     
-    this.setState({ isLoading: true });
+    var user_id = JSON.parse(localStorage.getItem("user_id"));
+    this.setState({ isLoading:true, user_id:user_id });
 
-    var user_id ={id: JSON.parse(localStorage.getItem("user_id"))};
-
-    get_users(user_id)
+    get_init_users({ user_id:user_id })
       .then(user_data => {
         this.setState({search_users:user_data, isLoading: false})
-        //console.log(user_data)
       });
+  }
+
+  public updateSearch(searchchars: string): void {
+    
+    this.setState({searchcharacters:searchchars})
+    update_search_users({ user_id:this.state.user_id, search_chars:searchchars })
+      .then(user_data => {
+        this.setState({ search_users:user_data, isLoading:false }, ()=>{
+          console.log(user_data)
+        })
+    });
   }
 
   render() {
 
-    const { search_users, isLoading } = this.state;
+    const { searchcharacters, search_users, isLoading } = this.state;
     const { email, phone } = this.state;
     const { onSelectUser, onInvite } = this.props;
-
-   if (Array.isArray(search_users) && search_users.length >0) {
+    
+    //&& search_users.length >0
+    if (Array.isArray(search_users)) {
       const users = search_users;
 
     return (
       <div>
         <h4 className="new-balance-detail-header">Favorites</h4>
-
         {/* TODO */}
         <div style={{ paddingLeft: 16, paddingRight: 16 }}>
           <div className="balance-alert">
-            <div className="alert-text text-bold">
-              Find Balancers in your email
-            </div>
-            <div className="alert-description text-sm">
-              We can help automatically find other balancers to add to your
-              favorites by connecting to Gmail.
-            </div>
-            <div className="alert-action text-sm text-bold">
-              Connect Balance to Gmail
-            </div>
+            <input
+              className="input-default full-width"
+              type="text"
+              placeholder="Search..."
+              value={searchcharacters}
+              onChange={e=>{this.updateSearch(e.target.value)}}
+            />
           </div>
 
           {users.map((user, key) => {
@@ -84,7 +94,6 @@ class BalanceUserDetails extends React.Component<Props, State> {
                 </div>
                 <div className="favorite-user-selector">Select</div>
                 {/* TODO: arrow icon */}
-
               </div>
             );
 
@@ -155,5 +164,16 @@ export default BalanceUserDetails;
       { name: 'Boro the Shizu', successes: 8 },
       { name: 'Bobo the Corgi', successes: 10 }
     ]
+
+            <div className="alert-text text-bold">
+              Find Balancers in your email
+            </div>
+            <div className="alert-description text-sm">
+              We can help automatically find other balancers to add to your
+              favorites by connecting to Gmail.
+            </div>
+            <div className="alert-action text-sm text-bold">
+              Connect Balance to Gmail
+            </div>
 
     */

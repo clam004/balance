@@ -40,29 +40,30 @@ api.post('/get_balances', (req, res, next) => {
 	}	
 });
 
+api.post('/get_init_users', (req, res, next) => {
+	if(req.isAuthenticated()) {
+ 		console.log(req.body)
+		knex('users').select(['id','email','username','num_completed_balances'])
+		.whereNot('id',req.body.user_id)
+		.limit(10)
+		.then(users => {
+			res.json(users);
+		});		
+	}	
+});
 
-api.get('/getusers', (req,res)=>{
-    //console.log(req)
-	knex('users').select(['id','email','username','num_completed_balances'])
+api.post('/update_search_users', (req, res, next) => {
+	if(req.isAuthenticated()) {
+		console.log(req.body)
+		var findlike = '%' + req.body.search_chars + '%'
+		console.log(findlike)
+		knex('users').select(['id','email','username','num_completed_balances'])
+		.where('email', 'ilike', findlike)
+		.whereNot('id',req.body.user_id)
+		.limit(10)
 		.then(users => {
 			res.json(users);
 		});
-
-	if(req.isAuthenticated()) {
-		console.log("get getuser authenticated")
-	}
-});
-
-
-api.post('/get_users', (req, res, next) => {
- 	console.log(req.body)
-
-	if(req.isAuthenticated()) {
-		knex('users').select(['id','email','username','num_completed_balances'])
-		.whereNot('id',req.body.id)
-		.then(users => {
-		res.json(users);
-		});		
 	}	
 });
 
