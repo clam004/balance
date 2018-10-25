@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { RouteComponentProps} from 'react-router-dom';
+import { RouteComponentProps } from 'react-router-dom';
 import { merge } from 'lodash';
 import { SideNav } from '../nav';
 import BalanceUserDetails from './BalanceUserDetails';
 import BalanceContractDetails from './BalanceContractDetails';
 import BalanceStakeDetails from './BalanceStakeDetails';
 import './Balance.less';
-import { submitBalance } from '../../helpers/transactions';
+import { submitBalance, get_balance_data, updateBalance } from '../../helpers/transactions';
 
 enum BalanceStep {
   SELECT_USER = 'SELECT_USER',
@@ -47,7 +47,7 @@ const BalanceStepCard = ({
 };
 
 interface IBalanceUser {
-  id:number,
+  id?:number,
   username: string;
   email?:string;
   stake?: number;
@@ -72,6 +72,7 @@ interface IBalance {
   buyer: IBalanceUser;
   seller: IBalanceUser;
   agreement: IBalanceAgreement;
+  balance_id?: number;
 }
 
 interface BalanceCreatorProps extends RouteComponentProps<{}> {}
@@ -80,6 +81,7 @@ interface BalanceCreatorState {
   balance: IBalance;
   selected: BalanceStep;
   error?: string;
+  edit?: boolean;
 }
 
 class BalanceCreator extends React.Component<
@@ -89,30 +91,73 @@ class BalanceCreator extends React.Component<
   constructor(props: BalanceCreatorProps & RouteComponentProps<{}>) {
     super(props);
 
-    var user_id = JSON.parse(localStorage.getItem("user_id"));
     var user_email = JSON.parse(localStorage.getItem("user_email"));
     var user_alias = user_email.substr(0, user_email.indexOf('@')); 
     var num_completed_balances = JSON.parse(localStorage.getItem("num_completed_balances"));
-    
-    const currentUser = { id:user_id,
-                          username: user_alias, 
+
+    const currentUser = { username: user_alias, 
                           email:user_email,
-                          num_completed_balances: num_completed_balances };
+                          num_completed_balances: num_completed_balances 
+                        };
 
     this.state = {
       balance: {
         buyer: currentUser,
         seller: {} as IBalanceUser,
-        agreement: {} as IBalanceAgreement
+        agreement: {} as IBalanceAgreement,
+        balance_id:null,
       },
       selected: null,
-      error:null
+      error:null,
+      edit:false,
     };
+
+  }
+
+  componentDidMount() {
+
+    var balance_id = JSON.parse(localStorage.getItem("balance_id"));
+
+    if (balance_id) {
+
+      this.setState({edit:true})    
+      this.handleUpdateBalance({balance_id:balance_id})
+      
+      get_balance_data({balance_id:balance_id})
+      .then(balance_data => {
+       
+        console.log("balance_data", balance_data[0])
+        
+        const initUser = {  email:balance_data[0].seller_email,
+                            id:balance_data[0].seller_id,
+                          };
+        
+        this.handleUpdateBalance({seller:initUser})
+
+        
+        const initAgreement = {  title:balance_data[0].title,
+                                 buyer_obligation:balance_data[0].buyer_obligation,
+                                 seller_obligation:balance_data[0].seller_obligation,
+                                 description:balance_data[0].balance_description, 
+                                 payment:balance_data[0].balance_price, 
+                                 duration:balance_data[0].duration,
+                                 duration_units:balance_data[0].duration_units,
+                              };
+
+        this.handleUpdateBalance({agreement:initAgreement})
+
+        const initBuyerStake = {stake:balance_data[0].buyer_stake_amount};
+        const initSellerStake = {stake:balance_data[0].seller_stake_amount};
+
+        this.handleUpdateBalance({buyer:initBuyerStake, seller:initSellerStake})
+
+      }) 
+    }
   }
 
   handleUpdateBalance(updates: any) {
     const { balance } = this.state;
-    // console.log(updates)
+    console.log("updates", updates)
     // TODO: connect to API
     this.setState({
       balance: merge({}, balance, updates),
@@ -158,18 +203,30 @@ class BalanceCreator extends React.Component<
     const { history } = this.props;
     const balanceInfo = this.state.balance;
 
-    console.log(balanceInfo.seller)
-
     if (!balanceInfo.seller.hasOwnProperty('id')) {
       return this.setState({ error: 'Select a seller',
                              selected: BalanceStep.SELECT_USER });
     } else if (balanceInfo.agreement.title && balanceInfo.agreement.buyer_obligation &&
                balanceInfo.agreement.seller_obligation) {
-      return submitBalance(balanceInfo)
-      .then((balance_id) => {
-        localStorage.setItem("balance_id", JSON.stringify(balance_id.id));
-      })  
-      .then(() => history.push('/balancesummary'))
+      
+      if (this.state.edit) {
+
+        return updateBalance(balanceInfo)
+        .then((balance_id) => {
+          localStorage.setItem("balance_id", JSON.stringify(balance_id.id)); 
+        })  
+        .then(() => history.push('/balancesummary'))
+
+      } else {
+
+        return submitBalance(balanceInfo)
+        .then((balance_id) => {
+          localStorage.setItem("balance_id", JSON.stringify(balance_id.id)); 
+        })  
+        .then(() => history.push('/balancesummary'))
+
+      }
+
     } else {
       return this.setState({ error: 'The contract title, buyer and seller obligations are required',
                              selected: BalanceStep.SET_AGREEMENT });
@@ -181,9 +238,10 @@ class BalanceCreator extends React.Component<
     const { balance, selected } = this.state;
     const { buyer, seller, agreement } = balance;
 
-    console.log(this.state, this.state.balance.seller)
+    console.log(" render: ", this.state)
 
     const error_state = this.state.error;
+
     let error_message;
 
     if (error_state) {
@@ -317,4 +375,5 @@ class BalanceCreator extends React.Component<
   }
 }
 
-export default BalanceCreator;
+export default BalanceCreator ;
+export { IBalanceUser, BalanceCreator }

@@ -33,7 +33,8 @@ class BalanceUserDetails extends React.Component<Props, State> {
 
     get_users(user_id)
       .then(user_data => {
-        this.setState({search_users:user_data, isLoading: false}), console.log(user_data)
+        this.setState({search_users:user_data, isLoading: false})
+        //console.log(user_data)
       });
   }
 

@@ -15,6 +15,7 @@ app.use(express.static(build));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(session({
   secret,
   resave: false,
@@ -40,11 +41,6 @@ passport.serializeUser(serialize);
 passport.deserializeUser(deserialize);
 
 
-passport.deserializeUser(function(obj, done) {
-  done(null, false);  // invalidates the existing login session.
-});
-
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -54,4 +50,11 @@ app.use('/api', api);
 app.get('*', home);
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
+
+
+/*
+passport.deserializeUser(function(obj, done) {
+  done(null, false);  // invalidates the existing login session.
+});
+*/
 

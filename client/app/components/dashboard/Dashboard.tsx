@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
 import { API_URL, getBalances, toggleConfirm, toggleComplete, balanceDone } from '../../helpers/transactions';
+import { logout } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
 import './Dashboard.less';
 import * as moment from 'moment';
@@ -25,6 +26,9 @@ const SideNav = () => {
         </li>
         <li className="nav-item">
           <Link to="/dashboard">Support</Link>
+        </li>
+        <li className="nav-item">
+          <Link onClick={() => logout()} to="/">Logout</Link>
         </li>
       </ul>
     </nav>
@@ -76,23 +80,9 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     
     this.setState({ isLoading: true });
 
-    /*  
-    const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
-    fetch(BAL_API_URL)
-      .then(response => response.json())
-      .then(data => {
-      console.log(typeof(data));
-      this.setState({data:data});
-      this.setState({isLoading: false}); 
-      });
-    */
-
-    var user_id = localStorage.getItem('user_id');
-    getBalances({user_id:user_id})
+    getBalances()
     .then(data => {
       console.log(data);
-      //let balance: IBalance[] = data;
-      //this.setState({data:balance});
       if (Array.isArray(data)) {
         this.setState({data:data});
         this.setState({isLoading:false});      
@@ -206,21 +196,25 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                 <h5 className="balance-agreement-header">{balance.title}</h5>
 
                 <div className="balance-agreement-text">
-                  {balance.balance_description} due {' '}
-                  <span className="text-bold">{moment(balance.due_date, moment.ISO_8601).fromNow()}</span>
+                  {balance.balance_description} {' '}
+                </div>
+                <div className="balance-agreement-text">
+                  <span className="text-bold">due {' '} {moment(balance.due_date, moment.ISO_8601).fromNow()}</span>
                 </div>
                 <div className="balance-agreement-price">${balance.balance_price}</div>
                 
                 <div className="balance-agreement-text">
-
+                  <label>
                   <h5 className="balance-agreement-header">{balance.agreement_confirmed? "balance confirmed" : "not confirmed"}</h5>
-                  
                   {agreement_button}
-
-                  <h5 className="balance-agreement-header">{balance.completed? "balance completed" : "balance in progress"}</h5>
+                  </label>
+                </div>
                   
+                <div className="balance-agreement-text">
+                  <label>
+                  <h5 className="balance-agreement-header">{balance.completed? "balance completed" : "balance in progress"}</h5>
                   {completed_button}
-
+                  </label>
                 </div>
 
               </div>
@@ -237,7 +231,6 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     var user_email = JSON.parse(localStorage.getItem("user_email"));
     var user_alias = user_email.substr(0, user_email.indexOf('@')); 
     
-    //console.log(this.state.data)
     // TODO: try out styled components
     //if (Array.isArray(data) && data.length >0) {
 
@@ -261,7 +254,12 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
               <section className="create-balance-container">
                 <Link to="/create">
-                  <button className="btn-primary create-balance-btn">
+                  <button 
+                   className="btn-primary create-balance-btn"
+                   onClick={() => {
+                    localStorage.setItem("balance_id",null); 
+                   }}
+                  >
                     <img src="assets/btn-logo-1.svg" />
                     Create Balance
                   </button>
@@ -395,4 +393,15 @@ const BalanceDetails = ({ balance }: { balance: IBalance}) => {
     fetch(BAL_API_URL)
       .then(response => response.json())
       .then(data => this.setState( {data:data, isLoading: false} ));
+    */
+
+    /*  
+    const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
+    fetch(BAL_API_URL)
+      .then(response => response.json())
+      .then(data => {
+      console.log(typeof(data));
+      this.setState({data:data});
+      this.setState({isLoading: false}); 
+      });
     */

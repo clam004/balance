@@ -18,6 +18,8 @@ exports.up = function(knex, Promise) {
     table.timestamp('created_at').defaultTo(knex.fn.now());
     table.timestamp('updated_at').defaultTo(knex.fn.now());
     table.timestamp('due_date');
+    table.integer('duration');
+    table.string('duration_units');
   });
 };
 

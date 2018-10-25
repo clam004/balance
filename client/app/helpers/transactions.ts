@@ -15,27 +15,6 @@ export interface IBalanceInfo {
   }
 }
 
-interface IBalance {
-    title:string,
-    balance_description:string,
-    buyer_obligation:string,
-    seller_obligation:string,
-    buyer_email: string,
-    seller_email:string,
-    buyer_stake_amount:number,
-    seller_stake_amount:number,
-    balance_price:number,
-    completed:boolean,
-    agreement_confirmed:boolean,
-    agreement_status:string,
-    buyer_id:number,
-    seller_id:number,
-    created_at:string,
-    updated_at:string,
-    due_date:string,
-    id:number 
-}
-
 export const getusers = (): Promise<HttpResponse> => {
   return get('/api/getusers');
 };
@@ -46,6 +25,10 @@ export const get_users = (user_id: object): Promise<HttpResponse> => {
 
 export const submitBalance = (IBalanceInfo: object): Promise<HttpResponse> => {
   return post('/api/submit_balance', IBalanceInfo);
+};
+
+export const updateBalance = (IBalanceInfo: object): Promise<HttpResponse> => {
+  return post('/api/update_balance', IBalanceInfo);
 };
 
 export const toggleConfirm = (balance_id:object): Promise<HttpResponse> => {
@@ -68,8 +51,8 @@ export const balanceDelete = (balance:object): Promise<HttpResponse> => {
   return post('/api/balance_delete', balance);
 };
 
-export const getBalances = (balance:object): Promise<HttpResponse> => {
-  return post('/api/get_balances', balance);
+export const getBalances = (): Promise<HttpResponse> => {
+  return post('/api/get_balances');
 };
 
 export const API_URL = 'http://localhost:8000' // 'https://appbalance.herokuapp.com' // 

@@ -29,7 +29,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
 
     const { agreement = {} } = props;
     const { title = '', description = '', buyer_obligation = '', seller_obligation = '',
-            payment = null, duration = null, duration_units = 'minutes' } = agreement;
+            payment = null, duration = null, duration_units = 'hours' } = agreement;
 
     this.state = {
       title,
@@ -44,7 +44,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
 
   render() {
 
-    console.log("state: ",this.state)
+    //console.log("state: ",this.state)
     const { title, buyer_obligation, seller_obligation, 
             description, payment, duration, duration_units } = this.state;
     const { onUpdate } = this.props;
@@ -133,7 +133,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
             />
 
             <select 
-              placeholder="days"
+              value={this.state.duration_units}
               onChange={e => this.setState({ duration_units: e.target.value })}
             >
               <option value="minutes">minutes</option>

@@ -1,34 +1,9 @@
 import * as React from 'react';
+import { SideNav, BalanceData } from './Elements'
 import { RouteComponentProps, Link } from 'react-router-dom';
 import { get_balance_data, balanceDelete } from '../../helpers/transactions';
 import './Dashboard.less';
 import * as moment from 'moment';
-
-const SideNav = () => {
-
-  return (
-    <nav className="side-nav-container">
-      <div className="side-nav-header">
-        <img className="side-nav-logo" src="assets/logo-green.svg" />
-        <h3><Link to="/">Balance</Link></h3>
-      </div>
-      <ul className="side-nav-list">
-        <li className="nav-item">
-          <Link to="/dashboard">Current Balances</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/history">History</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/dashboard">Arbitrations</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/dashboard">Support</Link>
-        </li>
-      </ul>
-    </nav>
-  );
-};
 
 interface DashboardProps extends RouteComponentProps<{}> {}
 
@@ -83,6 +58,16 @@ class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
 
   }
 
+  handleUpdateBalance(updates: any) {
+    //const { balance } = this.state;
+    // console.log(updates)
+    // TODO: connect to API
+    //this.setState({
+      //balance: merge({}, balance, updates),
+      //isEdit: true
+    //});
+  }
+
   render() {
     
     var user_email = JSON.parse(localStorage.getItem("user_email"));
@@ -92,173 +77,49 @@ class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
 
     if (isLoading || balance_data == null) { 
 
-      console.log('not yet', balance_data)
+      console.log('Loading...', balance_data)
 
       return (<h3> Loading ... </h3>)
 
     } else {
  
-      console.log('now', balance_data)
+      console.log('Loaded:', balance_data)
 
       return (
 
         <div className="dashboard-container">
+
           <SideNav />
+
           <main className="main-container">
             <div className="main-header">
               <img className="main-logo" src="assets/logo-white.svg" />
               <h3> Title: {balance_data.title} </h3>
             </div>
 
-                      
-            <section className="balance-section">
-              <div className="balance-created-date"> Buyer Obligation </div>
-              <div className="balance-cards-container">
-                <div className="balance-summary-card">
-                  <div className="balance-participant-container">
-                    <div className="balance-participant-details">
-                      <div className="balance-stake">
-                        {balance_data.buyer_obligation}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="balance-section">
-              <div className="balance-created-date"> Seller Obligation </div>
-              <div className="balance-cards-container">
-                <div className="balance-summary-card">
-                  <div className="balance-participant-container">
-                    <div className="balance-participant-details">
-                      <div className="balance-stake">
-                        {balance_data.seller_obligation}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="balance-section">
-              <div className="balance-created-date"> Additional Details </div>
-              <div className="balance-cards-container">
-                <div className="balance-summary-card">
-                  <div className="balance-participant-container">
-                    <div className="balance-participant-details">
-                      <div className="balance-stake">
-                        {balance_data.balance_description}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="balance-section">
-              <div className="balance-created-date"> Buyer's email </div>
-              <div className="balance-cards-container">
-                <div className="balance-summary-card">
-                  <div className="balance-participant-container">
-                    <div className="balance-participant-details">
-                      <div className="balance-stake">
-                        {balance_data.buyer_email}  
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="balance-section">
-              <div className="balance-created-date"> Seller's email </div>
-              <div className="balance-cards-container">
-                <div className="balance-summary-card">
-                  <div className="balance-participant-container">
-                    <div className="balance-participant-details">
-                      <div className="balance-stake">
-                        {balance_data.seller_email}  
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="balance-section">
-              <div className="balance-created-date"> Payment to seller for completed balance</div>
-              <div className="balance-cards-container">
-                <div className="balance-summary-card">
-                  <div className="balance-participant-container">
-                    <div className="balance-participant-details">
-                      <div className="balance-stake">
-                        $ {balance_data.balance_price}  
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="balance-section">
-              <div className="balance-created-date"> Buyer's stake </div>
-              <div className="balance-cards-container">
-                <div className="balance-summary-card">
-                  <div className="balance-participant-container">
-                    <div className="balance-participant-details">
-                      <div className="balance-stake">
-                        $ {balance_data.buyer_stake_amount}  
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="balance-section">
-              <div className="balance-created-date"> Seller's stake </div>
-              <div className="balance-cards-container">
-                <div className="balance-summary-card">
-                  <div className="balance-participant-container">
-                    <div className="balance-participant-details">
-                      <div className="balance-stake">
-                        $ {balance_data.seller_stake_amount}  
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="balance-section">
-              <div className="balance-created-date"> balance due date </div>
-              <div className="balance-cards-container">
-                <div className="balance-summary-card">
-                  <div className="balance-participant-container">
-                    <div className="balance-participant-details">
-                      <div className="balance-stake">
-                        {moment(balance_data.due_date).format('LLLL')}  
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
+               <BalanceData 
+                balance_data={balance_data} 
+                onUpdate={this.handleUpdateBalance.bind(this)}
+               />
 
               <div>
                 <Link to="/dashboard">
                   <button className="btn-primary create-balance-btn">
                     <img src="assets/btn-logo-1.svg" />
-                    Send Balance
+                    Confirm Balance
                   </button>
                 </Link>
 
-                <button className="btn-primary create-balance-btn"
-                >
-                  <img src="assets/btn-logo-1.svg" />
-                  Edit Balance
-                </button>
+                <Link to="/create">
+                  <button className="btn-primary create-balance-btn"
+                    onClick={() => {
+                      console.log("clicked edit balance")
+                    }}       
+                  >
+                    <img src="assets/btn-logo-1.svg" />
+                    Edit Balance
+                  </button>
+                </Link>
 
                 <Link to="/dashboard">
                   <button className="btn-primary create-balance-btn"
@@ -281,74 +142,7 @@ class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
   }
 }
 
-export default BalanceSummary;
+export default BalanceSummary
+export { BalanceSummary, Balance_Data};
 
-/*
 
-"YYYY-MM-DDTHH:mm:ss"
-
-      <div className="dashboard-container">
-        <SideNav />
-        <main className="main-container">
-          <div className="main-header">
-            <img className="main-logo" src="assets/logo-white.svg" />
-            <h3> Review Balance for {user_alias} </h3>
-          </div>
-
-                    <b>Title:</b> {balance_data.title}
-          <section className="balance-section">
-            <div className="balance-created-date"> Text1 </div>
-
-            <div className="balance-cards-container">
-              <div className="balance-participants-card">
-                <div className="balance-participant-container">
-                  <div className="balance-participant-photo">{}</div>
-
-                  <div className="balance-participant-details">
-                    <div className="balance-stake">
-                      Text2
-                    </div>
-                    <div className="balance-goods">Text3</div>
-                  </div>
-                </div>
-
-                <div className="balance-participant-container">
-                  <div className="balance-participant-photo">{}</div>
-
-                  <div className="balance-participant-details">
-                  
-                    <div className="balance-stake">
-                      Text5
-                    </div>
-                    <div className="balance-goods">Text6</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="balance-agreement-container">
-                <h5 className="balance-agreement-header">Text7</h5>
-
-                <div className="balance-agreement-text">
-                  Text7
-                  <span className="text-bold">Text8</span>
-                </div>
-                <div className="balance-agreement-price">Text9</div>
-                
-                <div className="balance-agreement-text">        
-
-                </div>
-
-              </div>
-            </div>
-          </section>
-                    <b>Buyer Obligation:</b> {balance_data.buyer_obligation}
-
-          <section className="create-balance-container">
-              <button className="btn-primary create-balance-btn">
-                <img src="assets/btn-logo-1.svg" />
-                Send Balance
-              </button>
-          </section>
-        </main>
-      </div>
-*/

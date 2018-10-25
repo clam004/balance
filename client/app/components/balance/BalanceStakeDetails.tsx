@@ -1,14 +1,5 @@
 import * as React from 'react';
-
-
-interface IBalanceUser {
-  id:number,
-  username: string;
-  stake?: number;
-  goods?: string;
-  num_completed_balances?: number;
-  failures?: number;
-}
+import { IBalanceUser } from './BalanceCreator';
 
 interface Props {
   buyer: IBalanceUser;
