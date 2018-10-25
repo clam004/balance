@@ -26,16 +26,26 @@ api.all('/logout', logout);
 // For testing
 api.get('/ping', (req, res) => res.json({ message: 'pong'}));
 
-
 api.post('/get_balances', (req, res, next) => {
  	if(req.isAuthenticated()) {
-        console.log("id:", req.user.id)
+        console.log(" get current balances id:", req.user.id)
 		knex('balances')
 		.where('buyer_id',req.user.id).orWhere('seller_id',req.user.id)
 		.then(balances => {
 			res.json(balances);
 		});
+		console.log("post get_user authenticated")
+	}	
+});
 
+api.post('/get_history', (req, res, next) => {
+ 	if(req.isAuthenticated()) {
+        console.log(" get history id:", req.user.id)
+		knex('history')
+		.where('buyer_id',req.user.id).orWhere('seller_id',req.user.id)
+		.then(balances => {
+			res.json(balances);
+		});
 		console.log("post get_user authenticated")
 	}	
 });

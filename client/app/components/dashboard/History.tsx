@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
-import { API_URL, getBalances, toggleConfirm, toggleComplete, balanceDone } from '../../helpers/transactions';
+import { getHistory } from '../../helpers/transactions';
 import { logout } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
 import './Dashboard.less';
@@ -15,11 +15,11 @@ const SideNav = () => {
         <h3><Link to="/">Balance</Link></h3>
       </div>
       <ul className="side-nav-list">
-        <li className="nav-item active">
+        <li className="nav-item">
           <Link to="/dashboard">Current Balances</Link>
         </li>
-        <li className="nav-item">
-          <Link to="/history">History</Link>
+        <li className="nav-item active">
+          <Link to="/dashboard">History</Link>
         </li>
         <li className="nav-item">
           <Link to="/dashboard">Arbitrations</Link>
@@ -63,7 +63,7 @@ interface DashboardState {
   isLoading: boolean,
 }
 
-class Dashboard extends React.Component<DashboardProps, DashboardState> {
+class History extends React.Component<DashboardProps, DashboardState> {
 
   constructor(props: DashboardProps) {
 
@@ -80,9 +80,9 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     
     this.setState({ isLoading: true });
 
-    getBalances()
+    getHistory()
     .then(data => {
-      console.log(data);
+      console.log("data", data);
       if (Array.isArray(data)) {
         this.setState({data:data});
         this.setState({isLoading:false});      
@@ -91,77 +91,11 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
   }
 
-  public toggleConfirmState(index: number): void {
-    let balance: IBalance[] = this.state.data.splice(index,1); 
-    balance[0].agreement_confirmed = !balance[0].agreement_confirmed; 
-    let balances: IBalance[] = [...this.state.data];
-    balances.splice(index, 0, balance[0]);
-    this.setState({data:balances});
-  }
-
-  public toggleCompleteState(index: number): void {
-    let balance: IBalance[] = this.state.data.splice(index,1); 
-    balance[0].completed = !balance[0].completed; 
-    let balances: IBalance[] = [...this.state.data];
-    balances.splice(index, 0, balance[0]);
-    this.setState({data:balances});
-  }
-
-  public completeBalance(index: number): void {
-    let balance: IBalance[] = this.state.data.splice(index,1); 
-    const balances: IBalance[] = [...this.state.data]
-    this.setState({data:balances});
-  }
-
   public renderBalance(): JSX.Element[] {
 
     var user_id = JSON.parse(localStorage.getItem("user_id"));
     
     return this.state.data.map((balance, array_index) => {
-
-        if (balance.seller_id == user_id) {
-
-          var agreement_button = (
-            
-              <button
-              onClick={() => {
-                toggleConfirm({id:balance.id, confirm:balance.agreement_confirmed});
-                this.toggleConfirmState(array_index);
-              }}
-              >
-               {balance.agreement_confirmed? "undo confirm" : "confirm balance" }
-              </button>
-          )
-
-          var completed_button = (
-
-              <button
-              onClick={() => {
-                toggleComplete({id:balance.id, completed:balance.completed});
-                this.toggleCompleteState(array_index);
-              }}
-              >
-               {balance.completed? "undo complete" : "balance completed"}
-              </button>
-          )
-
-        } else if (balance.buyer_id == user_id && balance.completed) { 
-
-          var completed_button = (
-              <button
-              onClick={() => {
-                balanceDone({balance});
-                this.completeBalance(array_index);
-              }}
-              >
-               balance delivered complete contract 
-              </button>
-          )
-        } else {
-          var agreement_button = <span></span>
-          var completed_button = <span></span>
-        }
-
 
         return (
           <section key={balance.id} className="balance-section">
@@ -202,20 +136,6 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                   <span className="text-bold">due {' '} {moment(balance.due_date, moment.ISO_8601).fromNow()}</span>
                 </div>
                 <div className="balance-agreement-price">${balance.balance_price}</div>
-                
-                <div className="balance-agreement-text">
-                  <label>
-                  <h5 className="balance-agreement-header">{balance.agreement_confirmed? "balance confirmed" : "not confirmed"}</h5>
-                  {agreement_button}
-                  </label>
-                </div>
-                  
-                <div className="balance-agreement-text">
-                  <label>
-                  <h5 className="balance-agreement-header">{balance.completed? "balance completed" : "balance in progress"}</h5>
-                  {completed_button}
-                  </label>
-                </div>
 
               </div>
             </div>
@@ -304,26 +224,24 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
   }
 }
 
-export default Dashboard;
-
 var example_balance = {
   title:'Example Balance',
-  balance_description:' Example Balance: Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof',
-  buyer_obligation:'Have a roof and let in Toro on time',
+  balance_description:`Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof`,
+  buyer_obligation:'have a roof and let in toro on time',
   seller_obligation:'To install 3 solar panels',
   buyer_email: 'Josh@balance.com',
   seller_email:'Toro@balance.com',
   buyer_stake_amount:800,
-  seller_stake_amount:400,
-  balance_price:2000,
+  seller_stake_amount:300,
+  balance_price:3600,
   completed:false,
   agreement_confirmed:true,
   agreement_status:"confirm",
   buyer_id:1,
   seller_id:2,
-  created_at: "2018-10-25 12:52:55-07", 
-  updated_at: "2018-10-25 12:52:55-07", 
-  due_date: "2018-10-25 12:52:55-07", 
+  created_at:'Last Month',
+  updated_at:'Last Month',
+  due_date:'Next Month',
   id:0
   }
 
@@ -368,40 +286,10 @@ const BalanceDetails = ({ balance }: { balance: IBalance}) => {
               </div>
               <div className="balance-agreement-price">${balance.balance_price}</div>
               
-              <div
-              onClick={() => {
-                toggleConfirm({id:balance.id, confirm:balance.agreement_confirmed});
-              }}
-              className="balance-agreement-text"
-              >
-              <button>
-                <h5>{balance.agreement_status}</h5>
-              </button>
-              </div>
-
             </div>
           </div>
         </section>
   );
 };
 
-
-
-
-    /*
-    const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
-    fetch(BAL_API_URL)
-      .then(response => response.json())
-      .then(data => this.setState( {data:data, isLoading: false} ));
-    */
-
-    /*  
-    const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
-    fetch(BAL_API_URL)
-      .then(response => response.json())
-      .then(data => {
-      console.log(typeof(data));
-      this.setState({data:data});
-      this.setState({isLoading: false}); 
-      });
-    */
+export default History;

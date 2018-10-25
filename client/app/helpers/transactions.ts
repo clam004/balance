@@ -55,6 +55,10 @@ export const getBalances = (): Promise<HttpResponse> => {
   return post('/api/get_balances');
 };
 
+export const getHistory = (): Promise<HttpResponse> => {
+  return post('/api/get_history');
+};
+
 export const API_URL = 'http://localhost:8000' // 'https://appbalance.herokuapp.com' // 
 
 /*
