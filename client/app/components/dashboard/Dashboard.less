@@ -1,6 +1,12 @@
 @import '../../styles/variables.less';
 
 // TODO: DRY up similar classes
+
+.StripeElement {
+  background-color: @white;
+}
+
+
 .dashboard-container {
   background-color: @white;
   display: flex;
@@ -16,6 +22,10 @@
     > h3 {
       color: @green;
     }
+  }
+  
+  .user-info-container {
+    max-width:  600px; // TODO
   }
 
   .side-nav-logo {

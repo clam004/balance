@@ -11,10 +11,6 @@ const config = require('./db/knexfile.js')[env];
 const knex = require('knex')(config);
 const moment = require('moment');
 
-api.post('/signup', users.signup);
-
-api.post('/login', auth, users.login);
-
 const logout = (req, res) => {
   //console.log( req.user)
   req.logout(); 
@@ -22,6 +18,23 @@ const logout = (req, res) => {
 };
 
 api.all('/logout', logout);
+
+api.post('/signup', users.signup);
+
+api.post('/login', auth, users.login);
+
+api.post('/get_user_data', (req, res, next) => {
+	//console.log('req.user.id',req.user.id)
+	if(req.isAuthenticated()) {
+		knex('users').select(['id','email','username','num_completed_balances','stripe_connect_account_token','stripe_customer_id'])
+		.where('id',req.user.id)
+		.limit(1)
+		.then(users => {
+			res.json(users);
+		});		
+	}	
+	
+});
 
 // For testing
 api.get('/ping', (req, res) => res.json({ message: 'pong'}));
@@ -34,7 +47,6 @@ api.post('/get_balances', (req, res, next) => {
 		.then(balances => {
 			res.json(balances);
 		});
-		console.log("post get_user authenticated")
 	}	
 });
 
@@ -123,6 +135,8 @@ api.post('/submit_balance', (req, res, next) => {
  		buyer_email:req.body.buyer.email,
  		seller_email:req.body.seller.email,
  		completed:false,
+		buyer_confirmed: true,
+		seller_confirmed: null,
  		buyer_id:req.user.id,
  		seller_id:req.body.seller.id,
  		buyer_stake_amount:req.body.buyer.stake,
@@ -144,7 +158,7 @@ api.post('/toggle_confirm', (req, res, next) => {
 	return knex('balances')
 	.where('id',req.body.id)
 	.update({
-		agreement_confirmed:!req.body.confirm,
+		seller_confirmed:!req.body.confirm,
 		updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
 	})
 	.then(response => {res.json(response)});
@@ -174,7 +188,8 @@ api.post('/balance_done', (req, res, next) => {
  		buyer_email:req.body.balance.buyer_email,
  		seller_email:req.body.balance.seller_email,
  		completed:req.body.balance.completed,
- 		agreement_confirmed:req.body.balance.agreement_confirmed,
+		//buyer_confirmed: req.body.balance.buyer_confirmed,
+		//seller_confirmed: req.body.balance.seller_confirmed,
  		buyer_id:req.body.balance.buyer_id,
  		seller_id:req.body.balance.seller_id,
  		buyer_stake_amount:req.body.balance.buyer_stake_amount,
@@ -182,7 +197,7 @@ api.post('/balance_done', (req, res, next) => {
  		balance_price:req.body.balance.balance_price,
  		created_at:req.body.balance.created_at,
  		updated_at:req.body.balance.updated_at,
- 		due_date:req.body.balance.updated_at,
+ 		due_date:req.body.balance.due_date,
  		completed_date:moment().format("YYYY-MM-DDTHH:mm:ss")
  	})	
  	.then(() => {
@@ -207,7 +222,7 @@ api.post('/get_balance_data', (req, res, next) => {
 
 	if(req.isAuthenticated()) {
 
- 	console.log(req.body)
+ 	console.log('/get_balance_data',req.body)
 
 	knex('balances')
 		.where('id',req.body.balance_id)
@@ -216,7 +231,6 @@ api.post('/get_balance_data', (req, res, next) => {
 		});	
 	}	
 });
-
 
 api.post('/balance_delete', (req, res, next) => {
 	if(req.isAuthenticated()) {
@@ -230,6 +244,10 @@ api.post('/balance_delete', (req, res, next) => {
 	}
  });
 
+api.post('/is_logged_in', (req, res, next) => {
+	console.log(req.isAuthenticated())
+	res.json({is_logged_in:req.isAuthenticated()})
+ });
 
 module.exports = api;
 
@@ -282,4 +300,16 @@ const balances = (req, res) => {
 	}
 };
 
+
+api.post('/store_plaid_token', (req, res, next) => {
+	console.log("data received ", req.body.plaid_token)
+
+	return knex('users')
+	.where('id', req.user.id)
+	.update({
+		plaid_token:req.body.plaid_token,
+	})
+	.then(response => {res.json(response)});
+	
+});
 	*/

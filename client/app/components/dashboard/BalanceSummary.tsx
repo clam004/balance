@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { SideNav, BalanceData } from './Elements'
 import { RouteComponentProps, Link } from 'react-router-dom';
-import { get_balance_data, balanceDelete } from '../../helpers/transactions';
+import { get_balance_data, balanceDelete } from '../../helpers/usersbalances';
+import { logout, getUserData } from '../../helpers/auth';
 import './Dashboard.less';
 import * as moment from 'moment';
 
@@ -23,7 +24,11 @@ interface Balance_Data {
 interface DashboardState {
   balance_data: Balance_Data,
   isLoading: boolean,
-  balance_id: number
+  balance_id: number,
+  user_id:number,
+  has_connect_account:boolean,
+  has_customer_id:boolean,
+  user_email:string,
 }
 
 class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
@@ -36,7 +41,11 @@ class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
     this.state = {
       balance_data: null,
       isLoading: false,
-      balance_id: null
+      balance_id: null,
+      user_id:null,
+      has_connect_account:null,
+      has_customer_id:null,
+      user_email:null,
     }
 
   }
@@ -48,13 +57,30 @@ class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
     var balance_id = JSON.parse(localStorage.getItem("balance_id"));
 
     get_balance_data({balance_id:balance_id})
+    .then(balance_data => {
+    this.setState({isLoading: false})
+    this.setState({balance_data:balance_data[0]})
+    }); 
 
-      .then(balance_data => {
-     
-      this.setState({isLoading: false})
-      this.setState({balance_data:balance_data[0]})
-
-      }); 
+    getUserData()
+    .then(userdata => {  
+      if (userdata) {
+        console.log("userdata", userdata[0]);
+        let has_connect_account = false;
+        let has_customer_id = false;
+        if (userdata[0].stripe_connect_account_token) {
+          has_connect_account = true;
+        }
+        if (userdata[0].stripe_customer_id) {
+          has_customer_id = true;
+        }
+        this.setState({user_id:userdata[0].id,
+                       has_connect_account:has_connect_account,
+                       has_customer_id:has_customer_id,  
+                       user_email:userdata[0].email, 
+                       isLoading:false}); 
+      }
+    });
 
   }
 
@@ -70,8 +96,13 @@ class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
 
   render() {
     
-    var user_email = JSON.parse(localStorage.getItem("user_email"));
-    var user_alias = user_email.substr(0, user_email.indexOf('@')); 
+    var user_email = this.state.user_email 
+
+    var user_alias = "You"
+
+    if (user_email) {
+      user_alias = user_email.substr(0, user_email.indexOf('@')); 
+    }
     
     const { balance_data, isLoading } = this.state;
 

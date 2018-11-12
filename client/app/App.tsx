@@ -4,9 +4,10 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { Home, About } from './components/home';
 import { Login, SignUp, SignUpComplete } from './components/auth';
-import { Dashboard, BalanceSummary, History } from './components/dashboard';
+import { Dashboard, BalanceSummary, History, MyAccount } from './components/dashboard';
 import { BalanceCreator } from './components/balance';
 import { Test } from './components/test';
+import PrivateRoute from './PrivateRoute'
 import './App.less';
 
 ReactDOM.render(
@@ -23,6 +24,7 @@ ReactDOM.render(
         <Route path="/balancesummary" component={BalanceSummary} />
         <Route path="/history" component={History} />
         <Route path="/create" component={BalanceCreator} />
+        <Route path="/myaccount" component={MyAccount} />
         <Route path="/test" component={Test} />
       </Switch>
     </div>
@@ -30,3 +32,6 @@ ReactDOM.render(
   document.getElementById('app')
 );
 
+/*
+        <PrivateRoute path="/history" component={History} />
+*/

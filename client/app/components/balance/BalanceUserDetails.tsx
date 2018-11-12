@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { get_init_users, update_search_users } from '../../helpers/transactions';
+import { get_init_users, update_search_users } from '../../helpers/usersbalances';
 
 interface State {
   user_id:number;

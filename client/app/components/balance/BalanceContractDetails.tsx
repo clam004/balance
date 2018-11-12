@@ -20,6 +20,8 @@ interface State {
   description: string;
   payment: number;
   duration: number;
+  payment_str: string;
+  duration_str: string;
   duration_units:string
 }
 
@@ -38,16 +40,32 @@ class BalanceContractDetails extends React.Component<Props, State> {
       description,
       payment,
       duration,
+      payment_str: "",
+      duration_str: "",
       duration_units
     };
   }
 
+  componentDidMount() {
+
+    if (this.state.payment != null) {
+      this.setState({payment_str:this.state.payment.toString()})
+    }
+
+    if (this.state.duration != null) {
+      this.setState({duration_str:this.state.duration.toString()})
+    }
+
+  }
+
   render() {
 
-    //console.log("state: ",this.state)
-    const { title, buyer_obligation, seller_obligation, 
-            description, payment, duration, duration_units } = this.state;
-    const { onUpdate } = this.props;
+    var { title, buyer_obligation, seller_obligation, 
+            description, payment, duration, duration_units,
+            duration_str, payment_str,
+          } = this.state;
+
+    var { onUpdate } = this.props;
 
     return (
       <div>
@@ -110,14 +128,21 @@ class BalanceContractDetails extends React.Component<Props, State> {
           </div>
 
           <div className="form-group">
-            <label className="label-default">Payment Amount (blank = $0)</label>
+            <label className="label-default"> Amount you will pay (blank = $0)</label>
             <input
               className="input-default full-width"
               type="number"
               min="0"
               placeholder="$0"
-              value={payment || null}
-              onChange={e => this.setState({ payment: Number(e.target.value) })}
+              value={payment_str}
+              onChange={e => {
+                if (e.target.value == "") {
+                  this.setState({payment:null, payment_str:e.target.value})
+                } else {
+                  this.setState({payment:Number(e.target.value), payment_str:e.target.value},() =>{
+                  })
+                }
+              }}
             />
           </div>
 
@@ -128,8 +153,16 @@ class BalanceContractDetails extends React.Component<Props, State> {
               type="number"
               min="0"
               placeholder="(Number)"
-              value={duration || ""}
-              onChange={e => this.setState({ duration: Number(e.target.value) })}
+              value={duration_str}
+              onChange={e => {
+
+                if (e.target.value == "") {
+                  this.setState({duration:null, duration_str:e.target.value})
+                } else {
+                  this.setState({duration:Number(e.target.value), duration_str:e.target.value},() =>{
+                  })
+                }
+              }}
             />
 
             <select 
@@ -146,10 +179,11 @@ class BalanceContractDetails extends React.Component<Props, State> {
 
           <button
             className="btn-primary full-width"
-            onClick={() =>
+            onClick={() => {
+              console.log("payment, duration", payment, duration)
               onUpdate({ agreement: { title, buyer_obligation, seller_obligation, description, 
                                       payment, duration, duration_units } })
-            }
+            }}
           >
             <img src="assets/btn-logo-1.svg" style={{ marginRight: 16 }} />
             Save Contract

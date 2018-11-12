@@ -10,24 +10,41 @@ interface Props {
 interface State {
   buyerStake: number;
   sellerStake: number;
+  buyerStake_str: string;
+  sellerStake_str: string;
 }
 
 class BalanceStakeDetails extends React.Component<Props, State> {
+
   constructor(props: Props) {
     super(props);
-
     const { buyer = {} as IBalanceUser, seller = {} as IBalanceUser } = props;
     const { stake: buyerStake } = buyer;
     const { stake: sellerStake } = seller;
+    this.state = { 
+      buyerStake, 
+      sellerStake,
+      buyerStake_str:"", 
+      sellerStake_str:"",
+    };
+  }
 
-    this.state = { buyerStake, sellerStake };
+  componentDidMount() {
+
+    if (this.state.buyerStake != null) {
+      this.setState({buyerStake_str:this.state.buyerStake.toString()})
+    }
+
+    if (this.state.sellerStake != null) {
+      this.setState({sellerStake_str:this.state.sellerStake.toString()})
+    }
+
   }
 
   render() {
 
-    const { buyerStake, sellerStake } = this.state;
+    const { buyerStake, sellerStake, buyerStake_str, sellerStake_str } = this.state;
     const { onUpdate } = this.props;
-    //console.log("stakes: ",this.state)
 
     return (
       <div>
@@ -52,24 +69,35 @@ class BalanceStakeDetails extends React.Component<Props, State> {
               className="input-default full-width"
               type="number"
               placeholder="$50"
-              value={buyerStake}
-              onChange={e =>
-                this.setState({ buyerStake: Number(e.target.value) })
+              value={buyerStake_str}
+              onChange={e => {
+
+                if (e.target.value=="") {
+                  this.setState({ buyerStake:null, buyerStake_str:e.target.value})
+                } else {
+                  this.setState({ buyerStake:Number(e.target.value), buyerStake_str:e.target.value})
+                }
+              }
               }
             />
           </div>
 
           <div className="form-group">
             <label className="label-default">
-              User's Proposed Stake (Optional)
+              Seller's Proposed Stake (Optional)
             </label>
             <input
               className="input-default full-width"
               type="number"
               placeholder="$25"
-              value={sellerStake}
-              onChange={e =>
-                this.setState({ sellerStake: Number(e.target.value) })
+              value={sellerStake_str}
+              onChange={e => {
+                if (e.target.value=="") {
+                  this.setState({ sellerStake:null, sellerStake_str:e.target.value })
+                } else {
+                  this.setState({ sellerStake:Number(e.target.value), sellerStake_str:e.target.value })
+                }
+              } 
               }
             />
           </div>

@@ -28,13 +28,17 @@
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "pg": "^6.1.2",
+    "plaid": "^2.9.0",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
+    "react-plaid-link": "^1.0.3",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.1.1",
+    "react-stripe-elements": "^2.0.1",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "stripe": "^6.13.0"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",

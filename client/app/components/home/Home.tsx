@@ -28,8 +28,7 @@ class Home extends React.Component<HomeProps, HomeState> {
           <img className="sidebar-logo" src="assets/logo-green-large.svg" />
           <h1 className="sidebar-header">Balance</h1>
           <p className="sidebar-text">
-            Balance makes it easy to create trustworthy contracts between
-            businesses and freelancers
+            Build sincere collaborations.
           </p>
           <button
             className="btn-primary signup-btn"
@@ -63,10 +62,9 @@ class Home extends React.Component<HomeProps, HomeState> {
               <div className="about-content">
                 <h4>What is Balance?</h4>
                 <p>
-                  Balance is an easy and trustworthy way to make a contract with
-                  someone for a job or comission. Too often are contracts
-                  between individuals difficult to resolve, and balance helps
-                  both sides build sincere collaborations.
+                  Too often are contracts between individuals difficult to resolve. 
+                  Balance is an easy and trustworthy way to make a contract
+                  between businesses and freelancers for a job or comission. 
                 </p>
               </div>
             </section>

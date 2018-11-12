@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
-import { getHistory } from '../../helpers/transactions';
-import { logout } from '../../helpers/auth';
+import { getHistory } from '../../helpers/usersbalances';
+import { logout, getUserData } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
 import './Dashboard.less';
 import * as moment from 'moment';
@@ -26,6 +26,9 @@ const SideNav = () => {
         </li>
         <li className="nav-item">
           <Link to="/dashboard">Support</Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/myaccount">My Account</Link>
         </li>
         <li className="nav-item">
           <Link onClick={() => logout()} to="/">Logout</Link>
@@ -61,6 +64,10 @@ interface IBalance {
 interface DashboardState {
   data:  Array<IBalance>, // Array<HttpResponse>, //
   isLoading: boolean,
+  user_id:number,
+  has_connect_account:boolean,
+  has_customer_id:boolean,
+  user_email:string,
 }
 
 class History extends React.Component<DashboardProps, DashboardState> {
@@ -72,6 +79,10 @@ class History extends React.Component<DashboardProps, DashboardState> {
     this.state = {
       data: [],
       isLoading: false,
+      user_id:null,
+      has_connect_account:null,
+      has_customer_id:null,
+      user_email:null,
     }
 
   }
@@ -86,6 +97,26 @@ class History extends React.Component<DashboardProps, DashboardState> {
       if (Array.isArray(data)) {
         this.setState({data:data});
         this.setState({isLoading:false});      
+      }
+    });
+
+    getUserData()
+    .then(userdata => {  
+      if (userdata) {
+        console.log("userdata", userdata[0]);
+        let has_connect_account = false;
+        let has_customer_id = false;
+        if (userdata[0].stripe_connect_account_token) {
+          has_connect_account = true;
+        }
+        if (userdata[0].stripe_customer_id) {
+          has_customer_id = true;
+        }
+        this.setState({user_id:userdata[0].id,
+                       has_connect_account:has_connect_account,
+                       has_customer_id:has_customer_id,  
+                       user_email:userdata[0].email, 
+                       isLoading:false}); 
       }
     });
 
@@ -148,11 +179,13 @@ class History extends React.Component<DashboardProps, DashboardState> {
 
     const { data, isLoading } = this.state;
     
-    var user_email = JSON.parse(localStorage.getItem("user_email"));
-    var user_alias = user_email.substr(0, user_email.indexOf('@')); 
-    
-    // TODO: try out styled components
-    //if (Array.isArray(data) && data.length >0) {
+    var user_email = this.state.user_email 
+
+    var user_alias = "You"
+
+    if (user_email) {
+      user_alias = user_email.substr(0, user_email.indexOf('@')); 
+    }
 
     if (!isLoading && data.length > 0) {
 
@@ -163,7 +196,7 @@ class History extends React.Component<DashboardProps, DashboardState> {
           <main className="main-container">
             <div className="main-header">
               <img className="main-logo" src="assets/logo-white.svg" />
-              <h3> Current Balances for {user_alias} </h3>
+              <h3> Past Balances for {user_alias} </h3>
             </div>
 
             <div className="balances-container">
@@ -203,9 +236,7 @@ class History extends React.Component<DashboardProps, DashboardState> {
 
             <div className="balances-container">
 
-            <BalanceDetails 
-              balance = {example_balance}
-            />
+            No Completed Balances
 
               <section className="create-balance-container">
                 <Link to="/create">
@@ -224,72 +255,5 @@ class History extends React.Component<DashboardProps, DashboardState> {
   }
 }
 
-var example_balance = {
-  title:'Example Balance',
-  balance_description:`Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof`,
-  buyer_obligation:'have a roof and let in toro on time',
-  seller_obligation:'To install 3 solar panels',
-  buyer_email: 'Josh@balance.com',
-  seller_email:'Toro@balance.com',
-  buyer_stake_amount:800,
-  seller_stake_amount:300,
-  balance_price:3600,
-  completed:false,
-  agreement_confirmed:true,
-  agreement_status:"confirm",
-  buyer_id:1,
-  seller_id:2,
-  created_at:'Last Month',
-  updated_at:'Last Month',
-  due_date:'Next Month',
-  id:0
-  }
-
-
-const BalanceDetails = ({ balance }: { balance: IBalance}) => {
-
-  return (
-        <section className="balance-section">
-          <div className="balance-created-date"> Created {balance.created_at} </div>
-
-          <div className="balance-cards-container">
-            <div className="balance-participants-card">
-              <div className="balance-participant-container">
-                <div className="balance-participant-photo">{/* TODO */}</div>
-
-                <div className="balance-participant-details">
-                  <div className="balance-stake">
-                    {balance.buyer_email} has staked ${balance.buyer_stake_amount}
-                  </div>
-                  <div className="balance-goods">{balance.buyer_obligation}</div>
-                </div>
-              </div>
-
-              <div className="balance-participant-container">
-                <div className="balance-participant-photo">{/* TODO */}</div>
-
-                <div className="balance-participant-details">
-                  <div className="balance-stake">
-                    {balance.seller_email} has staked ${balance.seller_stake_amount}
-                  </div>
-                  <div className="balance-goods">{balance.seller_obligation}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="balance-agreement-container">
-              <h5 className="balance-agreement-header">Balance Agreement</h5>
-
-              <div className="balance-agreement-text">
-                {balance.balance_description} due {' '}
-                <span className="text-bold">{moment(balance.due_date, moment.ISO_8601).fromNow()}</span>…
-              </div>
-              <div className="balance-agreement-price">${balance.balance_price}</div>
-              
-            </div>
-          </div>
-        </section>
-  );
-};
 
 export default History;

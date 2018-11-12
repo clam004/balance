@@ -8,8 +8,12 @@ const { build, port, secret } = require('./config');
 const { template } = require('./helpers');
 const knex = require('./db/knex');
 const api = require('./api');
-
+const finapi = require('./finapi');
 const app = express();
+
+var path = require('path');
+var fs = require('fs');
+var https = require('https');
 
 app.use(express.static(build));
 app.use(cookieParser());
@@ -47,14 +51,16 @@ app.use(passport.session());
 const home = (req, res) => res.send(template());
 
 app.use('/api', api);
+app.use('/finapi', finapi);
 app.get('*', home);
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+//app.listen(port, () => console.log(`Listening on port ${port}`));
+
+var certOptions = {
+  key: fs.readFileSync(path.resolve('build/cert/server.key')),
+  cert: fs.readFileSync(path.resolve('build/cert/server.crt'))
+}
 
 
-/*
-passport.deserializeUser(function(obj, done) {
-  done(null, false);  // invalidates the existing login session.
-});
-*/
+var server = https.createServer(certOptions, app).listen(port, () => console.log(`Listening on port ${port}`));
 

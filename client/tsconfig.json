@@ -3,7 +3,7 @@
     "jsx": "react",
     "lib" : ["es2015", "es2015.iterable", "dom"],
     "moduleResolution": "node",
-    "noImplicitAny": true,
+    "noImplicitAny": false, //true,
     "outDir": "build",
     "sourceMap": true,
     "target": "es5"

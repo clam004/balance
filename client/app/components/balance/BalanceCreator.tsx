@@ -6,7 +6,8 @@ import BalanceUserDetails from './BalanceUserDetails';
 import BalanceContractDetails from './BalanceContractDetails';
 import BalanceStakeDetails from './BalanceStakeDetails';
 import './Balance.less';
-import { submitBalance, get_balance_data, updateBalance } from '../../helpers/transactions';
+import { submitBalance, get_balance_data, updateBalance } from '../../helpers/usersbalances';
+import { logout, getUserData } from '../../helpers/auth';
 
 enum BalanceStep {
   SELECT_USER = 'SELECT_USER',
@@ -91,18 +92,11 @@ class BalanceCreator extends React.Component<
   constructor(props: BalanceCreatorProps & RouteComponentProps<{}>) {
     super(props);
 
-    var user_email = JSON.parse(localStorage.getItem("user_email"));
-    var user_alias = user_email.substr(0, user_email.indexOf('@')); 
-    var num_completed_balances = JSON.parse(localStorage.getItem("num_completed_balances"));
-
-    const currentUser = { username: user_alias, 
-                          email:user_email,
-                          num_completed_balances: num_completed_balances 
-                        };
+    var initUser = {stake:""};
 
     this.state = {
       balance: {
-        buyer: currentUser,
+        buyer: {} as IBalanceUser, 
         seller: {} as IBalanceUser,
         agreement: {} as IBalanceAgreement,
         balance_id:null,
@@ -116,13 +110,44 @@ class BalanceCreator extends React.Component<
 
   componentDidMount() {
 
+    getUserData()
+    .then(userdata => {  
+      if (userdata) {
+
+        let has_connect_account = false;
+        let has_customer_id = false;
+
+        if (userdata[0].stripe_connect_account_token) {
+          has_connect_account = true;
+        }
+
+        if (userdata[0].stripe_customer_id) {
+          has_customer_id = true;
+        }
+
+        var user_email = userdata[0].email;
+        var user_alias = user_email.substr(0, user_email.indexOf('@')); 
+        var num_completed_balances = userdata[0].num_completed_balances;
+
+        var currentUser = { username: user_alias, 
+                            email:user_email,
+                            num_completed_balances: num_completed_balances 
+                          };
+
+        this.handleUpdateBalance({buyer:currentUser})
+
+      }
+      
+    });
+      
+
     var balance_id = JSON.parse(localStorage.getItem("balance_id"));
 
     if (balance_id) {
 
       this.setState({edit:true})    
       this.handleUpdateBalance({balance_id:balance_id})
-      
+
       get_balance_data({balance_id:balance_id})
       .then(balance_data => {
        
@@ -238,8 +263,6 @@ class BalanceCreator extends React.Component<
     const { balance, selected } = this.state;
     const { buyer, seller, agreement } = balance;
 
-    console.log(" render: ", this.state)
-
     const error_state = this.state.error;
 
     let error_message;
@@ -308,12 +331,12 @@ class BalanceCreator extends React.Component<
               <div className="new-balance-action-container">
                 <BalanceStepCard
                   text={
-                    agreement.title && seller.username
-                      ? `${agreement.title} from ${seller.username}`
+                    agreement.title && seller.email
+                      ? `${agreement.title} within ${agreement.duration} ${agreement.duration_units}`
                       : 'Add an agreement to the contract'
                   }
                   subtext={
-                    agreement.title && agreement.description
+                    agreement.title && agreement.duration
                       ? 'See contract details here'
                       : 'Make a quick list of the things you want done'
                   }
@@ -335,12 +358,12 @@ class BalanceCreator extends React.Component<
                 <BalanceStepCard
                   text={
                     buyer.stake
-                      ? `${buyer.username} staked $${buyer.stake}`
+                      ? `you staked $${buyer.stake}`
                       : 'Decide how much you want to stake'
                   }
                   subtext={
-                    seller.username && seller.stake
-                      ? `${seller.username} staked $${seller.stake}`
+                    seller.email && seller.stake
+                      ? `${seller.email} staked $${seller.stake}`
                       : 'Stakes help build trust and mutual intention'
                   }
                   isSelected={selected === BalanceStep.SET_STAKE}

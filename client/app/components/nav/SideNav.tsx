@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { RouteComponentProps, Link } from 'react-router-dom';
 
 const SideNav = () => {
   return (
@@ -14,10 +15,13 @@ const SideNav = () => {
           <a href="/dashboard">Current Balances</a>
         </li>
         <li className="nav-item">
-          <a href="/dashboard">History</a>
+          <a href="/history">History</a>
         </li>
         <li className="nav-item">
           <a href="/dashboard">Arbitrations</a>
+        </li>
+        <li className="nav-item">
+          <Link to="/myaccount">My Account</Link>
         </li>
         <li className="nav-item">
           <a href="/dashboard">Support</a>
