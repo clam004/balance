@@ -202,7 +202,7 @@ class History extends React.Component<DashboardProps, DashboardState> {
             <div className="balances-container">
         
             {
-              this.renderBalance();
+              this.renderBalance()
             }
 
               <section className="create-balance-container">
