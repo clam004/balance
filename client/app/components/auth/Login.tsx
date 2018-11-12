@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { login } from '../../helpers/auth';
+import { login, isLoggedIn } from '../../helpers/auth';
 import './Auth.less';
 
 interface LoginProps {}

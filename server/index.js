@@ -54,8 +54,9 @@ app.use('/api', api);
 app.use('/finapi', finapi);
 app.get('*', home);
 
-//app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(port, () => console.log(`Listening on port ${port}`));
 
+/*
 var certOptions = {
   key: fs.readFileSync(path.resolve('build/cert/server.key')),
   cert: fs.readFileSync(path.resolve('build/cert/server.crt'))
@@ -63,4 +64,5 @@ var certOptions = {
 
 
 var server = https.createServer(certOptions, app).listen(port, () => console.log(`Listening on port ${port}`));
+*/
 

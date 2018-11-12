@@ -59,9 +59,7 @@ export const getHistory = (): Promise<HttpResponse> => {
   return post('/api/get_history');
 };
 
-export const deleteBalance = (balance_id:object): Promise<HttpResponse> => {
-  return post('/api/delete_balance', balance_id);
-};
+
 
 /*
 

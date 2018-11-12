@@ -377,6 +377,7 @@ class BalanceCreator extends React.Component<
             <section className="new-balance-detail-container">
               {this.renderBalanceDetails()}
             </section>
+            
           </div>
 
           <section className="create-balance-container">
