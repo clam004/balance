@@ -20,6 +20,10 @@ const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 
+console.log('fin api process.env', process.env);
+//console.log('PLAID_CLIENT_ID', PLAID_CLIENT_ID);
+//console.log('PLDPUBLISHABLE_KEY', PLDPUBLISHABLE_KEY);
+
 const stripe = require("stripe")(STRIPE_SECRET_KEY);
 
 var plaid = require('plaid');
