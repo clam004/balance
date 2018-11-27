@@ -19,8 +19,9 @@ import {Elements, StripeProvider} from 'react-stripe-elements';
 import CheckoutForm from './CheckoutForm';
 
 //const { PLDPUBLISHABLE_KEY, STRIPE_PUBLIC_KEY } = require('../../../../build/pldconfig');
-const PLDPUBLISHABLE_KEY = process.env.PLAID_PUBLISHABLE_KEY;
-const STRIPE_PUBLIC_KEY = process.env.STRIPE_PUBLIC_KEY;
+const PLDPUBLISHABLE_KEY = "a29874eb5e8cd1e080a3ca90d5183b";
+
+console.log('PLDPUBLISHABLE_KEY',PLDPUBLISHABLE_KEY)
 
 const SideNav = () => {
 
@@ -59,7 +60,6 @@ interface AccountProps extends RouteComponentProps<{}> {}
 interface AccountState {
   isLoading: boolean,
   pldpublickey:string,
-  strppublickey:string,
   user_id:number,
   has_connect_account:boolean,
   has_customer_id:boolean,
@@ -89,7 +89,6 @@ class MyAccount extends React.Component<AccountProps, AccountState> {
     this.state = {
       isLoading:false,
       pldpublickey:PLDPUBLISHABLE_KEY,
-      strppublickey:STRIPE_PUBLIC_KEY,
       user_id:null,
       has_connect_account:null,
       has_customer_id:null,
