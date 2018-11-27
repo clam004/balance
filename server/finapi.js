@@ -13,16 +13,12 @@ const knex = require('knex')(config);
 const moment = require('moment');
 
 
-//const { PLDPUBLISHABLE_KEY, PLAID_CLIENT_ID, PLAID_SECRET,STRIPE_SECRET_KEY } = require('../build/spldconfig');
+const { PLAID_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, PLAID_CLIENT_ID, PLAID_SECRET } = require('../spldconfig');
 
-const PLDPUBLISHABLE_KEY = process.env.PLAID_PUBLISHABLE_KEY;
-const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
-const PLAID_SECRET = process.env.PLAID_SECRET;
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-
-console.log('fin api process.env', process.env);
-//console.log('PLAID_CLIENT_ID', PLAID_CLIENT_ID);
-//console.log('PLDPUBLISHABLE_KEY', PLDPUBLISHABLE_KEY);
+console.log('finapi PLAID_CLIENT_ID', PLAID_CLIENT_ID);
+console.log('finapi PLAID_PUBLISHABLE_KEY', PLAID_PUBLISHABLE_KEY);
+console.log('finapi PLAID_SECRET', PLAID_SECRET);
+console.log('finapi STRIPE_SECRET_KEY', STRIPE_SECRET_KEY);
 
 const stripe = require("stripe")(STRIPE_SECRET_KEY);
 
@@ -30,17 +26,9 @@ var plaid = require('plaid');
 
 var plaidClient = new plaid.Client(PLAID_CLIENT_ID,
                                    PLAID_SECRET ,
-                                   PLDPUBLISHABLE_KEY,
+                                   PLAID_PUBLISHABLE_KEY,
                                    plaid.environments.sandbox);
                                    //plaid.environments.development);
-
-// Can I use the bank account token to make a customer ID and account token ? 
-// Do we need authentication at each payment ? 
-// unused: bankAccountToken btok_1DY0MlFe8nlPJCfgKrR38PH4
-// accessToken access-sandbox-53cd0926-7819-4fb7-a16d-7bf43cacf697
-// bankAccountToken: btok_1DY0gOFe8nlPJCfgaMHEKUii // stripe_bank_account_token
-// this works when the customer is a credit card generated id and account is a
-// connected account, 
 
 finapi.post('/test_payment_api', (req, response, next) => {
  

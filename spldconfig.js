@@ -1,0 +1,8 @@
+
+
+module.exports = {
+  PLAID_PUBLISHABLE_KEY:process.env.PLAID_PUBLISHABLE_KEY,
+  PLAID_CLIENT_ID:process.env.PLAID_CLIENT_ID,
+  PLAID_SECRET:process.env.PLAID_SECRET, 
+  STRIPE_SECRET_KEY:process.env.STRIPE_SECRET_KEY,
+};
