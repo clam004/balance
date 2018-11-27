@@ -68,10 +68,11 @@ if (env == 'dev') {
   var server = https.createServer(certOptions, app).listen(port, () => console.log(`Listening on port ${port}`));
 
 } else {
+
   console.log("process.env.NODE_ENV", env)
   app.listen(port, () => console.log(`Listening on port ${port}`));
-}
 
+}
 
 
 

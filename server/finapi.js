@@ -12,10 +12,14 @@ const config = require('./db/knexfile.js')[env];
 const knex = require('knex')(config);
 const moment = require('moment');
 
-const { PLDPUBLISHABLE_KEY, 
-	    PLAID_CLIENT_ID, 
-	    PLAID_SECRET,
-	    STRIPE_SECRET_KEY } = require('../build/spldconfig');
+
+//const { PLDPUBLISHABLE_KEY, PLAID_CLIENT_ID, PLAID_SECRET,STRIPE_SECRET_KEY } = require('../build/spldconfig');
+
+const NODE_ENV = process.env.NODE_ENV;
+const PLDPUBLISHABLE_KEY = process.env.PLAID_PUBLISHABLE_KEY;
+const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
+const PLAID_SECRET = process.env.PLAID_SECRET;
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 
 const stripe = require("stripe")(STRIPE_SECRET_KEY);
 

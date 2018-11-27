@@ -18,7 +18,9 @@ import PlaidLink from 'react-plaid-link'
 import {Elements, StripeProvider} from 'react-stripe-elements';
 import CheckoutForm from './CheckoutForm';
 
-const { PLDPUBLISHABLE_KEY, STRIPE_PUBLIC_KEY } = require('../../../../build/pldconfig');
+//const { PLDPUBLISHABLE_KEY, STRIPE_PUBLIC_KEY } = require('../../../../build/pldconfig');
+const PLDPUBLISHABLE_KEY = process.env.PLAID_PUBLISHABLE_KEY;
+const STRIPE_PUBLIC_KEY = process.env.STRIPE_PUBLIC_KEY;
 
 const SideNav = () => {
 
