@@ -15,7 +15,7 @@ const moment = require('moment');
 const { PLDPUBLISHABLE_KEY, 
 	    PLAID_CLIENT_ID, 
 	    PLAID_SECRET,
-	    STRIPE_SECRET_KEY } = require('./spldconfig');
+	    STRIPE_SECRET_KEY } = require('../build/spldconfig');
 
 const stripe = require("stripe")(STRIPE_SECRET_KEY);
 
@@ -26,6 +26,127 @@ var plaidClient = new plaid.Client(PLAID_CLIENT_ID,
                                    PLDPUBLISHABLE_KEY,
                                    plaid.environments.sandbox);
                                    //plaid.environments.development);
+
+// Can I use the bank account token to make a customer ID and account token ? 
+// Do we need authentication at each payment ? 
+// unused: bankAccountToken btok_1DY0MlFe8nlPJCfgKrR38PH4
+// accessToken access-sandbox-53cd0926-7819-4fb7-a16d-7bf43cacf697
+// bankAccountToken: btok_1DY0gOFe8nlPJCfgaMHEKUii // stripe_bank_account_token
+// this works when the customer is a credit card generated id and account is a
+// connected account, 
+
+finapi.post('/test_payment_api', (req, response, next) => {
+ 
+	//console.log('get_bank_acnt_tok', req.body);
+	//response.json(req.body);
+
+	stripe.charges.create({
+
+	  amount: 200, // this is written in cents
+	  //application_fee: 
+	  currency: "usd",
+	  description: "test_1a",
+	  customer: 'cus_E0uJKIVOSctO2D',//'cus_DzdWJ1qDZm1poy', // Plaid generated customer ID
+	  //source: 'btok_1DY0gOFe8nlPJCfgaMHEKUii',
+
+	  destination: {
+	      amount: 100,
+	      account: 'acct_1DYsSBHb2WoeqvJO', //{CONNECTED_STRIPE_ACCOUNT_ID},
+      },
+
+	}, (err, charge) => {
+		console.log('charge success: ', charge)
+		console.log('err', err)
+		response.json(charge);
+	});
+
+    /*
+	console.log('store_plaid_customer_id',req.body);
+
+	var PLAID_LINK_PUBLIC_TOKEN = req.body.plaid_token;
+	var ACCOUNT_ID = req.body.account_ID;
+	//var USER_ID = req.user.id;
+
+	plaidClient.exchangePublicToken(PLAID_LINK_PUBLIC_TOKEN, function(err, res) {
+
+	  var accessToken = res.access_token;
+	  console.log('accessToken', accessToken)
+
+	  	plaidClient.createStripeToken(accessToken, ACCOUNT_ID, function(err, res) {
+
+	  		bankAccountToken = res.stripe_bank_account_token;
+
+	  		console.log('bankAccountToken', bankAccountToken)
+	  		response.json({'bankAccountToken':bankAccountToken})
+
+			stripe.customers.create({
+
+			  	source: bankAccountToken,
+			  	description: USER_ID
+
+			  },(customer_err, customer) => {
+
+				customer_id = customer.id;
+
+	        });
+	    });
+	});
+       */ 
+
+});
+
+finapi.post('/buyer_pay_seller', (req, res, next) => {
+
+	var buyer_id = req.body.balance.buyer_id;
+	var seller_id = req.body.balance.seller_id;
+
+	var buyer_customer_id;
+	var seller_acnt_tok;
+
+	knex('users').select(['stripe_customer_id'])
+	.where('id',buyer_id)
+	.then(buyer_info => {
+
+        buyer_customer_id = buyer_info[0].stripe_customer_id;
+
+		knex('users').select(['stripe_connect_account_token'])
+	    .where('id',seller_id)
+	    .then(seller_info => {
+
+	    	seller_acnt_tok = seller_info[0].stripe_connect_account_token;
+
+	    	var balance_price = req.body.balance.balance_price;
+
+	    	var balance_price_cents = balance_price * 100;
+
+	    	console.log(balance_price_cents, seller_acnt_tok, buyer_customer_id);
+
+ 			var charge_amount = Math.round(balance_price_cents * 1.0041);
+ 			var deposit_amount = Math.round(balance_price_cents * (1 - 0.0041));
+
+	    	
+			stripe.charges.create({
+			  amount: charge_amount, // this is written in cents
+			  //application_fee: 
+			  currency: "usd",
+			  description: req.body.balance.title + " balance "+req.body.balance.id+" buyer "+buyer_id+" seller "+seller_id,
+			  customer: buyer_customer_id, // Plaid generated customer ID
+			  //source: buyer_stripe_connect_account_token,
+			  destination: {
+			      amount: deposit_amount,
+			      account: seller_acnt_tok,//{CONNECTED_STRIPE_ACCOUNT_ID},
+		      },
+			}, (err, charge) => {
+				console.log('charge SUCCESS!', charge)
+				console.log('err', err)
+				//res.json(users);
+			});
+
+	    });
+		
+	});	
+
+});
 
 
 finapi.post('/get_connect_data', (req, res, next) => {
@@ -50,6 +171,48 @@ finapi.post('/get_connect_data', (req, res, next) => {
 	)
 });
 
+finapi.post('/store_plaid_customer_id', (req, response, next) => {
+
+	console.log('store_plaid_customer_id',req.body);
+
+	var PLAID_LINK_PUBLIC_TOKEN = req.body.plaid_token;
+	var ACCOUNT_ID = req.body.account_ID;
+	var USER_ID = req.user.id;
+	var customer_id;
+
+	plaidClient.exchangePublicToken(PLAID_LINK_PUBLIC_TOKEN, function(err, res) {
+
+	  var accessToken = res.access_token;
+
+	  	plaidClient.createStripeToken(accessToken, ACCOUNT_ID, function(err, res) {
+
+	  		var bankAccountToken = res.stripe_bank_account_token;
+
+			stripe.customers.create({
+
+			  	source: bankAccountToken,
+			  	description: USER_ID
+
+			  },(customer_err, customer) => {
+
+				customer_id = customer.id;
+
+				if (customer_err) {
+				  	response.json({"error":customer_err.Error})
+				  } else {
+					return knex('users')
+					.where('id', USER_ID)
+					.update({
+						stripe_customer_id:customer_id,
+					}).then(()=>{
+					   	response.json({"success":true})
+					})
+				}
+	        });
+	    });
+	});
+});
+
 finapi.post('/store_connect_account_token', (req, response, next) => {
 
 	var PLAID_LINK_PUBLIC_TOKEN = req.body.plaid_token;
@@ -63,7 +226,7 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 
 	plaidClient.exchangePublicToken(PLAID_LINK_PUBLIC_TOKEN, function(err, res) {
 
-	  accessToken = res.access_token;
+	  var accessToken = res.access_token;
 
 	  // Generate a bank account token
 	    plaidClient.createStripeToken(accessToken, ACCOUNT_ID, function(err, res) {
@@ -73,12 +236,13 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 			stripe.accounts.create({
 		      
 			  type: "custom",
-			  country: req.body.country,
+			  //country: req.body.country,
 			  email: req.body.user_email,
 			  legal_entity: {
 			  	type: "individual",
 			  	first_name: req.body.first_name,
 			  	last_name: req.body.last_name,
+			    /*	
 			  	address: {
 			  		city: req.body.address_city,
 			  		line1: req.body.address_line1,
@@ -90,7 +254,8 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 			  		month: req.body.dob_month,
 			  		year: req.body.dob_year,
 			  	},
-			  	ssn_last_4: req.body.ssn_last_4,
+			  	*/
+			  	//ssn_last_4: req.body.ssn_last_4,
 
 			  },
 			  tos_acceptance: {
@@ -131,7 +296,6 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 							.where('id', USER_ID)
 							.update({
 								stripe_connect_account_token:stripe_connect_account_token,
-								//stripe_customer_id:customer_id,
 							}).then(()=>{
 							   	response.json({"success":true})
 							})
@@ -149,32 +313,10 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 });
 
 
-finapi.post("/stripe_customer_id", async (req, res) => {
 
-	console.log(req.body)
+module.exports = finapi;
 
-    stripe.customers.create({
-	  source: req.body.token_id,
-	  email: req.user.email,
-    }, function(customer_err, customer) {
-
-    	console.log('customer_err', customer_err);
-    	console.log('customer', customer);
-
-		if (customer_err) {
-		  	response.json({"error":customer_err.Error})
-		} else {
-			return knex('users')
-			.where('id',req.user.id)
-			.update({
-				stripe_customer_id:customer.id,
-			}).then(()=>{
-			   	res.json({"success":true})
-			})
-		}
-	});
-});
-
+/*
 
 finapi.post('/charge', (req, res, next) => {
 	stripe.charges.create({
@@ -221,10 +363,31 @@ finapi.post('/updateaccount', (req, res, next) => {
 	});
 });
 
+finapi.post("/stripe_customer_id", async (req, res) => {
 
-module.exports = finapi;
+	console.log(req.body)
 
-/*
+    stripe.customers.create({
+	  source: req.body.token_id,
+	  email: req.user.email,
+    }, function(customer_err, customer) {
+
+    	console.log('customer_err', customer_err);
+    	console.log('customer', customer);
+
+		if (customer_err) {
+		  	response.json({"error":customer_err.Error})
+		} else {
+			return knex('users')
+			.where('id',req.user.id)
+			.update({
+				stripe_customer_id:customer.id,
+			}).then(()=>{
+			   	res.json({"success":true})
+			})
+		}
+	});
+});
 
     const customer = await stripe.customers.create({
       source: req.body.token_id,

@@ -10,6 +10,8 @@ const knex = require('./db/knex');
 const api = require('./api');
 const finapi = require('./finapi');
 const app = express();
+const env = process.env.NODE_ENV || 'dev';
+
 
 var path = require('path');
 var fs = require('fs');
@@ -54,15 +56,22 @@ app.use('/api', api);
 app.use('/finapi', finapi);
 app.get('*', home);
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
 
-/*
-var certOptions = {
-  key: fs.readFileSync(path.resolve('build/cert/server.key')),
-  cert: fs.readFileSync(path.resolve('build/cert/server.crt'))
+if (env == 'dev') {
+
+  console.log("process.env.NODE_ENV", env)
+  var certOptions = {
+    key: fs.readFileSync(path.resolve('build/cert/server.key')),
+    cert: fs.readFileSync(path.resolve('build/cert/server.crt'))
+  }
+
+  var server = https.createServer(certOptions, app).listen(port, () => console.log(`Listening on port ${port}`));
+
+} else {
+  console.log("process.env.NODE_ENV", env)
+  app.listen(port, () => console.log(`Listening on port ${port}`));
 }
 
 
-var server = https.createServer(certOptions, app).listen(port, () => console.log(`Listening on port ${port}`));
-*/
+
 

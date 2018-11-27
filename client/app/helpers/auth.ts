@@ -28,4 +28,3 @@ export const getUserData = (): Promise<HttpResponse> => {
 export const isLoggedIn = (): Promise<HttpResponse> => {
   return post('/api/is_logged_in');
 };
-

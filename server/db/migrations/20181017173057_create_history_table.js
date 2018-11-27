@@ -12,7 +12,7 @@ exports.up = function(knex, Promise) {
     table.decimal('buyer_stake_amount',20,2);
     table.decimal('seller_stake_amount',20,2);
     table.decimal('balance_price',20,2);
-    table.boolean('completed').notNullable().defaultTo(true);
+    table.boolean('completed').notNullable();
     table.boolean('agreement_confirmed').notNullable().defaultTo(true);
     table.integer('buyer_id').notNullable().references('id').inTable('users').onDelete('cascade');
     table.integer('seller_id').notNullable().references('id').inTable('users').onDelete('cascade');

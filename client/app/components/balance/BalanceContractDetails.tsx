@@ -22,10 +22,11 @@ interface State {
   duration: number;
   payment_str: string;
   duration_str: string;
-  duration_units:string
+  duration_units: string
 }
 
 class BalanceContractDetails extends React.Component<Props, State> {
+
   constructor(props: Props) {
     super(props);
 
@@ -70,15 +71,19 @@ class BalanceContractDetails extends React.Component<Props, State> {
     return (
       <div>
         <h4 className="new-balance-detail-header">Contract Builder</h4>
-
         {/* TODO */}
         <div style={{ paddingLeft: 16, paddingRight: 16 }}>
           <div className="balance-alert">
-            <div className="alert-text text-bold">Your First Contract</div>
+            <div className="alert-text text-bold">Your Contract</div>
             <div className="alert-description text-sm">
-              Here is where you’ll build you first contract, you can make
-              something as simple as couple sentences describing the work, or
-              create a task list with due dates for the work.
+              Tell Balance what you and your seller have agreed upon, submit and
+              have the seller login to confirm. When agreeing on the time until 
+              payment, consider typical delays and time for buyer to evaluate 
+              the deliverable. When you both indicate the agreement has 
+              been completed, the agreed amount you will pay is sent 
+              to the seller. The buyer and seller split the 3% service fee. 
+              If the payment is $30, the buyer is charged $30.46, the seller
+              gets $29.54 transferred to their account. 
             </div>
             <div className="alert-action text-sm text-bold">Dismiss</div>
           </div>
@@ -148,7 +153,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
 
           <div className="form-group">
 
-            <label className="label-default">Time given to complete balance from this moment</label>
+            <label className="label-default">Time until payment (from this moment)</label>
             <input
               type="number"
               min="0"

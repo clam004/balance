@@ -15,18 +15,26 @@ export interface IBalanceInfo {
   }
 }
 
-export const storeConnectAcctToken = (plaid_token:object): Promise<HttpResponse> => {
-  return post('/finapi/store_connect_account_token', plaid_token);
+export const storeCustomerID = (plaid_token:object): Promise<HttpResponse> => {
+  return post('/finapi/store_plaid_customer_id', plaid_token);
 };
 
-export const storeCustomerID = (plaid_token:object): Promise<HttpResponse> => {
-  return post('/finapi/store_customer_id', plaid_token);
+export const storeConnectAcctToken = (plaid_token:object): Promise<HttpResponse> => {
+  return post('/finapi/store_connect_account_token', plaid_token);
 };
 
 export const getConnectData = (stripe_token:object): Promise<HttpResponse> => {
   return post('/finapi/get_connect_data', stripe_token);
 };
 
+export const buyerPaySeller = (balance:object): Promise<HttpResponse> => {
+  return post('/finapi/buyer_pay_seller', balance);
+};
+
+/*
+
 export const makeStripeCustomerID = (stripe_token:object): Promise<HttpResponse> => {
   return post('/finapi/stripe_customer_id', stripe_token);
 };
+
+*/

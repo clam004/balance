@@ -7,14 +7,15 @@ import {  getBalances,
           balanceDone,
           balanceDelete } from '../../helpers/usersbalances'; 
 
+import { buyerPaySeller } from '../../helpers/transactions';
+
 import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
-
 import { HttpResponse, get, post, del } from '../../helpers/http';
-import './Dashboard.less';
-import * as moment from 'moment';
-import PlaidLink from 'react-plaid-link'
+import { BalanceParticipantDetails } from './Elements';
 
-const { PLDPUBLISHABLE_KEY } = require('./pldconfig');
+import './Dashboard.less';
+import '../balance/Balance.less';
+import * as moment from 'moment';
 
 const SideNav = () => {
 
@@ -73,13 +74,13 @@ interface IBalance {
 }
 
 interface DashboardState {
-  data:  Array<IBalance>, // Array<HttpResponse>, //
+  data: Array<IBalance>, // Array<HttpResponse>, //
   isLoading: boolean,
-  pldpublickey:string,
   user_id:number,
   has_connect_account:boolean,
   has_customer_id:boolean,
   user_email:string,
+  finishing_balance:number,
 }
 
 class Dashboard extends React.Component<DashboardProps & RouteComponentProps<{}>, DashboardState> {
@@ -91,11 +92,11 @@ class Dashboard extends React.Component<DashboardProps & RouteComponentProps<{}>
     this.state = {
       data: [],
       isLoading: false,
-      pldpublickey:PLDPUBLISHABLE_KEY,
       user_id:null,
       has_connect_account:null,
       has_customer_id:null,
       user_email:null,
+      finishing_balance:null,
     }
 
   }
@@ -168,125 +169,145 @@ class Dashboard extends React.Component<DashboardProps & RouteComponentProps<{}>
 
   public renderBalance(): JSX.Element[] {
 
-    var user_id = this.state.user_id
+    var user_id = this.state.user_id;
+    var completed_button;
+    var agreement_button;
+    var participant_or_finish;
     
     return this.state.data.map((balance, array_index) => {
 
-        if (balance.seller_id == user_id && 
-            !balance.seller_confirmed) {
+      if (balance.id == this.state.finishing_balance) {
 
-          var agreement_button = (
+        participant_or_finish = (
 
-             <div>
-
-              <br/><br/>
-              <button className="btn-primary"
-              onClick={() => {
-                toggleConfirm({id:balance.id, confirm:balance.seller_confirmed});
-                this.toggleConfirmState(array_index);
-              }}
-              >
-               {balance.seller_confirmed? "undo confirm" : "confirm you agree with contract terms" }
-              </button>
-
-              <br/><br/>
-              <button className="btn-primary"
-              onClick={() => {
-                balanceDelete({id:balance.id});
-                this.completeBalance(array_index);
-              }}
-              >
-               Disgree with terms remove contract 
-              </button>
-
-             </div>
-
-          )
-
-        } else if (balance.seller_id == user_id && 
-                   balance.seller_confirmed) {
-
-          var agreement_button = (
-
-             <div>
-             <br/><br/>
-              <button className="btn-primary"
-              onClick={() => {
-                toggleConfirm({id:balance.id, confirm:balance.seller_confirmed});
-                this.toggleConfirmState(array_index);
-              }}
-              >
-               {balance.seller_confirmed? "undo confirm" : "confirm you agree with contract terms" }
-              </button>
+          <div key={balance.id} className="balance-participants-card">
+            <div className="balance-participant-container">
+              <div className="balance-participant-details">
+                <div className="balance-goods">
+                 Buy clicking Finish Balance you agree that the seller has 
+                 fullfilled their part of the agreement. This will bring 
+                 the balance to a conclusion and the agreed upon price will
+                 be transfered from your credit card or account 
+                 to the sellers account. 
+                </div>
               </div>
+            </div>
 
-          ) 
-
-          var completed_button = (
-              <div>
-              <br/><br/>
-              <button className="btn-primary"
-              onClick={() => {
-                toggleComplete({id:balance.id, completed:balance.completed});
-                this.toggleCompleteState(array_index);
-              }}
-              >
-               {balance.completed? "undo complete" : "indicate that balance is completed"}
-              </button>
+            <div className="balance-participant-container">
+              <div className="balance-participant-details">
+                <div className="balance-goods">
+                  <button className="btn-primary"
+                    onClick={() => {
+                      balanceDone({balance}); // moves balance to history so buyer can't double pay. 
+                      buyerPaySeller({balance});
+                      this.completeBalance(array_index);
+                    }}
+                  >
+                   Finish Balance
+                  </button>
+                </div>
               </div>
-          )
+            </div>
+          </div>
 
+        )
 
-        } else if (balance.buyer_id == user_id && balance.completed && 
-                   balance.buyer_confirmed && balance.seller_confirmed) { 
+      } else {
 
-          var completed_button = (
-              <div>
-              <br/><br/>
-              <button className="btn-primary"
-              onClick={() => {
-                balanceDone({balance});
-                this.completeBalance(array_index);
-              }}
-              >
-               balance delivered complete contract 
-              </button>
-              </div>
-          )
-        } else {
-          var agreement_button = <span></span>
-          var completed_button = <span></span>
-        }
+        participant_or_finish = <BalanceParticipantDetails balance={balance} />
+
+      }  
+
+      if (balance.seller_id == user_id && !balance.seller_confirmed) {
+
+        agreement_button = (
+
+           <div>
+
+            <br/><br/>
+            <button className="btn-primary"
+            onClick={() => {
+              toggleConfirm({id:balance.id, confirm:balance.seller_confirmed});
+              this.toggleConfirmState(array_index);
+            }}
+            >
+             {balance.seller_confirmed? "undo confirm" : "confirm you agree with contract terms" }
+            </button>
+
+            <br/><br/>
+            <button className="btn-primary"
+            onClick={() => {
+              balanceDelete({id:balance.id});
+              this.completeBalance(array_index);
+            }}
+            >
+             Disgree with terms remove contract 
+            </button>
+
+           </div>
+
+        )
+
+      } else if (balance.seller_id == user_id && balance.seller_confirmed) {
+
+        agreement_button = (
+
+           <div>
+           <br/><br/>
+            <button className="btn-primary"
+            onClick={() => {
+              toggleConfirm({id:balance.id, confirm:balance.seller_confirmed});
+              this.toggleConfirmState(array_index);
+            }}
+            >
+             {balance.seller_confirmed? "undo confirm" : "confirm you agree with contract terms" }
+            </button>
+            </div>
+
+        ) 
+
+        completed_button = (
+            <div>
+            <br/><br/>
+            <button className="btn-primary"
+            onClick={() => {
+              toggleComplete({id:balance.id, completed:balance.completed});
+              this.toggleCompleteState(array_index);
+            }}
+            >
+             {balance.completed? "undo complete" : "indicate that balance is completed"}
+            </button>
+            </div>
+        )
+
+      } else if (balance.buyer_id == user_id && balance.completed && 
+                 balance.buyer_confirmed && balance.seller_confirmed) { 
+
+        completed_button = (
+            <div>
+            <br/><br/>
+            <button className="btn-primary"
+            onClick={() => {
+              this.setState({finishing_balance:balance.id});
+            }}
+            >
+             balance delivered complete contract 
+            </button>
+            </div>
+        )
+      } else {
+        agreement_button = <span></span>
+        completed_button = <span></span>
+      }
 
 
         return (
+
           <section key={balance.id} className="balance-section">
             <div className="balance-created-date"> Created {moment(balance.created_at, moment.ISO_8601).fromNow()} </div>
-
             <div className="balance-cards-container">
-              <div className="balance-participants-card">
-                <div className="balance-participant-container">
-                  <div className="balance-participant-photo">{}</div>
-
-                  <div className="balance-participant-details">
-                    <div className="balance-stake">
-                      {balance.buyer_email} has staked ${balance.buyer_stake_amount}
-                    </div>
-                    <div className="balance-goods">{balance.buyer_obligation}</div>
-                  </div>
-                </div>
-
-                <div className="balance-participant-container">
-                  <div className="balance-participant-photo">{}</div>
-
-                  <div className="balance-participant-details">
-                    <div className="balance-stake">
-                      {balance.seller_email} has staked ${balance.seller_stake_amount}
-                    </div>
-                    <div className="balance-goods">{balance.seller_obligation}</div>
-                  </div>
-                </div>
-              </div>
+              
+               {participant_or_finish}
 
               <div className="balance-agreement-container">
                 <h5 className="balance-agreement-header">{balance.title}</h5>
@@ -317,6 +338,7 @@ class Dashboard extends React.Component<DashboardProps & RouteComponentProps<{}>
             </div>
           </section>
         );
+      
     });
   }
 
@@ -327,13 +349,15 @@ class Dashboard extends React.Component<DashboardProps & RouteComponentProps<{}>
     } else if (!this.state.has_connect_account || !this.state.has_customer_id) {
       return (
         <div>
-          Please go to My Account to finish setting up your account as a buyer, seller or both! 
+          Before starting a balance please go to My Account to set up your account  
         </div>
       );
     } else if (this.state.data.length == 0) {
       return (<div> No active or pending balances </div>);
     }
   }
+
+
 
   render() {
 
@@ -381,10 +405,13 @@ class Dashboard extends React.Component<DashboardProps & RouteComponentProps<{}>
             </section>
           </div>
         </main>
+
       </div>
     );
   }
 }
+
+
 
 export default Dashboard;
 
@@ -394,133 +421,5 @@ export default Dashboard;
 
 /*
 
-//if (!isLoading && data.length > 0 && user_email) {
 
-var example_balance = {
-  title:'Example Balance',
-  balance_description:' Toro the Solar Panel technian has agreed to install 3 solar panels on Josh’s roof',
-  buyer_obligation:'Have a roof and let in Toro on time',
-  seller_obligation:'To install 3 solar panels',
-  buyer_email: 'Josh@balance.com',
-  seller_email:'Toro@balance.com',
-  buyer_stake_amount:800,
-  seller_stake_amount:400,
-  balance_price:2000,
-  completed:false,
-  buyer_confirmed:true,
-  seller_confirmed:true,
-  agreement_status:"confirm",
-  buyer_id:1,
-  seller_id:2,
-  created_at: "2018-10-25 12:52:55-07", 
-  updated_at: "2018-10-25 12:52:55-07", 
-  due_date: "2018-10-25 12:52:55-07", 
-  id:0
-  }
-
-
-const BalanceDetails = ({ balance }: { balance: IBalance}) => {
-
-  return (
-        <section className="balance-section">
-          <div className="balance-created-date"> Created 2 days ago </div>
-
-          <div className="balance-cards-container">
-            <div className="balance-participants-card">
-              <div className="balance-participant-container">
-                <div className="balance-participant-photo">{}</div>
-
-                <div className="balance-participant-details">
-                  <div className="balance-stake">
-                    {balance.buyer_email} has staked ${balance.buyer_stake_amount}
-                  </div>
-                  <div className="balance-goods">{balance.buyer_obligation}</div>
-                </div>
-              </div>
-
-              <div className="balance-participant-container">
-                <div className="balance-participant-photo">{}</div>
-
-                <div className="balance-participant-details">
-                  <div className="balance-stake">
-                    {balance.seller_email} has staked ${balance.seller_stake_amount}
-                  </div>
-                  <div className="balance-goods">{balance.seller_obligation}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="balance-agreement-container">
-              <h5 className="balance-agreement-header">Example Balance Agreement</h5>
-
-              <div className="balance-agreement-text">
-                {balance.balance_description} due {' '}
-                <span className="text-bold"> in 10 days </span>
-              </div>
-              <div className="balance-agreement-price">${balance.balance_price}</div>
-
-            </div>
-          </div>
-        </section>
-  );
-};
-
-      return (
-
-        <div className="dashboard-container">
-          <SideNav />
-          <main className="main-container">
-            <div className="main-header">
-              <img className="main-logo" src="assets/logo-white.svg" />
-              <h3>Current Balances for {user_alias} </h3>
-            </div>
-
-              { this.renderDepositPlaid() }
-              { this.renderSendPlaid() }
-
-              <br/>
-            <div className="balances-container">
-
-            <BalanceDetails 
-              balance = {example_balance}
-            />
-
-              <section className="create-balance-container">
-                <Link to="/create">
-                  <button className="btn-primary create-balance-btn">
-                    <img src="assets/btn-logo-1.svg" />
-                    Create Balance
-                  </button>
-                </Link>
-              </section>
-            </div>
-          </main>
-        </div>
-      );
-
-
-
-    // TODO: try out styled components
-    //if (Array.isArray(data) && data.length >0) {
-
-    //var user_id = JSON.parse(localStorage.getItem("user_id"));
-
-    const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
-    fetch(BAL_API_URL)
-      .then(response => response.json())
-      .then(data => this.setState( {data:data, isLoading: false} ));
-    */
-
-    /*  
-    const BAL_API_URL = API_URL +'/api/balances/'+localStorage.getItem('user_id');
-    fetch(BAL_API_URL)
-      .then(response => response.json())
-      .then(data => {
-      console.log(typeof(data));
-      this.setState({data:data});
-      this.setState({isLoading: false}); 
-      });
-
-
-
-    */
+*/

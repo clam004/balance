@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { get_init_users, update_search_users } from '../../helpers/usersbalances';
+import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 
 interface State {
   user_id:number;
@@ -30,14 +31,24 @@ class BalanceUserDetails extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    
-    var user_id = JSON.parse(localStorage.getItem("user_id"));
-    this.setState({ isLoading:true, user_id:user_id });
 
-    get_init_users({ user_id:user_id })
-      .then(user_data => {
-        this.setState({search_users:user_data, isLoading: false})
-      });
+    var user_id;
+
+    getUserData()
+    .then(userdata => {  
+      if (userdata) {
+        
+        user_id = userdata[0].id;
+
+        this.setState({ isLoading:true, user_id:user_id });
+
+        get_init_users({user_id:user_id})
+        .then(user_data => {
+          this.setState({search_users:user_data, isLoading: false})
+        });
+
+      }
+    });
   }
 
   public updateSearch(searchchars: string): void {

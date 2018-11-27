@@ -24,7 +24,8 @@ api.post('/signup', users.signup);
 api.post('/login', auth, users.login);
 
 api.post('/get_user_data', (req, res, next) => {
-	//console.log('req.user.id',req.user.id)
+	console.log('/get_user_data, req.user.id',req.user.id)
+
 	if(req.isAuthenticated()) {
 		knex('users').select(['id','email','username','num_completed_balances','stripe_connect_account_token','stripe_customer_id'])
 		.where('id',req.user.id)
@@ -41,7 +42,7 @@ api.get('/ping', (req, res) => res.json({ message: 'pong'}));
 
 api.post('/get_balances', (req, res, next) => {
  	if(req.isAuthenticated()) {
-        console.log(" get current balances id:", req.user.id)
+        console.log("/get_balances, id:", req.user.id)
 		knex('balances')
 		.where('buyer_id',req.user.id).orWhere('seller_id',req.user.id)
 		.then(balances => {
@@ -63,6 +64,9 @@ api.post('/get_history', (req, res, next) => {
 });
 
 api.post('/get_init_users', (req, res, next) => {
+
+    console.log('/get_init_users, req.body',req.body)
+
 	if(req.isAuthenticated()) {
  		console.log(req.body)
 		knex('users').select(['id','email','username','num_completed_balances'])
@@ -72,6 +76,7 @@ api.post('/get_init_users', (req, res, next) => {
 			res.json(users);
 		});		
 	}	
+	
 });
 
 api.post('/update_search_users', (req, res, next) => {
@@ -188,8 +193,6 @@ api.post('/balance_done', (req, res, next) => {
  		buyer_email:req.body.balance.buyer_email,
  		seller_email:req.body.balance.seller_email,
  		completed:req.body.balance.completed,
-		//buyer_confirmed: req.body.balance.buyer_confirmed,
-		//seller_confirmed: req.body.balance.seller_confirmed,
  		buyer_id:req.body.balance.buyer_id,
  		seller_id:req.body.balance.seller_id,
  		buyer_stake_amount:req.body.balance.buyer_stake_amount,
@@ -245,7 +248,7 @@ api.post('/balance_delete', (req, res, next) => {
  });
 
 api.post('/is_logged_in', (req, res, next) => {
-	console.log(req.isAuthenticated())
+	console.log('/is_logged_in', req.isAuthenticated())
 	res.json({is_logged_in:req.isAuthenticated()})
  });
 

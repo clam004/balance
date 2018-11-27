@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
+import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 
 const SideNav = () => {
   return (
@@ -25,6 +26,9 @@ const SideNav = () => {
         </li>
         <li className="nav-item">
           <a href="/dashboard">Support</a>
+        </li>
+        <li className="nav-item">
+          <Link onClick={() => logout()} to="/">Logout</Link>
         </li>
       </ul>
     </nav>

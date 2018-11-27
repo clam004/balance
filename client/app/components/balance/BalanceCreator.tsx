@@ -7,7 +7,7 @@ import BalanceContractDetails from './BalanceContractDetails';
 import BalanceStakeDetails from './BalanceStakeDetails';
 import './Balance.less';
 import { submitBalance, get_balance_data, updateBalance } from '../../helpers/usersbalances';
-import { logout, getUserData } from '../../helpers/auth';
+import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 
 enum BalanceStep {
   SELECT_USER = 'SELECT_USER',
@@ -324,7 +324,7 @@ class BalanceCreator extends React.Component<
               <div className="new-balance-header-container">
                 <span className="new-balace-step-num">2</span>
                 <span className="new-balance-step">
-                  Add the things you will do or want done
+                  Add what each person will do and by when
                 </span>
               </div>
 

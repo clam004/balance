@@ -2,7 +2,7 @@ import * as React from 'react';
 import { SideNav, BalanceData } from './Elements'
 import { RouteComponentProps, Link } from 'react-router-dom';
 import { get_balance_data, balanceDelete } from '../../helpers/usersbalances';
-import { logout, getUserData } from '../../helpers/auth';
+import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 import './Dashboard.less';
 import * as moment from 'moment';
 
@@ -31,10 +31,10 @@ interface DashboardState {
   user_email:string,
 }
 
-class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
+class BalanceSummary extends React.Component<DashboardProps & RouteComponentProps<{}>, DashboardState> {
 
 
-  constructor(props: DashboardProps) {
+  constructor(props: DashboardProps & RouteComponentProps<{}>) {
 
     super(props);
 
@@ -51,6 +51,15 @@ class BalanceSummary extends React.Component<DashboardProps, DashboardState> {
   }
  
   componentDidMount() {
+
+    const { history } = this.props;
+  
+    isLoggedIn()
+    .then((res)=>{
+      if (!res.is_logged_in) {
+        history.push('/login');
+      }
+    })
 
     this.setState({ isLoading: true });
 
