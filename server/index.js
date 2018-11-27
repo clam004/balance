@@ -74,3 +74,15 @@ if (env == 'dev') {
 
 }
 
+const NODE_ENV = process.env.NODE_ENV;
+const PLDPUBLISHABLE_KEY = process.env.PLAID_PUBLISHABLE_KEY;
+const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
+const PLAID_SECRET = process.env.PLAID_SECRET;
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+
+console.log('process.env', process.env);
+console.log('PLAID_CLIENT_ID', PLAID_CLIENT_ID);
+console.log('PLDPUBLISHABLE_KEY', PLDPUBLISHABLE_KEY);
+console.log('NODE_ENV', NODE_ENV);
+
+
