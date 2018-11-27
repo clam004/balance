@@ -7,7 +7,6 @@ import { Login, SignUp, SignUpComplete } from './components/auth';
 import { Dashboard, BalanceSummary, History, MyAccount } from './components/dashboard';
 import { BalanceCreator } from './components/balance';
 import { Test } from './components/test';
-import PrivateRoute from './PrivateRoute'
 import './App.less';
 
 ReactDOM.render(
@@ -32,6 +31,3 @@ ReactDOM.render(
   document.getElementById('app')
 );
 
-/*
-        <PrivateRoute path="/history" component={History} />
-*/
