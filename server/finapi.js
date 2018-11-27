@@ -15,7 +15,6 @@ const moment = require('moment');
 
 //const { PLDPUBLISHABLE_KEY, PLAID_CLIENT_ID, PLAID_SECRET,STRIPE_SECRET_KEY } = require('../build/spldconfig');
 
-const NODE_ENV = process.env.NODE_ENV;
 const PLDPUBLISHABLE_KEY = process.env.PLAID_PUBLISHABLE_KEY;
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -230,7 +229,10 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 
 	plaidClient.exchangePublicToken(PLAID_LINK_PUBLIC_TOKEN, function(err, res) {
 
+	  console.log('exchangePublicToken err', err)
+	  console.log('res.access_token',res.access_token)
 	  var accessToken = res.access_token;
+	  console.log('res.access_token',res.access_token)
 
 	  // Generate a bank account token
 	    plaidClient.createStripeToken(accessToken, ACCOUNT_ID, function(err, res) {
