@@ -21,8 +21,6 @@ import CheckoutForm from './CheckoutForm';
 //const { PLDPUBLISHABLE_KEY, STRIPE_PUBLIC_KEY } = require('../../../../build/pldconfig');
 const PLDPUBLISHABLE_KEY = "a29874eb5e8cd1e080a3ca90d5183b";
 
-console.log('PLDPUBLISHABLE_KEY',PLDPUBLISHABLE_KEY)
-
 const SideNav = () => {
 
   return (
