@@ -116,9 +116,11 @@ finapi.post('/buyer_pay_seller', (req, res, next) => {
 
 	    	console.log(balance_price_cents, seller_acnt_tok, buyer_customer_id);
 
- 			var charge_amount = Math.round(balance_price_cents * 1.0041);
- 			var deposit_amount = Math.round(balance_price_cents * (1 - 0.0041));
+ 			//var charge_amount = Math.round(balance_price_cents * 1.0041);
+ 			//var deposit_amount = Math.round(balance_price_cents * (1 - 0.0041));
 
+ 			var charge_amount = Math.round(balance_price_cents * 1.005);
+ 			var deposit_amount = Math.round(balance_price_cents * (1 - 0.005));
 	    	
 			stripe.charges.create({
 			  amount: charge_amount, // this is written in cents
@@ -216,7 +218,7 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 	var stripe_connect_account_token;
 	var bankAccountToken;
 
-	//console.log(" PLAID_LINK_PUBLIC_TOKEN ", PLAID_LINK_PUBLIC_TOKEN, "ACCOUNT_ID", ACCOUNT_ID)
+	console.log(" PLAID_LINK_PUBLIC_TOKEN ", PLAID_LINK_PUBLIC_TOKEN, "ACCOUNT_ID", ACCOUNT_ID)
 	console.log("connect account", req.body)
 
 	plaidClient.exchangePublicToken(PLAID_LINK_PUBLIC_TOKEN, function(err, res) {
@@ -224,7 +226,6 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 	  console.log('exchangePublicToken err', err)
 	  console.log('res.access_token',res.access_token)
 	  var accessToken = res.access_token;
-	  console.log('res.access_token',res.access_token)
 
 	  // Generate a bank account token
 	    plaidClient.createStripeToken(accessToken, ACCOUNT_ID, function(err, res) {

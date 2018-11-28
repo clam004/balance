@@ -55,15 +55,12 @@ class BalanceStakeDetails extends React.Component<Props, State> {
           <div className="balance-alert">
             <div className="alert-text text-bold">Setting the Stakes</div>
             <div className="alert-description text-sm">
-              Balance builds mutual trust amongst business partners 
-              by asking both parties to stake an amount to
-              show commitment and balance the risk fairly. If both parties 
-              have not confirmed that the agreement is completed by the time of payment,
-              then these stakes will be paid by each party to Balance for arbitration. 
-              If both parties confirm before the time of payment, the balance is concluded 
-              and payment transfers from buyer to seller as usual.  
+              Balance builds trust by asking each party to stake an amount 
+              that promotes fairness. The stakes are returned upon balance completion.
+              If arbitration occurs, 20% of the stake is used to decide how the 
+              remaining stake is distrbuted to buyer and seller. 
             </div>
-            <div className="alert-action text-sm text-bold">Dismiss</div>
+            <div className="alert-action text-sm text-bold"></div>
           </div>
 
           <div className="form-group">

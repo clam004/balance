@@ -76,16 +76,9 @@ class BalanceContractDetails extends React.Component<Props, State> {
           <div className="balance-alert">
             <div className="alert-text text-bold">Your Contract</div>
             <div className="alert-description text-sm">
-              Tell Balance what you and your seller have agreed upon, submit and
-              have the seller login to confirm. When agreeing on the time until 
-              payment, consider typical delays and time for buyer to evaluate 
-              the deliverable. When you both indicate the agreement has 
-              been completed, the agreed amount you will pay is sent 
-              to the seller. The buyer and seller split the 3% service fee. 
-              If the payment is $30, the buyer is charged $30.46, the seller
-              gets $29.54 transferred to their account. 
+              Tell Balance what you and your seller have agreed upon
             </div>
-            <div className="alert-action text-sm text-bold">Dismiss</div>
+            <div className="alert-action text-sm text-bold"></div>
           </div>
 
           <div className="form-group">
@@ -133,7 +126,12 @@ class BalanceContractDetails extends React.Component<Props, State> {
           </div>
 
           <div className="form-group">
-            <label className="label-default"> Amount you will pay (blank = $0)</label>
+            <label className="label-default"> Amount you will pay 
+              (when both parties indicate the agreement is satisfied, 
+              this amount is sent from buyer to seller. The 1% transaction fee
+              is split equally. If the price is $10,
+              buyer is charged $10.05 and seller receives $9.95)
+            </label>
             <input
               className="input-default full-width"
               type="number"
@@ -153,7 +151,11 @@ class BalanceContractDetails extends React.Component<Props, State> {
 
           <div className="form-group">
 
-            <label className="label-default">Time until payment (from this moment)</label>
+            <label className="label-default">
+            Time until payment from this moment
+            (please consider typical delays and time for buyer 
+            to evaluate the deliverable)
+            </label>
             <input
               type="number"
               min="0"
