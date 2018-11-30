@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { Home, About } from './components/home';
 import { Login, SignUp, SignUpComplete } from './components/auth';
-import { Dashboard, BalanceSummary, History, MyAccount } from './components/dashboard';
+import { Buying_Balances, Selling_Balances, BalanceSummary, History, MyAccount } from './components/dashboard';
 import { BalanceCreator } from './components/balance';
 import { Test } from './components/test';
 import './App.less';
@@ -19,7 +19,8 @@ ReactDOM.render(
         <Route path="/signup" component={SignUp} />
         <Route path="/about" component={About} />
         <Route path="/signup-complete" component={SignUpComplete} />
-        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/buying-balances" component={Buying_Balances} />
+        <Route path="/selling-balances" component={Selling_Balances} />
         <Route path="/balancesummary" component={BalanceSummary} />
         <Route path="/history" component={History} />
         <Route path="/create" component={BalanceCreator} />

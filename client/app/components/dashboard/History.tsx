@@ -16,7 +16,10 @@ const SideNav = () => {
       </div>
       <ul className="side-nav-list">
         <li className="nav-item">
-          <Link to="/dashboard">Current Balances</Link>
+          <Link to="/buying-balances">Buying Balances</Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/selling-balances">Selling Balances</Link>
         </li>
         <li className="nav-item active">
           <Link to="/dashboard">History</Link>

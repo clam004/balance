@@ -193,25 +193,26 @@ const SideNav = () => {
 };
 
 interface IBalance {
-    title:string,
-    balance_description:string,
-    buyer_obligation:string,
-    seller_obligation:string,
-    buyer_email: string,
-    seller_email:string,
-    buyer_stake_amount:number,
-    seller_stake_amount:number,
-    balance_price:number,
-    completed:boolean,
-    buyer_confirmed:boolean,
-    seller_confirmed:boolean,
-    agreement_status:string,
-    buyer_id:number,
-    seller_id:number,
-    created_at:string,
-    updated_at:string,
-    due_date:string,
-    id:number 
+  title:string,
+  balance_description:string,
+  buyer_obligation:string,
+  seller_obligation:string,
+  buyer_email: string,
+  seller_email:string,
+  buyer_stake_amount:number,
+  seller_stake_amount:number,
+  balance_price:number,
+  buyer_indicates_delivered:boolean,
+  seller_indicates_delivered:boolean,
+  buyer_approves_contract:boolean,
+  seller_approves_contract:boolean,
+  agreement_status:string,
+  buyer_id:number,
+  seller_id:number,
+  created_at:string,
+  updated_at:string,
+  due_date:string,
+  id:number 
 }
 
 interface CompleteProps {
@@ -228,7 +229,6 @@ class BalanceParticipantDetails extends React.Component<CompleteProps, CompleteS
     super(props);
   }
   
-
   render() {
 
     const balance = this.props.balance;

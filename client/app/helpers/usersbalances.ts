@@ -31,12 +31,12 @@ export const updateBalance = (IBalanceInfo: object): Promise<HttpResponse> => {
   return post('/api/update_balance', IBalanceInfo);
 };
 
-export const toggleConfirm = (balance_id:object): Promise<HttpResponse> => {
-  return post('/api/toggle_confirm', balance_id);
+export const toggleSellerApprove = (balance_seller_approves:object): Promise<HttpResponse> => {
+  return post('/api/toggle_seller_approve', balance_seller_approves);
 };
 
-export const toggleComplete = (balance_id:object): Promise<HttpResponse> => {
-  return post('/api/toggle_complete', balance_id);
+export const toggleComplete = (balance_complete:object): Promise<HttpResponse> => {
+  return post('/api/toggle_complete', balance_complete);
 };
 
 export const balanceDone = (balance:object): Promise<HttpResponse> => {
@@ -51,8 +51,8 @@ export const balanceDelete = (balance:object): Promise<HttpResponse> => {
   return post('/api/balance_delete', balance);
 };
 
-export const getBalances = (): Promise<HttpResponse> => {
-  return post('/api/get_balances');
+export const getBalances = (buyer_or_seller_id:object): Promise<HttpResponse> => {
+  return post('/api/get_balances', buyer_or_seller_id);
 };
 
 export const getHistory = (): Promise<HttpResponse> => {

@@ -12,12 +12,14 @@ exports.up = function(knex, Promise) {
     table.decimal('buyer_stake_amount',20,2);
     table.decimal('seller_stake_amount',20,2);
     table.decimal('balance_price',20,2);
-    table.boolean('completed').notNullable();
-    table.boolean('agreement_confirmed').notNullable().defaultTo(true);
+    table.boolean('buyer_indicates_delivered').defaultTo(null);
+    table.boolean('seller_indicates_delivered').defaultTo(null);
+    table.boolean('buyer_approves_contract').defaultTo(null);
+    table.boolean('seller_approves_contract').defaultTo(null);
     table.integer('buyer_id').notNullable().references('id').inTable('users').onDelete('cascade');
     table.integer('seller_id').notNullable().references('id').inTable('users').onDelete('cascade');
-    table.timestamp('created_at').defaultTo(knex.fn.now());
-    table.timestamp('updated_at').defaultTo(knex.fn.now());
+    table.timestamp('created_at');
+    table.timestamp('updated_at');
     table.timestamp('due_date');
     table.timestamp('completed_date');
   });

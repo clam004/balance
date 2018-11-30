@@ -11,9 +11,10 @@ exports.up = function(knex, Promise) {
     table.decimal('buyer_stake_amount',20,2);
     table.decimal('seller_stake_amount',20,2);
     table.decimal('balance_price',20,2);
-    table.boolean('completed').defaultTo(null);
-    table.boolean('buyer_confirmed').defaultTo(null);
-    table.boolean('seller_confirmed').defaultTo(null);
+    table.boolean('buyer_indicates_delivered').defaultTo(null);
+    table.boolean('seller_indicates_delivered').defaultTo(null);
+    table.boolean('buyer_approves_contract').defaultTo(null);
+    table.boolean('seller_approves_contract').defaultTo(null);
     table.integer('buyer_id').notNullable().references('id').inTable('users').onDelete('cascade');
     table.integer('seller_id').notNullable().references('id').inTable('users').onDelete('cascade');
     table.timestamp('created_at').defaultTo(knex.fn.now());
@@ -27,3 +28,4 @@ exports.up = function(knex, Promise) {
 exports.down = function(knex, Promise) {
   return knex.schema.dropTable('balances');
 };
+

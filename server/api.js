@@ -41,13 +41,18 @@ api.post('/get_user_data', (req, res, next) => {
 api.get('/ping', (req, res) => res.json({ message: 'pong'}));
 
 api.post('/get_balances', (req, res, next) => {
+
+	const buyer_or_seller_id = req.body.buyer_or_seller_id
+
  	if(req.isAuthenticated()) {
+
         console.log("/get_balances, id:", req.user.id)
 		knex('balances')
-		.where('buyer_id',req.user.id).orWhere('seller_id',req.user.id)
+		.where(buyer_or_seller_id, req.user.id)//.orWhere('seller_id',req.user.id)
 		.then(balances => {
 			res.json(balances);
 		});
+
 	}	
 });
 
@@ -139,9 +144,10 @@ api.post('/submit_balance', (req, res, next) => {
  		seller_obligation:req.body.agreement.seller_obligation,
  		buyer_email:req.body.buyer.email,
  		seller_email:req.body.seller.email,
- 		completed:false,
-		buyer_confirmed: true,
-		seller_confirmed: null,
+      	buyer_indicates_delivered: false,
+      	seller_indicates_delivered: false,
+      	buyer_approves_contract:true,
+      	seller_approves_contract:null,
  		buyer_id:req.user.id,
  		seller_id:req.body.seller.id,
  		buyer_stake_amount:req.body.buyer.stake,
@@ -157,13 +163,13 @@ api.post('/submit_balance', (req, res, next) => {
 	});
 });
 
-api.post('/toggle_confirm', (req, res, next) => {
+api.post('/toggle_seller_approve', (req, res, next) => {
 	console.log("data received ", req.body)
 	
 	return knex('balances')
 	.where('id',req.body.id)
 	.update({
-		seller_confirmed:!req.body.confirm,
+		seller_approves_contract: !req.body.seller_approves_contract,
 		updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
 	})
 	.then(response => {res.json(response)});
@@ -171,14 +177,31 @@ api.post('/toggle_confirm', (req, res, next) => {
 });
 
 api.post('/toggle_complete', (req, res, next) => {
-	console.log("data received ", req.body)
-	return knex('balances')
-	.where('id',req.body.id)
-	.update({
-		completed:!req.body.completed,
-		updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
-	})
-	.then(response => {res.json(response)});
+
+	console.log(" /toggle_complete ", req.body)
+
+	if (req.body.seller_or_buyer == 'seller') {
+
+		return knex('balances')
+		.where('id',req.body.id)
+		.update({
+			seller_indicates_delivered: !req.body.completed_boolean,
+			updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
+		})
+	    .then(response => {res.json(response)});
+
+	} else if (req.body.seller_or_buyer == 'buyer') {
+
+		return knex('balances')
+		.where('id',req.body.id)
+		.update({
+			buyer_indicates_delivered: !req.body.completed_boolean,
+			updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
+		})
+		.then(response => {res.json(response)});
+
+	}
+
 });
 
 api.post('/balance_done', (req, res, next) => {
@@ -192,7 +215,10 @@ api.post('/balance_done', (req, res, next) => {
  		seller_obligation:req.body.balance.seller_obligation,
  		buyer_email:req.body.balance.buyer_email,
  		seller_email:req.body.balance.seller_email,
- 		completed:req.body.balance.completed,
+      	buyer_indicates_delivered:req.body.balance.buyer_indicates_delivered,
+      	seller_indicates_delivered:req.body.balance.seller_indicates_delivered,
+      	buyer_approves_contract:req.body.balance.buyer_approves_contract,
+      	seller_approves_contract:req.body.balance.seller_approves_contract,
  		buyer_id:req.body.balance.buyer_id,
  		seller_id:req.body.balance.seller_id,
  		buyer_stake_amount:req.body.balance.buyer_stake_amount,

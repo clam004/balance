@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SideNav, BalanceData } from './Elements'
+import { SideNav, BalanceData } from './Elements';
 import { RouteComponentProps, Link } from 'react-router-dom';
 import { get_balance_data, balanceDelete } from '../../helpers/usersbalances';
 import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
