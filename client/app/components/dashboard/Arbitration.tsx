@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
-import { getHistory } from '../../helpers/usersbalances';
+import { getHistory, getArbitrations } from '../../helpers/usersbalances';
 import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
 import './Dashboard.less';
@@ -21,10 +21,10 @@ const SideNav = () => {
         <li className="nav-item">
           <Link to="/selling-balances">Selling Balances</Link>
         </li>
-        <li className="nav-item active">
+        <li className="nav-item">
           <Link to="/history">History</Link>
         </li>
-        <li className="nav-item">
+        <li className="nav-item active">
           <Link to="/arbitrations">Arbitrations</Link>
         </li>
         <li className="nav-item">
@@ -73,7 +73,7 @@ interface DashboardState {
   user_email:string,
 }
 
-class History extends React.Component<DashboardProps & RouteComponentProps<{}>, DashboardState> {
+class Arbitration extends React.Component<DashboardProps & RouteComponentProps<{}>, DashboardState> {
 
   constructor(props: DashboardProps & RouteComponentProps<{}>) {
 
@@ -103,7 +103,7 @@ class History extends React.Component<DashboardProps & RouteComponentProps<{}>, 
     
     this.setState({ isLoading: true });
 
-    getHistory()
+    getArbitrations()
     .then(data => {
       console.log("data", data);
       if (Array.isArray(data)) {
@@ -267,5 +267,4 @@ class History extends React.Component<DashboardProps & RouteComponentProps<{}>, 
   }
 }
 
-
-export default History;
+export default Arbitration;

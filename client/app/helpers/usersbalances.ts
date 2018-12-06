@@ -75,6 +75,10 @@ export const arbitrateBalance = (balance:object): Promise<HttpResponse> => {
   return post('/api/arbitrate_balance', balance);
 };
 
+export const getArbitrations = (): Promise<HttpResponse> => {
+  return post('/api/get_arbitrations');
+};
+
 /*
 
 export const getBalances = (balance:object): Promise<HttpResponse> => {

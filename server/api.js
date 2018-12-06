@@ -131,8 +131,32 @@ api.post('/get_history', (req, res, next) => {
  	if(req.isAuthenticated()) {
 
 		knex('balances')
-		.where({buyer_id:req.user.id}).orWhere({seller_id:req.user.id})
-		.whereNotNull('completed_date')
+		.where(function() {
+			this.where({buyer_id:req.user.id}).orWhere({seller_id:req.user.id})
+		})
+		.andWhere(function() {
+			this.whereNotNull('completed_date').andWhere({state_string:'done'})		
+		})
+		.then(balances => {
+			res.json(balances);
+		});
+		console.log("post get_user authenticated")
+	}	
+});
+
+api.post('/get_arbitrations', (req, res, next) => {
+
+	console.log('/get_arbitrations', req.body)
+
+ 	if(req.isAuthenticated()) {
+
+		knex('balances')
+		.where(function() {
+			this.where({buyer_id:req.user.id}).orWhere({seller_id:req.user.id})
+		})
+		.andWhere(function() {
+			this.where({state_string:'arbitrate'})
+		})
 		.then(balances => {
 			res.json(balances);
 		});
@@ -293,18 +317,17 @@ api.post('/toggle_approve', (req, res, next) => {
 	console.log("/toggle_approve", req.body)
 
 	var user_id = req.user.id;
+	var status;
 
 	if (user_id == req.body.seller_id) {
 
-		let status;
-
 		if (!req.body.seller_approves_contract && req.body.buyer_approves_contract) {
 			status = 'active'
-			console.log(status)
 		} else {
-			status = 'new'
-			console.log(status)
+			status = 'new'	
 		}
+
+		console.log(status)
 
 		knex('balances')
 		.where('id',req.body.id)
@@ -313,30 +336,41 @@ api.post('/toggle_approve', (req, res, next) => {
 			seller_approves_contract: !req.body.seller_approves_contract,
 			updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
 		})
-		.then(response => {res.json(response)});
+		.then(response => {console.log(response)});
 
 	} else if (user_id == req.body.buyer_id) {
 
-		let status;
-
 		if (!req.body.buyer_approves_contract && req.body.seller_approves_contract) {
 			status = 'active'
-			console.log(status)
 		} else {
 			status = 'new'
-			console.log(status)
 		}
+
+		console.log(status)
 
 		knex('balances')
 		.where('id',req.body.id)
 		.update({
 			state_string:status,
 			buyer_approves_contract: !req.body.buyer_approves_contract,
-			updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
+			updated_at:moment().format("YYYY-MM-DDTHH:mm:ss"),
 		})
-		.then(response => {res.json(response)});
-
+		.then(response => {console.log(response)});
 	}
+
+	if (status == 'active') {
+		knex('actions')
+		.insert({
+			user_id1:req.body.buyer_id,
+			user_id2:req.body.seller_id,
+			action_int1:req.body.id,
+			action_string1:"balances goes active",
+			action_time1:moment().format("YYYY-MM-DDTHH:mm:ss"),
+		})	
+		.then(response => {res.json(response)});
+	}
+
+
 });
 
 api.post('/toggle_complete', (req, res, next) => {

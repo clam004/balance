@@ -38,7 +38,7 @@ const SideNav = () => {
           <Link to="/history">History</Link>
         </li>
         <li className="nav-item">
-          <Link to="/dashboard">Arbitrations</Link>
+          <Link to="/arbitrations">Arbitrations</Link>
         </li>
         <li className="nav-item">
           <Link to="/dashboard">Support</Link>
@@ -274,7 +274,6 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
     
     return this.state.data.map((balance, array_index) => {
-
       // Decides what goes into the left part of the balance card 
       var participant_or_finish;
 
@@ -411,8 +410,8 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
       //////////////// SELLER's VIEW ///////////////////
 
+      console.log(balance.title, balance.seller_approves_contract, balance.buyer_approves_contract, balance.buyer_indicates_delivered, balance.seller_indicates_delivered)
       // 1. Buyer approves and seller is has not decided yet, balance.seller_approves_contract
-      
       // = null denotes they neither agree nor disagree, the decision has to be made. 
       // TODO: there needs to be a confirm state to remind the seller that if they confirm, the balance will go into active mode
       // which is a state that can only go to completion and arbitration and can only be modified with agreement with both parties.

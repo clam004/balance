@@ -38,7 +38,7 @@ const SideNav = () => {
           <Link to="/history">History</Link>
         </li>
         <li className="nav-item">
-          <Link to="/dashboard">Arbitrations</Link>
+          <Link to="/arbitrations">Arbitrations</Link>
         </li>
         <li className="nav-item">
           <Link to="/dashboard">Support</Link>

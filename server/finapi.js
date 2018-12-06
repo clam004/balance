@@ -15,10 +15,12 @@ const moment = require('moment');
 
 const { PLAID_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, PLAID_CLIENT_ID, PLAID_SECRET } = require('../spldconfig');
 
+/*
 console.log('finapi PLAID_CLIENT_ID', PLAID_CLIENT_ID);
 console.log('finapi PLAID_PUBLISHABLE_KEY', PLAID_PUBLISHABLE_KEY);
 console.log('finapi PLAID_SECRET', PLAID_SECRET);
 console.log('finapi STRIPE_SECRET_KEY', STRIPE_SECRET_KEY);
+*/
 
 const stripe = require("stripe")(STRIPE_SECRET_KEY);
 
@@ -27,8 +29,9 @@ var plaid = require('plaid');
 var plaidClient = new plaid.Client(PLAID_CLIENT_ID,
                                    PLAID_SECRET ,
                                    PLAID_PUBLISHABLE_KEY,
-                                   plaid.environments.sandbox);
-                                   //plaid.environments.development);
+                                   plaid.environments.development);
+                                   //plaid.environments.sandbox);
+
 
 finapi.post('/test_payment_api', (req, response, next) => {
  

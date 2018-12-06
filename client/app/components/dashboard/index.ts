@@ -3,5 +3,13 @@ import Selling_Balances from './Selling_Balances';
 import History from './History';
 import BalanceSummary from './BalanceSummary';
 import MyAccount from './MyAccount';
+import MyAccount2 from './MyAccount2';
+import Arbitration from './Arbitration';
 
-export { Buying_Balances, Selling_Balances, BalanceSummary, History, MyAccount };
+export { Buying_Balances, 
+	     Selling_Balances, 
+	     BalanceSummary, 
+	     History, 
+	     MyAccount, 
+	     MyAccount2,
+	     Arbitration };

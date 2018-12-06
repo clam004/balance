@@ -1,4 +1,7 @@
 import * as React from 'react';
+import * as moment from 'moment';
+import './Dashboard.less';
+
 import { RouteComponentProps, Link } from 'react-router-dom';
 
 import { storeConnectAcctToken, 
@@ -7,49 +10,13 @@ import { storeConnectAcctToken,
 
 import { logout, getUserData } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
-import './Dashboard.less';
-import * as moment from 'moment';
+
 import PlaidLink from 'react-plaid-link'
 import {Elements, StripeProvider} from 'react-stripe-elements';
 import CheckoutForm from './CheckoutForm';
+import { SideNavAccount } from './Elements';
 
-//const { PLDPUBLISHABLE_KEY, STRIPE_PUBLIC_KEY } = require('../../../../build/pldconfig');
 const PLDPUBLISHABLE_KEY = "a29874eb5e8cd1e080a3ca90d5183b";
-
-const SideNav = () => {
-
-  return (
-    <nav className="side-nav-container">
-      <div className="side-nav-header">
-        <img className="side-nav-logo" src="assets/logo-green.svg" />
-        <h3><Link to="/">Balance</Link></h3>
-      </div>
-      <ul className="side-nav-list">
-        <li className="nav-item">
-          <Link to="/buying-balances">Current Balances as Buyer</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/selling-balances">Current Balances as Seller</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/history">History</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/dashboard">Arbitrations</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/dashboard">Support</Link>
-        </li>
-        <li className="nav-item active">
-          <Link to="/myaccount">My Account</Link>
-        </li>
-        <li className="nav-item">
-          <Link onClick={() => logout()} to="/">Logout</Link>
-        </li>
-      </ul>
-    </nav>
-  );
-};
 
 interface AccountProps extends RouteComponentProps<{}> {}
 
@@ -291,7 +258,7 @@ class MyAccount extends React.Component<AccountProps, AccountState> {
           className="btn-primary create-balance-btn"
           style={{backgroundColor: '#19c8b5'}}
           clientName="BalanceReceive"
-          env="sandbox" // "development" 
+          env="development" //"sandbox" // 
           product={["auth", "transactions"]}
           publicKey={this.state.pldpublickey}
           onExit={this.handleOnExit}
@@ -324,7 +291,7 @@ class MyAccount extends React.Component<AccountProps, AccountState> {
             className="btn-primary create-balance-btn"
             style={{backgroundColor: '#5DBCD2'}}
             clientName="BalanceSend"
-            env="sandbox" // "development" 
+            env="development" // "sandbox" //
             product={["auth", "transactions"]}
             publicKey={this.state.pldpublickey}
             onExit={this.handleOnExit}
@@ -443,7 +410,7 @@ class MyAccount extends React.Component<AccountProps, AccountState> {
     return (
 
       <div className="dashboard-container">
-        <SideNav />
+        <SideNavAccount />
         <main className="main-container">
           <div className="main-header">
             <img className="main-logo" src="assets/logo-white.svg" />

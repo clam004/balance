@@ -22,9 +22,9 @@ exports.seed = function(knex, Promise) {
           salt:'a1265934cb1bc3f5fb5cfd6ca22ddc2ab8e4c739', username:'Vicki', num_completed_balances:3,
           stripe_connect_account_token:'acct_1Dd2JQFBGuZLGHXA', stripe_customer_id:'cus_E5CjfnLOpLixcm'},
         { 
-          email: 'Carson@balance.com', password: '460ba70b046f3768bd9c47458badbeb680c0605bef2de1c233ffdf413dd1d7179ffea33f7185528bb81212887fa85d4da232f81e54998e3313eedc36e562d506',
-          salt:'a1265934cb1bc3f5fb5cfd6ca22ddc2ab8e4c739',username:null, num_completed_balances:3, 
-          stripe_connect_account_token:'acct_1Dd2G0FgxTx3cXKM', stripe_customer_id:'cus_E5Cfm31AYHLmCN'},
+          email: 'carson608@gmail.com', password: '460ba70b046f3768bd9c47458badbeb680c0605bef2de1c233ffdf413dd1d7179ffea33f7185528bb81212887fa85d4da232f81e54998e3313eedc36e562d506',
+          salt:'a1265934cb1bc3f5fb5cfd6ca22ddc2ab8e4c739',username:'Carson', num_completed_balances:3, 
+          stripe_connect_account_token:'acct_1DeUTpGcogdEF1Hw', stripe_customer_id:'cus_E6hwgRLTcQgF2Z'},
         { 
           email: 'Anne@balance.com', password: '460ba70b046f3768bd9c47458badbeb680c0605bef2de1c233ffdf413dd1d7179ffea33f7185528bb81212887fa85d4da232f81e54998e3313eedc36e562d506',
           salt:'a1265934cb1bc3f5fb5cfd6ca22ddc2ab8e4c739', username:null, num_completed_balances:3},

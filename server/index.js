@@ -14,10 +14,10 @@ const env = process.env.NODE_ENV || 'dev';
 
 const { PLAID_PUBLISHABLE_KEY, STRIPE_PUBLIC_KEY, PLAID_CLIENT_ID } = require('../spldconfig');
 
+/*
 console.log('index PLAID_CLIENT_ID', PLAID_CLIENT_ID);
 console.log('index PLAID_PUBLISHABLE_KEY', PLAID_PUBLISHABLE_KEY);
-
-
+*/
 
 var path = require('path');
 var fs = require('fs');

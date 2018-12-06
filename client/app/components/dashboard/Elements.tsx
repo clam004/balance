@@ -3,6 +3,43 @@ import { RouteComponentProps, Link } from 'react-router-dom';
 import './Dashboard.less';
 import { Balance_Data } from './BalanceSummary';
 import * as moment from 'moment';
+import { logout, getUserData } from '../../helpers/auth';
+
+const SideNavAccount = () => {
+
+  return (
+    <nav className="side-nav-container">
+      <div className="side-nav-header">
+        <img className="side-nav-logo" src="assets/logo-green.svg" />
+        <h3><Link to="/">Balance</Link></h3>
+      </div>
+      <ul className="side-nav-list">
+        <li className="nav-item">
+          <Link to="/buying-balances">Buying Balances</Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/selling-balances">Selling Balances</Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/history">History</Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/arbitrations">Arbitrations</Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/dashboard">Support</Link>
+        </li>
+        <li className="nav-item active">
+          <Link to="/myaccount">My Account</Link>
+        </li>
+        <li className="nav-item">
+          <Link onClick={() => logout()} to="/">Logout</Link>
+        </li>
+      </ul>
+    </nav>
+  );
+
+};
 
 const SideNav = () => {
 
@@ -14,20 +51,30 @@ const SideNav = () => {
       </div>
       <ul className="side-nav-list">
         <li className="nav-item">
-          <Link to="/dashboard">Current Balances</Link>
+          <Link to="/buying-balances">Buying Balances</Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/selling-balances">Selling Balances</Link>
         </li>
         <li className="nav-item">
           <Link to="/history">History</Link>
         </li>
         <li className="nav-item">
-          <Link to="/dashboard">Arbitrations</Link>
+          <Link to="/arbitrations">Arbitrations</Link>
         </li>
         <li className="nav-item">
           <Link to="/dashboard">Support</Link>
         </li>
+        <li className="nav-item">
+          <Link to="/myaccount">My Account</Link>
+        </li>
+        <li className="nav-item">
+          <Link onClick={() => logout()} to="/">Logout</Link>
+        </li>
       </ul>
     </nav>
   );
+
 };
 
 interface IBalance {
@@ -266,7 +313,7 @@ class BalanceData extends React.Component<Props, State> {
   };
 };
 
-export {SideNav, BalanceData, BalanceParticipantDetails, IBalance};
+export {SideNav, BalanceData, BalanceParticipantDetails, IBalance, SideNavAccount};
 
 // export default CompleteBalanceDetails;
 
