@@ -55,7 +55,7 @@ class Login extends React.Component<
 
   }
 
-  public renderError(): JSX.Element[] {
+  public renderError(): JSX.Element {
 
     var { error } = this.state;  
 
