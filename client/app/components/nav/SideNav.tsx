@@ -28,7 +28,7 @@ const SideNav = () => {
           <Link to="/myaccount">My Account</Link>
         </li>
         <li className="nav-item">
-          <a href="/dashboard">Support</a>
+          <a href="/support">Support</a>
         </li>
         <li className="nav-item">
           <Link onClick={() => logout()} to="/">Logout</Link>

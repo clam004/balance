@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
-interface TestState {}
+interface SupportState {}
 
-class Test extends React.Component<RouteComponentProps<{}>, TestState> {
+class Support extends React.Component<RouteComponentProps<{}>, SupportState> {
   constructor(props: RouteComponentProps<{}>) {
     super(props);
 
@@ -13,10 +13,12 @@ class Test extends React.Component<RouteComponentProps<{}>, TestState> {
   render() {
     return (
       <div>
-        Test Page is different!
+        Hello !! 
+        Please email deepnetworkresearch@gmail.com for questions.
+        Thank you 
       </div>
     );
   }
 }
 
-export default Test;
+export default Support;

@@ -27,7 +27,7 @@ const SideNavAccount = () => {
           <Link to="/arbitrations">Arbitrations</Link>
         </li>
         <li className="nav-item">
-          <Link to="/dashboard">Support</Link>
+          <Link to="/support">Support</Link>
         </li>
         <li className="nav-item active">
           <Link to="/myaccount">My Account</Link>
@@ -63,7 +63,7 @@ const SideNav = () => {
           <Link to="/arbitrations">Arbitrations</Link>
         </li>
         <li className="nav-item">
-          <Link to="/dashboard">Support</Link>
+          <Link to="/support">Support</Link>
         </li>
         <li className="nav-item">
           <Link to="/myaccount">My Account</Link>

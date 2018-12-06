@@ -28,7 +28,7 @@ const SideNav = () => {
           <Link to="/arbitrations">Arbitrations</Link>
         </li>
         <li className="nav-item">
-          <Link to="/dashboard">Support</Link>
+          <Link to="/support">Support</Link>
         </li>
         <li className="nav-item">
           <Link to="/myaccount">My Account</Link>
@@ -208,7 +208,7 @@ class Arbitration extends React.Component<DashboardProps & RouteComponentProps<{
           <main className="main-container">
             <div className="main-header">
               <img className="main-logo" src="assets/logo-white.svg" />
-              <h3> Past Balances for {user_alias} </h3>
+              <h3> Balances in arbitration for {user_alias} </h3>
             </div>
 
             <div className="balances-container">
@@ -243,12 +243,12 @@ class Arbitration extends React.Component<DashboardProps & RouteComponentProps<{
           <main className="main-container">
             <div className="main-header">
               <img className="main-logo" src="assets/logo-white.svg" />
-              <h3>Current Balances for {user_alias} </h3>
+              <h3>Current Balances in arbitration for {user_alias} </h3>
             </div>
 
             <div className="balances-container">
 
-            No Completed Balances
+            No Balances in Arbitration
 
               <section className="create-balance-container">
                 <Link to="/create">
