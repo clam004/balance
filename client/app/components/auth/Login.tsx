@@ -55,7 +55,25 @@ class Login extends React.Component<
 
   }
 
+  public renderError(): JSX.Element[] {
+
+    var { error } = this.state;  
+
+    if (error) {
+      return (
+        <div> 
+        <a href="/signup">incorrect email / password click here to sign up</a>
+        </div>
+      );
+    } else {
+      return (
+        <div> </div>
+      );
+    }
+  }
+
   render() {
+
     return (
       <div className="sign-in-wrapper">
         <div className="sign-in-container">
@@ -90,6 +108,9 @@ class Login extends React.Component<
                 />
               </div>
             </form>
+
+            { this.renderError() }
+
           </div>
 
           <button
@@ -98,7 +119,8 @@ class Login extends React.Component<
             onClick={this.handleSubmit.bind(this)}
           >
             Log in
-          </button>    
+          </button>  
+
         </div>
       </div>
     );
