@@ -14,7 +14,7 @@ class Support extends React.Component<RouteComponentProps<{}>, SupportState> {
     return (
       <div>
         Hello !! 
-        Please email deepnetworkresearch@gmail.com for questions.
+        Please email deepnetworkresearch [at] gmail [dot] com for questions.
         Thank you 
       </div>
     );
