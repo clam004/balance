@@ -2,16 +2,19 @@ import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
 
 import {  getBalances, 
-          toggleSellerApprove, 
+          toggleApprove, 
           toggleComplete, 
           balanceDone,
-          balanceDelete } from '../../helpers/usersbalances'; 
+          balanceDelete,
+          archiveEdit,
+          approveEdit,
+          arbitrateBalance } from '../../helpers/usersbalances';  
 
 import { buyerPaySeller } from '../../helpers/transactions';
 
 import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
-import { BalanceParticipantDetails } from './Elements';
+import { BalanceParticipantDetails, IBalance } from './Elements';
 
 import './Dashboard.less';
 import '../balance/Balance.less';
@@ -26,10 +29,10 @@ const SideNav = () => {
       </div>
       <ul className="side-nav-list">
         <li className="nav-item">
-          <Link to="/buying-balances">Buying Balances</Link>
+          <Link to="/buying-balances">Current Balances as Buyer</Link>
         </li>
         <li className="nav-item active">
-          <Link to="/selling-balances">Selling Balances</Link>
+          <Link to="/selling-balances">Current Balances as Seller</Link>
         </li>
         <li className="nav-item">
           <Link to="/history">History</Link>
@@ -53,29 +56,6 @@ const SideNav = () => {
 
 interface DashboardProps extends RouteComponentProps<{}> {}
 
-interface IBalance {
-  title:string,
-  balance_description:string,
-  buyer_obligation:string,
-  seller_obligation:string,
-  buyer_email: string,
-  seller_email:string,
-  buyer_stake_amount:number,
-  seller_stake_amount:number,
-  balance_price:number,
-  buyer_indicates_delivered:boolean,
-  seller_indicates_delivered:boolean,
-  buyer_approves_contract:boolean,
-  seller_approves_contract:boolean,
-  agreement_status:string,
-  buyer_id:number,
-  seller_id:number,
-  created_at:string,
-  updated_at:string,
-  due_date:string,
-  id:number 
-}
-
 interface DashboardState {
   data: Array<IBalance>, 
   isLoading: boolean,
@@ -85,6 +65,8 @@ interface DashboardState {
   user_email:string,
   balance_array_index_buyer_says_complete:number,
   balance_array_index_buyer_says_arbitration:number,
+  balance_array_index_buyer_says_delete:number,
+  edit_list: Array<number>,
 }
 
 class Selling_Balances extends React.Component<DashboardProps & RouteComponentProps<{}>, DashboardState> {
@@ -102,6 +84,8 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
       user_email:null,
       balance_array_index_buyer_says_complete:null,
       balance_array_index_buyer_says_arbitration:null,
+      balance_array_index_buyer_says_delete:null,
+      edit_list:[]
     }
 
   }
@@ -150,9 +134,12 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
     });
   }
 
-  public toggleConfirmState(index: number): void {
+  public toggleApproveState(index: number): void {
     let balance: IBalance[] = this.state.data.splice(index,1); 
-    balance[0].seller_approves_contract = !balance[0].seller_approves_contract; 
+    balance[0].seller_approves_contract = !balance[0].seller_approves_contract;
+    if (balance[0].seller_approves_contract) {
+      balance[0].state_string = 'active';
+    }
     let balances: IBalance[] = [...this.state.data];
     balances.splice(index, 0, balance[0]);
     this.setState({data:balances});
@@ -172,13 +159,124 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
     this.setState({data:balances});
   }
 
+  public remove(array, element) {
+    return array.filter(el => el !== element);
+  }
+
+  public toggleSeeEdit(index: number): void {
+
+    let edit_list = this.state.edit_list;
+    var edit_list_includes_index = edit_list.includes(index);
+
+    if (edit_list_includes_index) {
+      let shorter_list = this.remove(edit_list,index);
+      this.setState({edit_list:shorter_list});
+    } else {
+      edit_list.push(index);
+      this.setState({edit_list:edit_list});
+    }
+
+    let balance: IBalance[] = this.state.data.splice(index,1);
+    let balance_temp = JSON.parse(JSON.stringify(balance)); // hack to make a deep copy of object or array 
+    var balance_state = balance[0].state_string;
+    
+    if (balance_state=='proposed_edit') {
+      // toggle balance_state and change what is being displayed 
+      balance[0].state_string = 'edit_displayed'; 
+
+      balance[0].title = balance[0].title_prelim; 
+      balance[0].balance_description = balance[0].balance_description_prelim; 
+      balance[0].buyer_obligation = balance[0].buyer_obligation_prelim; 
+      balance[0].seller_obligation = balance[0].seller_obligation_prelim; 
+      balance[0].balance_price = balance[0].balance_price_prelim; 
+      balance[0].due_date = balance[0].due_date_prelim; 
+
+      balance[0].title_prelim = balance_temp[0].title; 
+      balance[0].balance_description_prelim = balance_temp[0].balance_description; 
+      balance[0].buyer_obligation_prelim = balance_temp[0].buyer_obligation; 
+      balance[0].seller_obligation_prelim = balance_temp[0].seller_obligation; 
+      balance[0].balance_price_prelim = balance_temp[0].balance_price; 
+      balance[0].due_date_prelim = balance_temp[0].due_date; 
+
+      // re-render the page 
+      let balances: IBalance[] = [...this.state.data];
+      balances.splice(index, 0, balance[0]);
+      this.setState({data:balances});
+
+    } else if (balance_state=='edit_displayed') {
+      // toggle balance_state and change what is being displayed
+      balance[0].state_string = 'proposed_edit'; 
+
+      balance[0].title = balance[0].title_prelim; 
+      balance[0].balance_description = balance[0].balance_description_prelim; 
+      balance[0].buyer_obligation = balance[0].buyer_obligation_prelim; 
+      balance[0].seller_obligation = balance[0].seller_obligation_prelim; 
+      balance[0].balance_price = balance[0].balance_price_prelim; 
+      balance[0].due_date = balance[0].due_date_prelim; 
+
+      balance[0].title_prelim = balance_temp[0].title; 
+      balance[0].balance_description_prelim = balance_temp[0].balance_description; 
+      balance[0].buyer_obligation_prelim = balance_temp[0].buyer_obligation; 
+      balance[0].seller_obligation_prelim = balance_temp[0].seller_obligation; 
+      balance[0].balance_price_prelim = balance_temp[0].balance_price; 
+      balance[0].due_date_prelim = balance_temp[0].due_date; 
+
+      // re-render the page 
+      let balances: IBalance[] = [...this.state.data];
+      balances.splice(index, 0, balance[0]);
+      this.setState({data:balances});
+
+    }
+    
+  }
+
+  public rejectEdits(index: number): void {
+
+    let balance: IBalance[] = this.state.data.splice(index,1);
+
+    if (balance[0].seller_approves_contract && balance[0].seller_approves_contract) {
+      balance[0].state_string = "active";
+    } else {
+      balance[0].state_string = "new";
+    }
+
+    archiveEdit(balance[0]);
+
+    balance[0].title = balance[0].title_prelim; 
+    balance[0].balance_description = balance[0].balance_description_prelim; 
+    balance[0].buyer_obligation = balance[0].buyer_obligation_prelim; 
+    balance[0].seller_obligation = balance[0].seller_obligation_prelim; 
+    balance[0].balance_price = balance[0].balance_price_prelim; 
+    balance[0].due_date = balance[0].due_date_prelim; 
+
+    let balances: IBalance[] = [...this.state.data];
+    balances.splice(index, 0, balance[0]);
+    this.setState({data:balances});
+  }
+
+  public acceptEdits(index: number): void {
+    let balance: IBalance[] = this.state.data.splice(index,1);
+
+    if (balance[0].seller_approves_contract && balance[0].seller_approves_contract) {
+      balance[0].state_string = "active";
+    } else {
+      balance[0].state_string = "new";
+    }
+
+    approveEdit(balance[0]);
+
+    let balances: IBalance[] = [...this.state.data];
+    balances.splice(index, 0, balance[0]);
+    this.setState({data:balances});    
+  }
+
   public renderBalance(): JSX.Element[] {
 
-    var participant_or_finish;
     
     return this.state.data.map((balance, array_index) => {
 
       // Decides what goes into the left part of the balance card 
+      var participant_or_finish;
 
       if (balance.id == this.state.balance_array_index_buyer_says_complete) {
 
@@ -240,12 +338,56 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
                 <div className="balance-goods">
                   <button className="btn-primary"
                     onClick={() => {
-
+                      arbitrateBalance({balance});
                       this.completeBalance(array_index);
                     }}
                   >
                    Move Balance to Arbitration 
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        )
+
+      } else if (balance.id == this.state.balance_array_index_buyer_says_delete) {
+
+        participant_or_finish = (
+
+          <div key={balance.id} className="balance-participants-card">
+            <div className="balance-participant-container">
+              <div className="balance-participant-details">
+                <div className="balance-goods">
+                  Are you sure you want to delete this balance?
+                </div>
+              </div>
+            </div>
+
+            <div className="balance-participant-container">
+              <div className="balance-participant-details">
+                <div className="balance-goods">
+
+                  <button className="btn-primary"
+                    onClick={() => {
+                      balanceDelete({id:balance.id})
+                      .then(res => {
+                        console.log('deleted',res)
+                      })
+                      this.completeBalance(array_index);
+                    }}
+                  >
+                   delete this balance
+                  </button>
+
+                  <button className="btn-primary"
+                    onClick={() => {
+                      this.setState({balance_array_index_buyer_says_delete:null});
+                    }}
+                  >
+                   keep balance
+                  </button>
+
                 </div>
               </div>
             </div>
@@ -268,7 +410,9 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
       var lower_right_buttons;
 
       //////////////// SELLER's VIEW ///////////////////
-      // Seller's View: Buyer has just created the balance and this is the first time the seller is seeing it, balance.seller_approves_contract
+
+      // 1. Buyer approves and seller is has not decided yet, balance.seller_approves_contract
+      
       // = null denotes they neither agree nor disagree, the decision has to be made. 
       // TODO: there needs to be a confirm state to remind the seller that if they confirm, the balance will go into active mode
       // which is a state that can only go to completion and arbitration and can only be modified with agreement with both parties.
@@ -288,33 +432,41 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
               </h5>
             </label>
 
-            <button className="btn-primary"
-              onClick={() => {
-                // TODO: differentiate seller approve and buyer approve 
-                toggleSellerApprove({id:balance.id, seller_approves_contract:balance.seller_approves_contract});
-                this.toggleConfirmState(array_index);
-              }}
-            >
-             confirm you agree with terms
-            </button>
+            <br/><br/>
 
             <button className="btn-primary"
               onClick={() => {
-                // TODO: change balance state to seller_approves_contract=false from seller_approves_contract=null 
-                // balanceDelete({id:balance.id});
-                // this.completeBalance(array_index);
+                toggleApprove({
+                  id:balance.id, 
+                  seller_id:balance.seller_id,
+                  buyer_id:balance.buyer_id,
+                  seller_approves_contract:balance.seller_approves_contract,
+                  buyer_approves_contract:balance.buyer_approves_contract,
+                  seller_or_buyer:'seller',
+                });
+                this.toggleApproveState(array_index);
               }}
             >
-             propose edit to the balance  
+             confirm you agree with terms
             </button>
 
             <br/><br/>
 
             <button className="btn-primary"
               onClick={() => {
-                // TODO: change balance state to seller_approves_contract=false from seller_approves_contract=null 
-                // balanceDelete({id:balance.id});
-                //this.completeBalance(array_index);
+                const { history } = this.props;
+                localStorage.setItem("balance_id", JSON.stringify(balance.id)); 
+                history.push('/edit') 
+              }}
+            >
+             propose edit to the balance
+            </button>
+
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                this.setState({balance_array_index_buyer_says_delete:balance.id});
               }}
             >
              delete balance 
@@ -323,7 +475,46 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
           </div>
         )
 
-      // Seller's View: Seller saw balance for the first time and agreed with the terms, making balance.seller_approves_contract == true 
+      // 2. Seller approves and buyer has not indicated yet 
+
+      } else if (balance.seller_approves_contract == true && balance.buyer_approves_contract == null &&
+          balance.buyer_indicates_delivered == false && balance.seller_indicates_delivered == false) {
+
+        lower_right_buttons = (
+
+          <div className="balance-agreement-text">
+
+            <label> 
+              <h5 className="balance-agreement-header">
+                Once {balance.buyer_email} confirms the balance will be active. 
+              </h5>
+            </label>
+
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                const { history } = this.props;
+                localStorage.setItem("balance_id", JSON.stringify(balance.id)); 
+                history.push('/edit') 
+              }}
+            >
+             propose edit to the balance
+            </button>
+
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                this.setState({balance_array_index_buyer_says_delete:balance.id});
+              }}
+            >
+             delete balance 
+            </button>
+
+          </div>
+        )
+      // 3. Both Seller and Buyer have approved, making balance.seller_approves_contract == true 
       // now it is time to do the work in the contract, for now we have decided to have the rejection button disappear. 
       // During the process of working on the balance the seller cen decide to propose edits or indicate completed 
 
@@ -340,30 +531,44 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
               </h5>
             </label>
 
+            <br/><br/>
+
             <button className="btn-primary"
               onClick={() => {
-                // toggleConfirm({id:balance.id, confirm:balance.seller_approves_contract});
-                // this.toggleConfirmState(array_index);
+                toggleComplete({id:balance.id, 
+                                completed_boolean:balance.seller_indicates_delivered, 
+                                seller_or_buyer:'seller'});
+                this.toggleSellerSaysCompleteState(array_index);
               }}
             >
-             propose edit to the balance 
+             indicate balance completed & delivered
             </button>
 
             <br/><br/>
 
             <button className="btn-primary"
               onClick={() => {
-                // toggleComplete({id:balance.id, completed:balance.completed});
-                // this.toggleCompleteState(array_index);
+                const { history } = this.props;
+                localStorage.setItem("balance_id", JSON.stringify(balance.id)); 
+                history.push('/edit') 
               }}
             >
-             indicate balance completed & delivered
+             propose edit to the balance
             </button>
 
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                this.setState({balance_array_index_buyer_says_arbitration:balance.id});
+              }}
+            >
+             move balance to arbitration 
+            </button>
           </div>
         )
 
-      // Seller's View: Seller has indicated they have completed and delivered the balance and is waiting
+      // 4. Both approve, Seller has indicated they have completed and delivered the balance and is waiting
       // for the Buyer to indicate they have received a completed balance thereby complteing the balance, 
       // we leave open the option of reverting back to the balance.seller_indicates_delivered == false state
       // but when in the state 
@@ -381,6 +586,8 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
                Until they confirm, you have the option to undo. 
             </label>
 
+            <br/><br/>
+
             <button className="btn-primary"
               onClick={() => {
                 toggleComplete({id:balance.id, 
@@ -389,19 +596,146 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
                 this.toggleSellerSaysCompleteState(array_index);
               }}
             >
-             undo completed
+             undo completed & delivered 
+            </button>
+
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                const { history } = this.props;
+                localStorage.setItem("balance_id", JSON.stringify(balance.id)); 
+                history.push('/edit') 
+              }}
+            >
+             propose edit to the balance
+            </button>
+
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                this.setState({balance_array_index_buyer_says_arbitration:balance.id});
+              }}
+            >
+             move balance to arbitration 
             </button>
 
           </div>
         )
       }
       
+      var header;
+
+      console.log(balance.state_string, balance.proposer_id, balance.buyer_id)
+
+      if (balance.state_string == 'active') {
+
+        header = (
+          <div className="balance-created-date"> 
+
+            Created {moment(balance.created_at, moment.ISO_8601).fromNow()} 
+            {' - '}
+            Active
+
+          </div>          
+        )
+
+      } else if (balance.state_string == 'new') {
+
+        header = (
+          <div className="balance-created-date"> 
+
+            Created {moment(balance.created_at, moment.ISO_8601).fromNow()} 
+            {' - '}
+            Waiting for approval
+
+          </div>          
+        )
+
+      } else if (balance.state_string == 'proposed_edit' && balance.proposer_id == balance.buyer_id) {
+
+        header = (
+          <div className="balance-created-date"> 
+
+            Created {moment(balance.created_at, moment.ISO_8601).fromNow()} 
+            {' - '}
+            {balance.buyer_email} has proposed edits
+
+            <button 
+             className="btn-primary create-balance-btn"
+             onClick={() => {
+              this.toggleSeeEdit(array_index);
+             }}
+            >
+              see new poposed edits 
+            </button>
+
+          </div>          
+        )
+
+      } else if (balance.state_string == 'edit_displayed' && balance.proposer_id == balance.buyer_id) {
+
+        header = (
+          <div className="balance-created-date"> 
+
+            Created {moment(balance.created_at, moment.ISO_8601).fromNow()} 
+            {' - '}
+            displaying new proposed edits by {balance.buyer_email}
+
+            <button 
+             className="btn-primary create-balance-btn"
+             onClick={() => {
+              this.toggleSeeEdit(array_index);
+             }}
+            >
+              return to original contract
+            </button>
+
+          </div>
+        )
+
+        lower_right_buttons = (
+          <div className="balance-agreement-text">
+            <button 
+             className="btn-primary create-balance-btn"
+             onClick={() => {
+              this.rejectEdits(array_index);
+             }}
+            >
+              decline edits
+            </button>
+
+            <button 
+             className="btn-primary create-balance-btn"
+             onClick={() => {
+              this.acceptEdits(array_index);
+             }}
+            >
+              accept edits
+            </button>
+          </div>
+        )
+      
+      } else if (balance.state_string == 'proposed_edit' && balance.proposer_id == balance.seller_id) {
+
+        header = (
+          <div className="balance-created-date"> 
+
+            Created {moment(balance.created_at, moment.ISO_8601).fromNow()} 
+            {' - '}
+            suggestions sent to {balance.buyer_email} 
+
+          </div>          
+        )
+      }
+
       // put together balance, participant_or_finish, agreement_button, completed_button 
 
       return (
 
         <section key={balance.id} className="balance-section">
-            <div className="balance-created-date"> Created {moment(balance.created_at, moment.ISO_8601).fromNow()} </div>
+            {header}
           <div className="balance-cards-container">
             {participant_or_finish}
           <div className="balance-agreement-container">
@@ -461,32 +795,36 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
       <div className="dashboard-container">
         <SideNav />
         <main className="main-container">
+
           <div className="main-header">
             <img className="main-logo" src="assets/logo-white.svg" />
             <h3> Current Balances for {user_alias} </h3>
           </div>
 
+          <div>
             { this.renderAccount() }
+          </div>
+
+          <section className="create-balance-container">
+            <Link to="/create-sell">
+              <button 
+               className="btn-primary create-balance-btn"
+               onClick={() => {
+                localStorage.setItem("balance_id",null); 
+               }}
+              >
+                <img src="assets/btn-logo-1.svg" />
+                Create a Balance to Sell 
+              </button>
+            </Link>
+          </section>
 
           <br/>
-          <div className="balances-container">
-      
-            { this.renderBalance() }
 
-            <section className="create-balance-container">
-              <Link to="/create">
-                <button 
-                 className="btn-primary create-balance-btn"
-                 onClick={() => {
-                  localStorage.setItem("balance_id",null); 
-                 }}
-                >
-                  <img src="assets/btn-logo-1.svg" />
-                  Create Balance
-                </button>
-              </Link>
-            </section>
+          <div className="balances-container">
+            { this.renderBalance() }
           </div>
+
         </main>
 
       </div>

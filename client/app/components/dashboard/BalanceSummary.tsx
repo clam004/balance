@@ -93,13 +93,22 @@ class BalanceSummary extends React.Component<DashboardProps & RouteComponentProp
 
   }
 
+  approveBalance(balance_data: any) {
+
+    const { history } = this.props;
+
+    if (this.state.user_id == balance_data.buyer_id) {
+      history.push('/buying-balances')
+    } else if (this.state.user_id == balance_data.seller_id) {
+      history.push('/selling-balances')
+    }
+
+  }
+
   handleUpdateBalance(updates: any) {
     //const { balance } = this.state;
-    // console.log(updates)
-    // TODO: connect to API
     //this.setState({
       //balance: merge({}, balance, updates),
-      //isEdit: true
     //});
   }
 
@@ -143,12 +152,17 @@ class BalanceSummary extends React.Component<DashboardProps & RouteComponentProp
                />
 
               <div>
-                <Link to="/dashboard">
-                  <button className="btn-primary create-balance-btn">
+
+                  <button className="btn-primary create-balance-btn"
+                    onClick={() => {
+                      localStorage.setItem("balance_id",null);
+                      this.approveBalance(balance_data); 
+                    }}
+                  >
                     <img src="assets/btn-logo-1.svg" />
-                    Confirm Balance
+                    see balance among current balances 
                   </button>
-                </Link>
+
 
                 <Link to="/create">
                   <button className="btn-primary create-balance-btn"
@@ -161,11 +175,12 @@ class BalanceSummary extends React.Component<DashboardProps & RouteComponentProp
                   </button>
                 </Link>
 
-                <Link to="/dashboard">
+                <Link to="/myaccount">
                   <button className="btn-primary create-balance-btn"
                     onClick={() => {
                       balanceDelete(balance_data);
                       console.log("clicked cancel balance")
+                      localStorage.setItem("balance_id",null); 
                     }}
                   >
                     <img src="assets/btn-logo-1.svg" />

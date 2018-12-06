@@ -2,16 +2,19 @@ import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
 
 import {  getBalances, 
-          toggleSellerApprove, 
+          toggleApprove, 
           toggleComplete, 
           balanceDone,
-          balanceDelete } from '../../helpers/usersbalances'; 
+          balanceDelete,
+          archiveEdit,
+          approveEdit,
+          arbitrateBalance } from '../../helpers/usersbalances';  
 
 import { buyerPaySeller } from '../../helpers/transactions';
 
 import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
-import { BalanceParticipantDetails } from './Elements';
+import { BalanceParticipantDetails, IBalance } from './Elements';
 
 import './Dashboard.less';
 import '../balance/Balance.less';
@@ -26,10 +29,10 @@ const SideNav = () => {
       </div>
       <ul className="side-nav-list">
         <li className="nav-item active">
-          <Link to="/buying-balances">Buying Balances</Link>
+          <Link to="/buying-balances">Current Balances as Buyer</Link>
         </li>
         <li className="nav-item">
-          <Link to="/selling-balances">Selling Balances</Link>
+          <Link to="/selling-balances">Selling Balances as Seller</Link>
         </li>
         <li className="nav-item">
           <Link to="/history">History</Link>
@@ -53,29 +56,6 @@ const SideNav = () => {
 
 interface DashboardProps extends RouteComponentProps<{}> {}
 
-interface IBalance {
-  title:string,
-  balance_description:string,
-  buyer_obligation:string,
-  seller_obligation:string,
-  buyer_email: string,
-  seller_email:string,
-  buyer_stake_amount:number,
-  seller_stake_amount:number,
-  balance_price:number,
-  buyer_indicates_delivered:boolean,
-  seller_indicates_delivered:boolean,
-  buyer_approves_contract:boolean,
-  seller_approves_contract:boolean,
-  agreement_status:string,
-  buyer_id:number,
-  seller_id:number,
-  created_at:string,
-  updated_at:string,
-  due_date:string,
-  id:number 
-}
-
 interface DashboardState {
   data: Array<IBalance>, 
   isLoading: boolean,
@@ -83,8 +63,9 @@ interface DashboardState {
   has_connect_account:boolean,
   has_customer_id:boolean,
   user_email:string,
-  balance_array_index_buyer_says_complete:number,
   balance_array_index_buyer_says_arbitration:number,
+  balance_array_index_buyer_says_delete:number,
+  edit_list: Array<number>,
 }
 
 class Buying_Balances
@@ -101,8 +82,9 @@ class Buying_Balances
       has_connect_account:null,
       has_customer_id:null,
       user_email:null,
-      balance_array_index_buyer_says_complete:null,
       balance_array_index_buyer_says_arbitration:null,
+      balance_array_index_buyer_says_delete:null,
+      edit_list:[],
     }
 
   }
@@ -151,23 +133,20 @@ class Buying_Balances
     });
   }
 
-  public toggleConfirmState(index: number): void {
+  public toggleApproveState(index: number): void {
     let balance: IBalance[] = this.state.data.splice(index,1); 
-    balance[0].seller_approves_contract = !balance[0].seller_approves_contract; 
+    balance[0].buyer_approves_contract = !balance[0].buyer_approves_contract; 
     let balances: IBalance[] = [...this.state.data];
     balances.splice(index, 0, balance[0]);
-    this.setState({data:balances});
-  }
-
-  public toggleSellerSaysCompleteState(index: number): void {
-    let balance: IBalance[] = this.state.data.splice(index,1); 
-    balance[0].seller_indicates_delivered = !balance[0].seller_indicates_delivered; 
-    let balances: IBalance[] = [...this.state.data];
-    balances.splice(index, 0, balance[0]);
+    if (balance[0].buyer_approves_contract && balance[0].seller_approves_contract) {
+      balance[0].state_string = 'active';
+    }
+    console.log("STATE: ", balance[0].state_string)
     this.setState({data:balances});
   }
 
   public toggleBuyerSaysCompleteState(index: number): void {
+    // toggles the balance display array element  
     let balance: IBalance[] = this.state.data.splice(index,1); 
     balance[0].buyer_indicates_delivered = !balance[0].buyer_indicates_delivered; 
     let balances: IBalance[] = [...this.state.data];
@@ -176,20 +155,134 @@ class Buying_Balances
   }
 
   public completeBalance(index: number): void {
+    // removes the balance at index form the display array 
     let balance: IBalance[] = this.state.data.splice(index,1); 
     const balances: IBalance[] = [...this.state.data]
     this.setState({data:balances});
   }
 
-  public renderBalance(): JSX.Element[] {
+  public remove(array, element) {
+    return array.filter(el => el !== element);
+  }
 
-    var participant_or_finish;
+  public toggleSeeEdit(index: number): void {
+
+    let edit_list = this.state.edit_list;
+    var edit_list_includes_index = edit_list.includes(index);
+
+    if (edit_list_includes_index) {
+      let shorter_list = this.remove(edit_list,index);
+      this.setState({edit_list:shorter_list});
+    } else {
+      edit_list.push(index);
+      this.setState({edit_list:edit_list});
+    }
+
+    let balance: IBalance[] = this.state.data.splice(index,1);
+    let balance_temp = JSON.parse(JSON.stringify(balance)); // hack to make a deep copy of object or array 
+    var balance_state = balance[0].state_string;
+    
+
+    if (balance_state=='proposed_edit') {
+      // toggle balance_state and change what is being displayed 
+      balance[0].state_string = 'edit_displayed'; 
+
+      balance[0].title = balance[0].title_prelim; 
+      balance[0].balance_description = balance[0].balance_description_prelim; 
+      balance[0].buyer_obligation = balance[0].buyer_obligation_prelim; 
+      balance[0].seller_obligation = balance[0].seller_obligation_prelim; 
+      balance[0].balance_price = balance[0].balance_price_prelim; 
+      balance[0].due_date = balance[0].due_date_prelim; 
+
+      balance[0].title_prelim = balance_temp[0].title; 
+      balance[0].balance_description_prelim = balance_temp[0].balance_description; 
+      balance[0].buyer_obligation_prelim = balance_temp[0].buyer_obligation; 
+      balance[0].seller_obligation_prelim = balance_temp[0].seller_obligation; 
+      balance[0].balance_price_prelim = balance_temp[0].balance_price; 
+      balance[0].due_date_prelim = balance_temp[0].due_date; 
+
+      // re-render the page 
+      let balances: IBalance[] = [...this.state.data];
+      balances.splice(index, 0, balance[0]);
+      this.setState({data:balances});
+
+    } else if (balance_state=='edit_displayed') {
+      // toggle balance_state and change what is being displayed
+      balance[0].state_string = 'proposed_edit'; 
+
+      balance[0].title = balance[0].title_prelim; 
+      balance[0].balance_description = balance[0].balance_description_prelim; 
+      balance[0].buyer_obligation = balance[0].buyer_obligation_prelim; 
+      balance[0].seller_obligation = balance[0].seller_obligation_prelim; 
+      balance[0].balance_price = balance[0].balance_price_prelim; 
+      balance[0].due_date = balance[0].due_date_prelim; 
+
+      balance[0].title_prelim = balance_temp[0].title; 
+      balance[0].balance_description_prelim = balance_temp[0].balance_description; 
+      balance[0].buyer_obligation_prelim = balance_temp[0].buyer_obligation; 
+      balance[0].seller_obligation_prelim = balance_temp[0].seller_obligation; 
+      balance[0].balance_price_prelim = balance_temp[0].balance_price; 
+      balance[0].due_date_prelim = balance_temp[0].due_date; 
+
+      // re-render the page 
+      let balances: IBalance[] = [...this.state.data];
+      balances.splice(index, 0, balance[0]);
+      this.setState({data:balances});
+
+    }
+    
+  }
+
+  public rejectEdits(index: number): void {
+
+    let balance: IBalance[] = this.state.data.splice(index,1);
+
+    if (balance[0].seller_approves_contract && balance[0].seller_approves_contract) {
+      balance[0].state_string = "active";
+    } else {
+      balance[0].state_string = "new";
+    }
+
+    archiveEdit(balance[0]);
+
+    balance[0].title = balance[0].title_prelim; 
+    balance[0].balance_description = balance[0].balance_description_prelim; 
+    balance[0].buyer_obligation = balance[0].buyer_obligation_prelim; 
+    balance[0].seller_obligation = balance[0].seller_obligation_prelim; 
+    balance[0].balance_price = balance[0].balance_price_prelim; 
+    balance[0].due_date = balance[0].due_date_prelim; 
+
+    let balances: IBalance[] = [...this.state.data];
+    balances.splice(index, 0, balance[0]);
+    this.setState({data:balances});
+  }
+
+  public acceptEdits(index: number): void {
+
+    let balance: IBalance[] = this.state.data.splice(index,1);
+
+    if (balance[0].seller_approves_contract && balance[0].seller_approves_contract) {
+      balance[0].state_string = "active";
+    } else {
+      balance[0].state_string = "new";
+    }
+
+    approveEdit(balance[0]);
+
+    let balances: IBalance[] = [...this.state.data];
+    balances.splice(index, 0, balance[0]);
+    this.setState({data:balances});    
+  }
+
+  public renderBalance(): JSX.Element[] {
     
     return this.state.data.map((balance, array_index) => {
 
+      var participant_or_finish;
+
       // Decides what goes into the left part of the balance card 
 
-      if (balance.id == this.state.balance_array_index_buyer_says_complete) {
+      if (balance.buyer_indicates_delivered) {
 
         participant_or_finish = (
 
@@ -213,9 +306,15 @@ class Buying_Balances
                 <div className="balance-goods">
                   <button className="btn-primary"
                     onClick={() => {
-                      balanceDone({balance}); // moves balance to history so buyer can't double pay. 
-                      buyerPaySeller({balance});
-                      this.completeBalance(array_index);
+                      balanceDone({balance})
+                      .then(res => {
+                        console.log(res)
+                      })     
+                      buyerPaySeller({balance})
+                      .then(res => {
+                        console.log(res)
+                      })   
+                      this.completeBalance(array_index); // removes the balance at index form the display array 
                     }}
                   >
                    Finish Balance
@@ -249,12 +348,56 @@ class Buying_Balances
                 <div className="balance-goods">
                   <button className="btn-primary"
                     onClick={() => {
-
+                      arbitrateBalance({balance});
                       this.completeBalance(array_index);
                     }}
                   >
                    Move Balance to Arbitration 
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        )
+
+      } else if (balance.id == this.state.balance_array_index_buyer_says_delete) {
+
+        participant_or_finish = (
+
+          <div key={balance.id} className="balance-participants-card">
+            <div className="balance-participant-container">
+              <div className="balance-participant-details">
+                <div className="balance-goods">
+                  Are you sure you want to delete this balance?
+                </div>
+              </div>
+            </div>
+
+            <div className="balance-participant-container">
+              <div className="balance-participant-details">
+                <div className="balance-goods">
+
+                  <button className="btn-primary"
+                    onClick={() => {
+                      balanceDelete({id:balance.id})
+                      .then(res => {
+                        console.log('deleted',res)
+                      })
+                      this.completeBalance(array_index);
+                    }}
+                  >
+                   delete this balance
+                  </button>
+
+                  <button className="btn-primary"
+                    onClick={() => {
+                      this.setState({balance_array_index_buyer_says_delete:null});
+                    }}
+                  >
+                   keep balance
+                  </button>
+
                 </div>
               </div>
             </div>
@@ -278,7 +421,8 @@ class Buying_Balances
 
       /////////////// BUYER's VIEW ///////////////////////
 
-      // Buyer's View: Buyer has written a new balance or has edited the balance and waiting for the seller to agree to the terms 
+      // 1. Buyer has written a new balance or has edited the balance and waiting for the seller to agree to the terms 
+      console.log(balance.title, balance.seller_approves_contract, balance.buyer_approves_contract, balance.buyer_indicates_delivered, balance.seller_indicates_delivered)
 
       if (balance.seller_approves_contract == null && balance.buyer_approves_contract == true &&
           balance.buyer_indicates_delivered == false && balance.seller_indicates_delivered == false)  {
@@ -292,22 +436,95 @@ class Buying_Balances
              Once they agree, the balance becomes active.  
             </label>
 
+            <br/><br/>
+
             <button className="btn-primary"
               onClick={() => {
-                // toggleComplete({id:balance.id, completed:balance.completed});
-                // this.toggleCompleteState(array_index);
+                const { history } = this.props;
+                localStorage.setItem("balance_id", JSON.stringify(balance.id));
+                history.push('/edit') 
               }}
             >
              propose edit to the balance
             </button>
 
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                this.setState({balance_array_index_buyer_says_delete:balance.id});
+              }}
+            >
+             delete balance 
+            </button>
+
           </div>
         )
 
-      // Buyer's View: Buyer and seller agreed to the terms, seller presumably working on the balance 
+      // 2. Seller has written a new balance or has edited the balance and waiting for the Buyer to agree to the terms 
 
-      } else if (balance.seller_approves_contract == true && balance.buyer_approves_contract == true &&
-                 balance.buyer_indicates_delivered == false && balance.seller_indicates_delivered == false)  {
+      } else if (balance.seller_approves_contract == true && balance.buyer_approves_contract == null &&
+          balance.buyer_indicates_delivered == false && balance.seller_indicates_delivered == false)  {
+  
+        lower_right_buttons = (
+
+          <div className="balance-agreement-text">
+
+            <label> 
+              <h5 className="balance-agreement-header">
+              {balance.seller_email} {' '} has proposed this balance. 
+              Please indicate you agree with these terms, propose edits
+              or delete this balance. Once confirmed the balance will be active. 
+              </h5>
+            </label>
+
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                toggleApprove({
+                  id:balance.id, 
+                  seller_id:balance.seller_id,
+                  buyer_id:balance.buyer_id,
+                  seller_approves_contract:balance.seller_approves_contract,
+                  buyer_approves_contract:balance.buyer_approves_contract,
+                  seller_or_buyer:'buyer',
+                });
+                this.toggleApproveState(array_index);
+              }}
+            >
+             confirm you agree with terms
+            </button>
+
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                const { history } = this.props;
+                localStorage.setItem("balance_id", JSON.stringify(balance.id)); 
+                history.push('/edit') 
+              }}
+            >
+             propose edit to the balance
+            </button>
+
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                this.setState({balance_array_index_buyer_says_delete:balance.id});
+              }}
+            >
+             delete balance 
+            </button>
+
+          </div>
+        )
+      // 3. Buyer and seller agreed to the terms, seller presumably working on the balance 
+
+      } else if (balance.seller_approves_contract == true && 
+                 balance.buyer_approves_contract == true &&
+                 balance.seller_indicates_delivered == false)  {
   
         lower_right_buttons = (
 
@@ -320,23 +537,48 @@ class Buying_Balances
               </h5>
             </label>
 
+            <br/><br/>
+            
             <button className="btn-primary"
               onClick={() => {
-                // toggleComplete({id:balance.id, completed:balance.completed});
-                // this.toggleCompleteState(array_index);
+                // open confirm option
+                this.toggleBuyerSaysCompleteState(array_index);
+              }}
+            >
+              {balance.buyer_indicates_delivered ? 'undo complete' : 'indicate balance completed & delivered'}   
+            </button>
+
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                const { history } = this.props;
+                localStorage.setItem("balance_id", JSON.stringify(balance.id)); 
+                history.push('/edit') 
               }}
             >
              propose edit to the balance
             </button>
 
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
+                this.setState({balance_array_index_buyer_says_arbitration:balance.id});
+              }}
+            >
+             move balance to arbitration 
+            </button>
+
           </div>
         )
 
-      // Buyer's View: Buyer and seller agreed to the terms, seller indicated the balance is completed and delivered 
+      // 4. Buyer and seller agreed to the terms, seller indicated the balance is completed and delivered 
       // buyer has the choice to complete
 
-      } else if (balance.seller_approves_contract == true && balance.buyer_approves_contract == true &&
-                 balance.buyer_indicates_delivered == false && balance.seller_indicates_delivered == true)  {
+      } else if (balance.seller_approves_contract == true && 
+                 balance.buyer_approves_contract == true &&
+                 balance.seller_indicates_delivered == true)  {
   
         lower_right_buttons = (
 
@@ -351,22 +593,33 @@ class Buying_Balances
 
             </label>
 
+            <br/><br/>
+            
             <button className="btn-primary"
               onClick={() => {
-                // toggleComplete({id:balance.id, completed:balance.completed});
-                // this.toggleCompleteState(array_index);
-                this.setState({balance_array_index_buyer_says_complete:balance.id});
+                // open confirm option
+                this.toggleBuyerSaysCompleteState(array_index);
               }}
             >
-             confirm & complete balance 
+              {balance.buyer_indicates_delivered ? 'undo complete' : 'indicate balance completed & delivered'}  
             </button>
 
             <br/><br/>
 
             <button className="btn-primary"
               onClick={() => {
-                // toggleComplete({id:balance.id, completed:balance.completed});
-                // this.toggleCompleteState(array_index);
+                const { history } = this.props;
+                localStorage.setItem("balance_id", JSON.stringify(balance.id)); 
+                history.push('/edit') 
+              }}
+            >
+             propose edit to the balance
+            </button>
+
+            <br/><br/>
+
+            <button className="btn-primary"
+              onClick={() => {
                 this.setState({balance_array_index_buyer_says_arbitration:balance.id});
               }}
             >
@@ -376,18 +629,123 @@ class Buying_Balances
           </div>
         )
       } 
-        
+
+      var header;
+
+      console.log('state_string, proposer_id, buyer_id',balance.state_string, balance.proposer_id, balance.buyer_id)
+
+      if (balance.state_string == 'active') {
+
+        header = (
+          <div className="balance-created-date"> 
+
+            Created {moment(balance.created_at, moment.ISO_8601).fromNow()} 
+            {' - '}
+            Active
+
+          </div>          
+        )
+
+      } else if (balance.state_string == 'new') {
+
+        header = (
+          <div className="balance-created-date"> 
+
+            Created {moment(balance.created_at, moment.ISO_8601).fromNow()} 
+            {' - '}
+            Waiting for approval
+
+          </div>          
+        )
+
+      } else if (balance.state_string == 'proposed_edit' && balance.proposer_id == balance.buyer_id) {
+
+        header = (
+          <div className="balance-created-date"> 
+
+            Created {moment(balance.created_at, moment.ISO_8601).fromNow()} 
+            {' - '}
+            suggestions sent to {balance.seller_email} 
+
+          </div>          
+        )
+
+      } else if (balance.state_string == 'proposed_edit' && balance.proposer_id == balance.seller_id) {
+
+        header = (
+          <div className="balance-created-date"> 
+
+            Created {moment(balance.created_at, moment.ISO_8601).fromNow()} 
+            {' - '}
+            {balance.seller_email} has proposed edits
+
+            <button 
+             className="btn-primary create-balance-btn"
+             onClick={() => {
+              this.toggleSeeEdit(array_index);
+             }}
+            >
+              see new poposed edits 
+            </button>
+
+          </div>          
+        )
+
+      } else if (balance.state_string == 'edit_displayed' && balance.proposer_id == balance.seller_id) {
+
+        header = (
+          <div className="balance-created-date"> 
+
+            Created {moment(balance.created_at, moment.ISO_8601).fromNow()} 
+            {' - '}
+            displaying new proposed edits by {balance.seller_email}
+
+            <button 
+             className="btn-primary create-balance-btn"
+             onClick={() => {
+              this.toggleSeeEdit(array_index);
+             }}
+            >
+              return to original contract
+            </button>
+
+          </div>
+        )
+
+        lower_right_buttons = (
+          <div className="balance-agreement-text">
+            <button 
+             className="btn-primary create-balance-btn"
+             onClick={() => {
+              this.rejectEdits(array_index);
+             }}
+            >
+              decline edits
+            </button>
+
+            <button 
+             className="btn-primary create-balance-btn"
+             onClick={() => {
+              this.acceptEdits(array_index);
+             }}
+            >
+              accept edits
+            </button>
+          </div>
+        )
+      }
+
       // put together balance, participant_or_finish, agreement_button, completed_button 
 
       return (
 
         <section key={balance.id} className="balance-section">
-            <div className="balance-created-date"> Created {moment(balance.created_at, moment.ISO_8601).fromNow()} </div>
+
+            {header}
+
           <div className="balance-cards-container">
             {participant_or_finish}
           <div className="balance-agreement-container">
-
-
 
               <h5 className="balance-agreement-header">{balance.title}</h5>
               <div className="balance-agreement-text">
@@ -447,26 +805,27 @@ class Buying_Balances
             <h3> Current Balances for {user_alias} </h3>
           </div>
 
+          <div>
             { this.renderAccount() }
+          </div>
+
+          <section className="create-balance-container">
+            <Link to="/create-buy">
+              <button 
+               className="btn-primary create-balance-btn"
+               onClick={() => {
+                localStorage.setItem("balance_id",null); 
+               }}
+              >
+                <img src="assets/btn-logo-1.svg" />
+                 Create a Balance to Purchase 
+              </button>
+            </Link>
+          </section>
 
           <br/>
           <div className="balances-container">
-      
             { this.renderBalance() }
-
-            <section className="create-balance-container">
-              <Link to="/create">
-                <button 
-                 className="btn-primary create-balance-btn"
-                 onClick={() => {
-                  localStorage.setItem("balance_id",null); 
-                 }}
-                >
-                  <img src="assets/btn-logo-1.svg" />
-                  Create Balance
-                </button>
-              </Link>
-            </section>
           </div>
         </main>
 

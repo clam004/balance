@@ -2,12 +2,12 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { merge } from 'lodash';
 import { SideNav } from '../nav';
-import BalanceUserDetails from './BalanceUserDetails';
 import BalanceContractDetails from './BalanceContractDetails';
 import BalanceStakeDetails from './BalanceStakeDetails';
 import './Balance.less';
-import { submitBalance, get_balance_data, updateBalance } from '../../helpers/usersbalances';
+import { get_balance_data, editBalance } from '../../helpers/usersbalances';
 import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
+import { IBalanceUser, IBalanceAgreement, IBalance } from './BalanceElements';
 
 enum BalanceStep {
   SELECT_USER = 'SELECT_USER',
@@ -47,35 +47,6 @@ const BalanceStepCard = ({
   );
 };
 
-interface IBalanceUser {
-  id?:number,
-  username: string;
-  email?:string;
-  stake?: number;
-  goods?: string;
-  num_completed_balances?: number;
-  failures?: number;
-}
-
-interface IBalanceAgreement {
-  title?: string;
-  buyer_obligation?: string;
-  seller_obligation?: string;
-  description?: string;
-  date?: string;
-  price?: number;
-  duration?:number;
-  duration_units?:string;
-}
-
-interface IBalance {
-  createdAt?: string;
-  buyer: IBalanceUser;
-  seller: IBalanceUser;
-  agreement: IBalanceAgreement;
-  balance_id?: number;
-}
-
 interface BalanceCreatorProps extends RouteComponentProps<{}> {}
 
 interface BalanceCreatorState {
@@ -83,9 +54,10 @@ interface BalanceCreatorState {
   selected: BalanceStep;
   error?: string;
   edit?: boolean;
+  user_id:number;
 }
 
-class BalanceCreator extends React.Component<
+class BalanceEditor extends React.Component<
   BalanceCreatorProps & RouteComponentProps<{}>,
   BalanceCreatorState
 > {
@@ -104,6 +76,7 @@ class BalanceCreator extends React.Component<
       selected: null,
       error:null,
       edit:false,
+      user_id:null,
     };
 
   }
@@ -134,8 +107,7 @@ class BalanceCreator extends React.Component<
                             num_completed_balances: num_completed_balances 
                           };
 
-        this.handleUpdateBalance({buyer:currentUser})
-
+        this.setState({user_id:userdata[0].id})
       }
       
     });
@@ -153,11 +125,16 @@ class BalanceCreator extends React.Component<
        
         console.log("balance_data", balance_data[0])
         
-        const initUser = {  email:balance_data[0].seller_email,
-                            id:balance_data[0].seller_id,
-                          };
-        
-        this.handleUpdateBalance({seller:initUser})
+        const seller = {email:balance_data[0].seller_email,
+                        id:balance_data[0].seller_id,
+                        };
+
+        const buyer = {email:balance_data[0].buyer_email,
+                        id:balance_data[0].buyer_id,
+                        };
+
+        this.handleUpdateBalance({seller:seller})
+        this.handleUpdateBalance({buyer:buyer})
 
         
         const initAgreement = {  title:balance_data[0].title,
@@ -195,25 +172,10 @@ class BalanceCreator extends React.Component<
     const { buyer, seller, agreement } = balance;
 
     switch (selected) {
-      case BalanceStep.SELECT_USER:
-        return (
-          <BalanceUserDetails
-            onSelectUser={this.handleUpdateBalance.bind(this)}
-            onInvite={invite => console.log('Invite sent:', invite)}
-          />
-        );
       case BalanceStep.SET_AGREEMENT:
         return (
           <BalanceContractDetails
             agreement={agreement}
-            onUpdate={this.handleUpdateBalance.bind(this)}
-          />
-        );
-      case BalanceStep.SET_STAKE:
-        return (
-          <BalanceStakeDetails
-            buyer={buyer}
-            seller={seller}
             onUpdate={this.handleUpdateBalance.bind(this)}
           />
         );
@@ -228,29 +190,24 @@ class BalanceCreator extends React.Component<
     const { history } = this.props;
     const balanceInfo = this.state.balance;
 
-    if (!balanceInfo.seller.hasOwnProperty('id')) {
-      return this.setState({ error: 'Select a seller',
-                             selected: BalanceStep.SELECT_USER });
-    } else if (balanceInfo.agreement.title && balanceInfo.agreement.buyer_obligation &&
-               balanceInfo.agreement.seller_obligation) {
+    console.log(this.state.user_id, balanceInfo.buyer.id);
+
+    if (balanceInfo.agreement.title && 
+        balanceInfo.agreement.buyer_obligation && 
+        balanceInfo.agreement.seller_obligation) {
       
-      if (this.state.edit) {
+      editBalance(balanceInfo)
+      .then((balance_id) => {
 
-        return updateBalance(balanceInfo)
-        .then((balance_id) => {
-          localStorage.setItem("balance_id", JSON.stringify(balance_id.id)); 
-        })  
-        .then(() => history.push('/balancesummary'))
+        localStorage.setItem("balance_id",null);
 
-      } else {
+        if (this.state.user_id == balanceInfo.buyer.id) {
+          history.push('/buying-balances')
+        } else if (this.state.user_id == balanceInfo.seller.id) {
+          history.push('/selling-balances')
+        }
 
-        return submitBalance(balanceInfo)
-        .then((balance_id) => {
-          localStorage.setItem("balance_id", JSON.stringify(balance_id.id)); 
-        })  
-        .then(() => history.push('/balancesummary'))
-
-      }
+      })
 
     } else {
       return this.setState({ error: 'The contract title, buyer and seller obligations are required',
@@ -281,94 +238,33 @@ class BalanceCreator extends React.Component<
         <main className="main-container">
           <div className="main-header">
             <img className="main-logo" src="assets/logo-white.svg" />
-            <h3>Creating Balance</h3>
+            <h3>Edit the Balance</h3>
           </div>
 
           <div className="new-balance-container">
             <section className="new-balance-box">
-              <div className="new-balance-header-container">
-                <span className="new-balace-step-num">1</span>
-                <span className="new-balance-step">
-                  Select who to make a Balance with
-                </span>
-              </div>
-
-              <div className="new-balance-action-container">
-                <BalanceStepCard
-                  text={`${buyer.username} as buyer`} //{buyer.username} 
-                  subtext={//`${buyer.num_completed_balances} successful contracts. 
-                            `The buyer sets the initial terms of the balance.
-                             Once Balance is sent and you both agree on the terms, the balance will be made`}
-                  isSelectable={false}
-                />
-
-                <div className="new-balance-logo-divider">
-                  <img src="assets/logo-gray.svg" />
-                </div>
-
-                <BalanceStepCard
-                  text={seller.email || 'Select your seller'}
-                  subtext={
-                    seller.num_completed_balances
-                      ? `${seller.num_completed_balances} successful contracts`
-                      : 'choose existing balancer or invite someone to make a Balance with'
-                  }
-                  isSelected={selected === BalanceStep.SELECT_USER}
-                  onSelect={() =>
-                    this.setState({ selected: BalanceStep.SELECT_USER })
-                  }
-                />
-
-              </div>
 
               <div className="new-balance-header-container">
-                <span className="new-balace-step-num">2</span>
                 <span className="new-balance-step">
-                  Add what each person will do and by when
+                  You are about to propose an edit your balance with {seller.email}.
+                  If {seller.email} has already agreed to a previous version of this
+                  balance, they will need to approve of these edits before the new
+                  version replaces the old balance. If they do not agree to your proposed
+                  edits the original terms will continue to hold. 
                 </span>
               </div>
 
               <div className="new-balance-action-container">
                 <BalanceStepCard
                   text={
-                    agreement.title && seller.email
-                      ? `${agreement.title} within ${agreement.duration} ${agreement.duration_units}`
-                      : 'Add an agreement to the contract'
+                     `${agreement.title} within ${agreement.duration} ${agreement.duration_units}`           
                   }
                   subtext={
-                    agreement.title && agreement.duration
-                      ? 'See contract details here'
-                      : 'Make a quick list of the things you want done'
+                    "click here to edit the balance"
                   }
                   isSelected={selected === BalanceStep.SET_AGREEMENT}
                   onSelect={() =>
                     this.setState({ selected: BalanceStep.SET_AGREEMENT })
-                  }
-                />
-              </div>
-
-              <div className="new-balance-header-container">
-                <span className="new-balace-step-num">3</span>
-                <span className="new-balance-step">
-                  Decide how much to stake.
-                </span>
-              </div>
-
-              <div className="new-balance-action-container">
-                <BalanceStepCard
-                  text={
-                    buyer.stake
-                      ? `you staked $${buyer.stake}`
-                      : 'Decide how much you want to stake'
-                  }
-                  subtext={
-                    seller.email && seller.stake
-                      ? `${seller.email} staked $${seller.stake}`
-                      : 'Stakes help build trust and mutual intention'
-                  }
-                  isSelected={selected === BalanceStep.SET_STAKE}
-                  onSelect={() =>
-                    this.setState({ selected: BalanceStep.SET_STAKE })
                   }
                 />
               </div>
@@ -387,7 +283,7 @@ class BalanceCreator extends React.Component<
               onClick={this.handleSubmitBalance.bind(this)}
             >
               <img src="assets/btn-logo-1.svg" />
-              Review and Send Balance 
+              Return to Current Balances
             </button>
               <div className="output-if-error">
                 {error_message}
@@ -399,5 +295,5 @@ class BalanceCreator extends React.Component<
   }
 }
 
-export default BalanceCreator ;
-export { IBalanceUser, BalanceCreator }
+export default BalanceEditor ;
+export { IBalanceUser, BalanceEditor }

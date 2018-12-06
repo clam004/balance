@@ -96,7 +96,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
             <label className="label-default">Buyer Obligations</label>
             <textarea
               className="input-default full-width"
-              rows={3}
+              rows={4}
               placeholder="responsibilities of payer"
               value={buyer_obligation || ""}
               onChange={e => this.setState({ buyer_obligation: e.target.value })}
@@ -107,7 +107,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
             <label className="label-default">Seller Obligations</label>
             <textarea
               className="input-default full-width"
-              rows={3}
+              rows={4}
               placeholder="responsibilities of receiver of payment"
               value={seller_obligation || ""}
               onChange={e => this.setState({ seller_obligation: e.target.value })}
@@ -118,7 +118,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
             <label className="label-default">Additional Details</label>
             <textarea
               className="input-default full-width"
-              rows={3}
+              rows={2}
               placeholder="optional"
               value={description || ""}
               onChange={e => this.setState({ description: e.target.value })}

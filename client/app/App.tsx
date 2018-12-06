@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { Home, About } from './components/home';
 import { Login, SignUp, SignUpComplete } from './components/auth';
 import { Buying_Balances, Selling_Balances, BalanceSummary, History, MyAccount } from './components/dashboard';
-import { BalanceCreator } from './components/balance';
+import { BalanceCreatorSell, BalanceCreatorBuy, BalanceEditor } from './components/balance';
 import { Test } from './components/test';
 import './App.less';
 
@@ -23,7 +23,9 @@ ReactDOM.render(
         <Route path="/selling-balances" component={Selling_Balances} />
         <Route path="/balancesummary" component={BalanceSummary} />
         <Route path="/history" component={History} />
-        <Route path="/create" component={BalanceCreator} />
+        <Route path="/create-buy" component={BalanceCreatorBuy} />
+        <Route path="/create-sell" component={BalanceCreatorSell} />
+        <Route path="/edit" component={BalanceEditor} />
         <Route path="/myaccount" component={MyAccount} />
         <Route path="/test" component={Test} />
       </Switch>

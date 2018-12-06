@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IBalanceUser } from './BalanceCreator';
+import { IBalanceUser, IBalanceAgreement, IBalance } from './BalanceElements';
 
 interface Props {
   buyer: IBalanceUser;

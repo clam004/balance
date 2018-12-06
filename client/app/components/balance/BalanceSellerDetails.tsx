@@ -93,7 +93,11 @@ class BalanceUserDetails extends React.Component<Props, State> {
               <div
                 key={key}
                 className="favorite-user-card"
-                onClick={() => onSelectUser({ seller: user })}
+                onClick={() => {
+
+                  onSelectUser({ seller: user })
+                  
+                }}
               >
               
                 <div className="favorite-user-photo">{/* TODO */}</div>

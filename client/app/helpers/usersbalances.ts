@@ -31,8 +31,12 @@ export const updateBalance = (IBalanceInfo: object): Promise<HttpResponse> => {
   return post('/api/update_balance', IBalanceInfo);
 };
 
-export const toggleSellerApprove = (balance_seller_approves:object): Promise<HttpResponse> => {
-  return post('/api/toggle_seller_approve', balance_seller_approves);
+export const editBalance = (IBalanceInfo: object): Promise<HttpResponse> => {
+  return post('/api/edit_balance', IBalanceInfo);
+};
+
+export const toggleApprove = (balance_seller_approves:object): Promise<HttpResponse> => {
+  return post('/api/toggle_approve', balance_seller_approves);
 };
 
 export const toggleComplete = (balance_complete:object): Promise<HttpResponse> => {
@@ -51,15 +55,25 @@ export const balanceDelete = (balance:object): Promise<HttpResponse> => {
   return post('/api/balance_delete', balance);
 };
 
+export const archiveEdit = (balance:object): Promise<HttpResponse> => {
+  return post('/api/archive_edit', balance);
+};
+
+export const approveEdit = (balance:object): Promise<HttpResponse> => {
+  return post('/api/approve_edit', balance);
+};
+
 export const getBalances = (buyer_or_seller_id:object): Promise<HttpResponse> => {
-  return post('/api/get_balances', buyer_or_seller_id);
+  return post('/api/get_incomplete_balances_by_id', buyer_or_seller_id);
 };
 
 export const getHistory = (): Promise<HttpResponse> => {
   return post('/api/get_history');
 };
 
-
+export const arbitrateBalance = (balance:object): Promise<HttpResponse> => {
+  return post('/api/arbitrate_balance', balance);
+};
 
 /*
 

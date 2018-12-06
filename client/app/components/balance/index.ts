@@ -1,3 +1,5 @@
-import BalanceCreator from './BalanceCreator';
+import BalanceCreatorBuy from './BalanceCreatorBuy';
+import BalanceCreatorSell from './BalanceCreatorSell';
+import BalanceEditor from './BalanceEditor';
 
-export { BalanceCreator };
+export { BalanceEditor, BalanceCreatorBuy, BalanceCreatorSell };

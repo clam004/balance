@@ -92,56 +92,98 @@ finapi.post('/test_payment_api', (req, response, next) => {
 
 finapi.post('/buyer_pay_seller', (req, res, next) => {
 
-	var buyer_id = req.body.balance.buyer_id;
-	var seller_id = req.body.balance.seller_id;
+    console.log('/buyer_pay_seller', req.body);
 
-	var buyer_customer_id;
-	var seller_acnt_tok;
+	let buyer_id = req.body.balance.buyer_id;
+	let seller_id = req.body.balance.seller_id;
 
-	knex('users').select(['stripe_customer_id'])
-	.where('id',buyer_id)
-	.then(buyer_info => {
+	let action_id;
+	let buyer_customer_id;
+	let seller_acnt_tok;
 
-        buyer_customer_id = buyer_info[0].stripe_customer_id;
+    knex('actions')
+    .insert({
+    	user_id1:buyer_id,
+    	user_id2:seller_id,
+    	action_time1:moment().format("YYYY-MM-DDTHH:mm:ss"),
+    	action_string1:'buyer to seller payment for delivered balance in USD',
+    	action_int1:req.body.balance.id,
+    	action_decimal1:req.body.balance.balance_price,
+    })
+ 	.returning('id')
+	.then((id) => {
 
-		knex('users').select(['stripe_connect_account_token'])
-	    .where('id',seller_id)
-	    .then(seller_info => {
+	    action_id = id[0]; //res.json({id:id[0]})
 
-	    	seller_acnt_tok = seller_info[0].stripe_connect_account_token;
+		knex('users').select(['stripe_customer_id'])
+		.where('id',buyer_id)
+		.then(buyer_info => {
 
-	    	var balance_price = req.body.balance.balance_price;
+	        buyer_customer_id = buyer_info[0].stripe_customer_id;
 
-	    	var balance_price_cents = balance_price * 100;
+			knex('users').select(['stripe_connect_account_token'])
+		    .where('id',seller_id)
+		    .then(seller_info => {
 
-	    	console.log(balance_price_cents, seller_acnt_tok, buyer_customer_id);
+		    	seller_acnt_tok = seller_info[0].stripe_connect_account_token;
 
- 			//var charge_amount = Math.round(balance_price_cents * 1.0041);
- 			//var deposit_amount = Math.round(balance_price_cents * (1 - 0.0041));
+		    	let balance_price = req.body.balance.balance_price;
+		    	let balance_price_cents = balance_price * 100;
 
- 			var charge_amount = Math.round(balance_price_cents * 1.005);
- 			var deposit_amount = Math.round(balance_price_cents * (1 - 0.005));
-	    	
-			stripe.charges.create({
-			  amount: charge_amount, // this is written in cents
-			  //application_fee: 
-			  currency: "usd",
-			  description: req.body.balance.title + " balance "+req.body.balance.id+" buyer "+buyer_id+" seller "+seller_id,
-			  customer: buyer_customer_id, // Plaid generated customer ID
-			  //source: buyer_stripe_connect_account_token,
-			  destination: {
-			      amount: deposit_amount,
-			      account: seller_acnt_tok,//{CONNECTED_STRIPE_ACCOUNT_ID},
-		      },
-			}, (err, charge) => {
-				console.log('charge SUCCESS!', charge)
-				console.log('err', err)
-				//res.json(users);
-			});
+		    	console.log('balance_price_cents, seller_acnt_tok, buyer_customer_id', balance_price_cents, seller_acnt_tok, buyer_customer_id);
 
-	    });
-		
-	});	
+	 			let charge_amount = Math.round(balance_price_cents * 1.005);
+	 			let deposit_amount = Math.round(balance_price_cents * (1 - 0.005));
+		    	
+				stripe.charges.create({
+					amount: charge_amount, // this is written in cents
+					//application_fee: 
+					currency: "usd",
+					description: req.body.balance.title + " balance "+req.body.balance.id+" buyer "+buyer_id+" seller "+seller_id,
+					customer: buyer_customer_id, // Plaid generated customer ID
+					//source: buyer_stripe_connect_account_token,
+					destination: {
+						amount: deposit_amount,
+						account: seller_acnt_tok, //{CONNECTED_STRIPE_ACCOUNT_ID},
+				    },    
+				}, (err, charge) => {
+					console.log('SUCCESS! charge: ', charge)
+					console.log('err', err)
+
+					if (err) {
+						
+						knex('actions')
+						.where('id', action_id)
+						.update({
+							action_string2:err.requestId,
+						})
+						.then((response) => {
+							console.log('err',response)
+						})
+						res.json({response:err.message});
+						//console.log("ERROR", err)
+
+					} else {
+						
+						knex('actions')
+						.where('id', action_id)
+						.update({
+							action_string2:charge.id,
+						})
+						.then((response) => {
+							console.log('charge',response)
+						})
+						res.json({response:charge.balance_transaction});
+						//console.log("SUCCESS", action_id, charge.id)
+					}
+
+				});
+				
+		    });
+			
+		});	
+
+	});
 
 });
 
@@ -241,6 +283,7 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 			  	type: "individual",
 			  	first_name: req.body.first_name,
 			  	last_name: req.body.last_name,
+
 			    /*	
 			  	address: {
 			  		city: req.body.address_city,

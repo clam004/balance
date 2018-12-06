@@ -4,6 +4,106 @@ import './Dashboard.less';
 import { Balance_Data } from './BalanceSummary';
 import * as moment from 'moment';
 
+const SideNav = () => {
+
+  return (
+    <nav className="side-nav-container">
+      <div className="side-nav-header">
+        <img className="side-nav-logo" src="assets/logo-green.svg" />
+        <h3><Link to="/">Balance</Link></h3>
+      </div>
+      <ul className="side-nav-list">
+        <li className="nav-item">
+          <Link to="/dashboard">Current Balances</Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/history">History</Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/dashboard">Arbitrations</Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/dashboard">Support</Link>
+        </li>
+      </ul>
+    </nav>
+  );
+};
+
+interface IBalance {
+  id:number,
+  proposer_id:number,
+  state_string:string,
+  title:string,
+  balance_description:string,
+  buyer_obligation:string,
+  seller_obligation:string,
+  buyer_email: string,
+  seller_email:string,
+  buyer_stake_amount:number,
+  seller_stake_amount:number,
+  balance_price:number,
+  buyer_indicates_delivered:boolean,
+  seller_indicates_delivered:boolean,
+  buyer_approves_contract:boolean,
+  seller_approves_contract:boolean,
+  agreement_status:string,
+  buyer_id:number,
+  seller_id:number,
+  created_at:string,
+  updated_at:string,
+  due_date:string, 
+  title_prelim:string,
+  balance_description_prelim:string,
+  buyer_obligation_prelim:string,
+  seller_obligation_prelim:string,
+  balance_price_prelim:number,
+  due_date_prelim:string, 
+}
+
+interface CompleteProps {
+  balance:IBalance
+}
+
+interface CompleteState {
+
+}
+
+class BalanceParticipantDetails extends React.Component<CompleteProps, CompleteState> {
+
+  constructor(props: CompleteProps) {
+    super(props);
+  }
+  
+  render() {
+
+    const balance = this.props.balance;
+    return (
+      <div className="balance-participants-card">
+        <div className="balance-participant-container">
+          <div className="balance-participant-photo">{}</div>
+          <div className="balance-participant-details">
+            <div className="balance-stake">
+              {balance.buyer_email} has staked ${balance.buyer_stake_amount}
+            </div>
+            <div className="balance-goods">{balance.buyer_obligation}</div>
+          </div>
+        </div>
+
+        <div className="balance-participant-container">
+          <div className="balance-participant-photo">{}</div>
+          <div className="balance-participant-details">
+            <div className="balance-stake">
+              {balance.seller_email} has staked ${balance.seller_stake_amount}
+            </div>
+            <div className="balance-goods">{balance.seller_obligation}</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
 interface Props {
   balance_data: Balance_Data
   onUpdate: (updates: any) => void;
@@ -166,99 +266,7 @@ class BalanceData extends React.Component<Props, State> {
   };
 };
 
-const SideNav = () => {
-
-  return (
-    <nav className="side-nav-container">
-      <div className="side-nav-header">
-        <img className="side-nav-logo" src="assets/logo-green.svg" />
-        <h3><Link to="/">Balance</Link></h3>
-      </div>
-      <ul className="side-nav-list">
-        <li className="nav-item">
-          <Link to="/dashboard">Current Balances</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/history">History</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/dashboard">Arbitrations</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/dashboard">Support</Link>
-        </li>
-      </ul>
-    </nav>
-  );
-};
-
-interface IBalance {
-  title:string,
-  balance_description:string,
-  buyer_obligation:string,
-  seller_obligation:string,
-  buyer_email: string,
-  seller_email:string,
-  buyer_stake_amount:number,
-  seller_stake_amount:number,
-  balance_price:number,
-  buyer_indicates_delivered:boolean,
-  seller_indicates_delivered:boolean,
-  buyer_approves_contract:boolean,
-  seller_approves_contract:boolean,
-  agreement_status:string,
-  buyer_id:number,
-  seller_id:number,
-  created_at:string,
-  updated_at:string,
-  due_date:string,
-  id:number 
-}
-
-interface CompleteProps {
-  balance:IBalance
-}
-
-interface CompleteState {
-
-}
-
-class BalanceParticipantDetails extends React.Component<CompleteProps, CompleteState> {
-
-  constructor(props: CompleteProps) {
-    super(props);
-  }
-  
-  render() {
-
-    const balance = this.props.balance;
-    return (
-      <div className="balance-participants-card">
-        <div className="balance-participant-container">
-          <div className="balance-participant-photo">{}</div>
-          <div className="balance-participant-details">
-            <div className="balance-stake">
-              {balance.buyer_email} has staked ${balance.buyer_stake_amount}
-            </div>
-            <div className="balance-goods">{balance.buyer_obligation}</div>
-          </div>
-        </div>
-
-        <div className="balance-participant-container">
-          <div className="balance-participant-photo">{}</div>
-          <div className="balance-participant-details">
-            <div className="balance-stake">
-              {balance.seller_email} has staked ${balance.seller_stake_amount}
-            </div>
-            <div className="balance-goods">{balance.seller_obligation}</div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-}
-
-export {SideNav, BalanceData, BalanceParticipantDetails};
+export {SideNav, BalanceData, BalanceParticipantDetails, IBalance};
 
 // export default CompleteBalanceDetails;
 
