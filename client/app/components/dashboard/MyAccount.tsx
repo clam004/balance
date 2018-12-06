@@ -7,8 +7,9 @@ import { RouteComponentProps, Link } from 'react-router-dom';
 import { storeConnectAcctToken, 
          storeCustomerID,
          getConnectData } from '../../helpers/transactions';  
+         
+import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 
-import { logout, getUserData } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
 
 import PlaidLink from 'react-plaid-link'
@@ -43,9 +44,9 @@ interface AccountState {
   account_error:string
 }
 
-class MyAccount extends React.Component<AccountProps, AccountState> {
+class MyAccount extends React.Component<AccountProps & RouteComponentProps<{}>, AccountState> {
 
-  constructor(props: AccountProps) {
+  constructor(props: AccountProps & RouteComponentProps<{}>) {
 
     super(props);
 
@@ -79,6 +80,15 @@ class MyAccount extends React.Component<AccountProps, AccountState> {
   componentDidMount() {
     
     this.setState({ isLoading: true });
+
+    const { history } = this.props;
+  
+    isLoggedIn()
+    .then((res)=>{
+      if (!res.is_logged_in) {
+        history.push('/login');
+      }
+    })
     
     getUserData()
     .then(userdata => {  

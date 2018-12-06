@@ -8,7 +8,7 @@ import { storeConnectAcctToken,
          storeCustomerID,
          getConnectData } from '../../helpers/transactions';  
 
-import { logout, getUserData } from '../../helpers/auth';
+import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
 
 import { SideNavAccount } from './Elements';
@@ -35,9 +35,9 @@ interface AccountState {
   account_error:string
 }
 
-class MyAccount2 extends React.Component<AccountProps, AccountState> {
+class MyAccount2 extends React.Component<AccountProps & RouteComponentProps<{}>, AccountState> {
 
-  constructor(props: AccountProps) {
+  constructor(props: AccountProps & RouteComponentProps<{}>) {
 
     super(props);
 
@@ -63,6 +63,15 @@ class MyAccount2 extends React.Component<AccountProps, AccountState> {
   componentDidMount() {
     
     this.setState({ isLoading: true });
+
+    const { history } = this.props;
+  
+    isLoggedIn()
+    .then((res)=>{
+      if (!res.is_logged_in) {
+        history.push('/login');
+      }
+    })
     
     getUserData()
     .then(userdata => {  
