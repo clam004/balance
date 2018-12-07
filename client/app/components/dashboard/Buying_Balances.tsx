@@ -20,39 +20,7 @@ import './Dashboard.less';
 import '../balance/Balance.less';
 import * as moment from 'moment';
 
-const SideNav = () => {
-  return (
-    <nav className="side-nav-container">
-      <div className="side-nav-header">
-        <img className="side-nav-logo" src="assets/logo-green.svg" />
-        <h3><Link to="/">Balance</Link></h3>
-      </div>
-      <ul className="side-nav-list">
-        <li className="nav-item active">
-          <Link to="/buying-balances">Current Balances as Buyer</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/selling-balances">Selling Balances as Seller</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/history">History</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/arbitrations">Arbitrations</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/support">Support</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/myaccount">My Account</Link>
-        </li>
-        <li className="nav-item">
-          <Link onClick={() => logout()} to="/">Logout</Link>
-        </li>
-      </ul>
-    </nav>
-  );
-};
+import { SideNav } from '../nav';
 
 interface DashboardProps extends RouteComponentProps<{}> {}
 
@@ -802,7 +770,7 @@ class Buying_Balances
         <main className="main-container">
           <div className="main-header">
             <img className="main-logo" src="assets/logo-white.svg" />
-            <h3> Current Balances for {user_alias} </h3>
+            <h3> Current Balances with {user_alias} as Buyer </h3>
           </div>
 
           <div>
@@ -818,7 +786,7 @@ class Buying_Balances
                }}
               >
                 <img src="assets/btn-logo-1.svg" />
-                 Create a Balance to Purchase 
+                 Create a Balance to Buy 
               </button>
             </Link>
           </section>

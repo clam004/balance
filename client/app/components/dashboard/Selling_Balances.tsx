@@ -19,40 +19,8 @@ import { BalanceParticipantDetails, IBalance } from './Elements';
 import './Dashboard.less';
 import '../balance/Balance.less';
 import * as moment from 'moment';
+import { SideNav } from '../nav';
 
-const SideNav = () => {
-  return (
-    <nav className="side-nav-container">
-      <div className="side-nav-header">
-        <img className="side-nav-logo" src="assets/logo-green.svg" />
-        <h3><Link to="/">Balance</Link></h3>
-      </div>
-      <ul className="side-nav-list">
-        <li className="nav-item">
-          <Link to="/buying-balances">Current Balances as Buyer</Link>
-        </li>
-        <li className="nav-item active">
-          <Link to="/selling-balances">Current Balances as Seller</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/history">History</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/arbitrations">Arbitrations</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/support">Support</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/myaccount">My Account</Link>
-        </li>
-        <li className="nav-item">
-          <Link onClick={() => logout()} to="/">Logout</Link>
-        </li>
-      </ul>
-    </nav>
-  );
-};
 
 interface DashboardProps extends RouteComponentProps<{}> {}
 
@@ -797,7 +765,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
           <div className="main-header">
             <img className="main-logo" src="assets/logo-white.svg" />
-            <h3> Current Balances for {user_alias} </h3>
+            <h3> Current Balances with {user_alias} as Seller</h3>
           </div>
 
           <div>

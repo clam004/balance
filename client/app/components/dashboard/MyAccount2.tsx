@@ -11,7 +11,7 @@ import { storeConnectAcctToken,
 import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
 
-import { SideNavAccount } from './Elements';
+import { SideNav } from '../nav';
 
 import {Elements, StripeProvider} from 'react-stripe-elements';
 import CheckoutForm from './CheckoutForm';
@@ -306,7 +306,7 @@ class MyAccount2 extends React.Component<AccountProps & RouteComponentProps<{}>,
     return (
 
       <div className="dashboard-container">
-        <SideNavAccount />
+        <SideNav />
         <main className="main-container">
           <div className="main-header">
             <img className="main-logo" src="assets/logo-white.svg" />

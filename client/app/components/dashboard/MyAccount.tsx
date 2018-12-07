@@ -7,7 +7,7 @@ import { RouteComponentProps, Link } from 'react-router-dom';
 import { storeConnectAcctToken, 
          storeCustomerID,
          getConnectData } from '../../helpers/transactions';  
-         
+
 import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 
 import { HttpResponse, get, post, del } from '../../helpers/http';
@@ -15,7 +15,7 @@ import { HttpResponse, get, post, del } from '../../helpers/http';
 import PlaidLink from 'react-plaid-link'
 import {Elements, StripeProvider} from 'react-stripe-elements';
 import CheckoutForm from './CheckoutForm';
-import { SideNavAccount } from './Elements';
+import { SideNav } from '../nav';
 
 const PLDPUBLISHABLE_KEY = "a29874eb5e8cd1e080a3ca90d5183b";
 
@@ -420,7 +420,7 @@ class MyAccount extends React.Component<AccountProps & RouteComponentProps<{}>, 
     return (
 
       <div className="dashboard-container">
-        <SideNavAccount />
+        <SideNav />
         <main className="main-container">
           <div className="main-header">
             <img className="main-logo" src="assets/logo-white.svg" />

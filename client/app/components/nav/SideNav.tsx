@@ -15,8 +15,8 @@ const SideNav = () => {
         <li className="nav-item">
           <Link to="/buying-balances">Buying Balances</Link>
         </li>
-        <li className="nav-item active">
-          <Link to="/selling-balances">Buying Balances</Link>
+        <li className="nav-item">
+          <Link to="/selling-balances">Selling Balances</Link>
         </li>
         <li className="nav-item">
           <a href="/history">History</a>

@@ -5,41 +5,7 @@ import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
 import './Dashboard.less';
 import * as moment from 'moment';
-
-const SideNav = () => {
-
-  return (
-    <nav className="side-nav-container">
-      <div className="side-nav-header">
-        <img className="side-nav-logo" src="assets/logo-green.svg" />
-        <h3><Link to="/">Balance</Link></h3>
-      </div>
-      <ul className="side-nav-list">
-        <li className="nav-item">
-          <Link to="/buying-balances">Buying Balances</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/selling-balances">Selling Balances</Link>
-        </li>
-        <li className="nav-item active">
-          <Link to="/history">History</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/arbitrations">Arbitrations</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/support">Support</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/myaccount">My Account</Link>
-        </li>
-        <li className="nav-item">
-          <Link onClick={() => logout()} to="/">Logout</Link>
-        </li>
-      </ul>
-    </nav>
-  );
-};
+import { SideNav } from '../nav';
 
 interface DashboardProps extends RouteComponentProps<{}> {}
 
