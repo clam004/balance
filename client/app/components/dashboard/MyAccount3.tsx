@@ -44,7 +44,7 @@ interface AccountState {
   account_error:string
 }
 
-class MyAccount extends React.Component<AccountProps & RouteComponentProps<{}>, AccountState> {
+class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>, AccountState> {
 
   constructor(props: AccountProps & RouteComponentProps<{}>) {
 
@@ -74,7 +74,6 @@ class MyAccount extends React.Component<AccountProps & RouteComponentProps<{}>, 
     }
     
     this.handleDepositSuccess = this.handleDepositSuccess.bind(this)
-    this.handleSendSuccess = this.handleSendSuccess.bind(this)
   }
  
   componentDidMount() {
@@ -195,6 +194,36 @@ class MyAccount extends React.Component<AccountProps & RouteComponentProps<{}>, 
         onChange={e => this.setState({ last_name: e.target.value })}
       />
     
+      <label className="label-default">birthday (month/day/year) </label>
+      <input
+        className="input-default full-width"
+        type="text"
+        placeholder="mm/dd/yyyy"
+        value={birthday_string || ""}
+        onChange={e => {
+
+          this.setState({ birthday_string: e.target.value }, () => {
+
+            var str_array = this.state.birthday_string.split("/");
+            
+            if (str_array.length == 3) {
+              var day = parseInt(str_array[1], 10)
+              var month = parseInt(str_array[0], 10)
+              var year = parseInt(str_array[2], 10)
+              
+              if (day > 0 && day < 32 && month > 0 && month < 13 && 
+                  year > 0 && year < new Date().getFullYear()) {
+                  this.setState({
+                    dob_year:year,
+                    dob_month:month,
+                    dob_day:day,
+                  }) 
+              }
+            }
+          })
+        }}
+      />
+
       <h3>{error_message}</h3>
 
     </div>
@@ -208,7 +237,8 @@ class MyAccount extends React.Component<AccountProps & RouteComponentProps<{}>, 
     if (this.state.has_connect_account) {
 
       return (
-        <div> 
+        <div>
+          Thank you 
         </div>
       )
 
@@ -255,7 +285,7 @@ class MyAccount extends React.Component<AccountProps & RouteComponentProps<{}>, 
 
   public renderGetReceiveAccount(): JSX.Element {
 
-    if (this.state.has_connect_account && this.state.has_customer_id) {
+    if (this.state.has_connect_account) {
       return (
         <div> 
 
@@ -269,7 +299,7 @@ class MyAccount extends React.Component<AccountProps & RouteComponentProps<{}>, 
           </button>
         </div>
       )
-    } else if (!this.state.has_connect_account && !this.state.has_customer_id) {
+    } else if (!this.state.has_connect_account) {
 
       return (
 
@@ -277,90 +307,16 @@ class MyAccount extends React.Component<AccountProps & RouteComponentProps<{}>, 
           className="btn-primary create-balance-btn"
           style={{backgroundColor: '#19c8b5'}}
           clientName="BalanceReceive"
-          env="development" //"sandbox" // 
+          env="sandbox" // "development" //
           product={["auth", "transactions"]}
           publicKey={this.state.pldpublickey}
           onExit={this.handleOnExit}
           onSuccess={this.handleDepositSuccess}
         >
-          Setup your bank account to RECEIVE payments
+          Setup your bank account 
         </PlaidLink>
       )
     }
-  }
-
-  public renderGetSendAccount(): JSX.Element {
-
-    if (this.state.has_connect_account && this.state.has_customer_id) {
-      return (
-        <div></div>
-      )
-    } else if (this.state.has_connect_account && !this.state.has_customer_id) {
-
-      return (
-        <div>
-          
-          
-
-          <label>
-          <br/><h3>Account is not yet complete. Next...</h3>
-          indicate which account should send payments.
-          </label>
-          <PlaidLink
-            className="btn-primary create-balance-btn"
-            style={{backgroundColor: '#5DBCD2'}}
-            clientName="BalanceSend"
-            env="development" // "sandbox" //
-            product={["auth", "transactions"]}
-            publicKey={this.state.pldpublickey}
-            onExit={this.handleOnExit}
-            onSuccess={this.handleSendSuccess}
-          >
-            Setup your bank account to SEND payments
-        </PlaidLink>
-        </div>
-      )
-    }
-  }
-
-  handleSendSuccess(public_token, metadata) {
-
-    console.log('SEND')
-    console.log('public_token: ' + public_token);
-    console.log('account ID: ' + metadata.account_id);
-
-    this.setState({has_customer_id:true})
-
-    storeCustomerID({ 
-      plaid_token:public_token,
-      account_ID:metadata.account_id,
-      user_email:this.state.user_email,
-      first_name:this.state.first_name,
-      last_name:this.state.last_name,
-      dob_day:this.state.dob_day,
-      dob_month:this.state.dob_month,
-      dob_year:this.state.dob_year,
-      address_line1:this.state.address_line1,
-      address_city:this.state.address_city,
-      address_postal_code:this.state.address_postal_code,
-      address_state:this.state.address_state,
-      country:this.state.country,
-      ssn_last_4:this.state.ssn_last_4,
-    })
-    .then((response) => {
-      console.log("storeCustomerID", response)
-     if (response.success) {
-      this.setState({has_customer_id:true})
-      console.log("S success")
-     } else {
-      this.setState({has_customer_id:false})
-      console.log("S fail", response, typeof(response))
-      this.setState({
-        has_customer_id:false,
-        account_error:String(response),
-      })
-     }
-    })
   }
 
   handleDepositSuccess(public_token, metadata) {
@@ -456,19 +412,13 @@ class MyAccount extends React.Component<AccountProps & RouteComponentProps<{}>, 
 
           </section>
 
-          <section className="create-balance-container">
-
-              {this.renderGetSendAccount()}
-
-          </section>
-
         </main>
       </div>
     );
   }
 }
 
-export default MyAccount;
+export default MyAccount3;
 
 
 /*

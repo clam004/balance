@@ -13,89 +13,56 @@ const knex = require('knex')(config);
 const moment = require('moment');
 
 
-const { PLAID_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, PLAID_CLIENT_ID, PLAID_SECRET } = require('../spldconfig');
+const { PLAID_PUBLISHABLE_KEY, 
+		STRIPE_SECRET_KEY, 
+		PLAID_CLIENT_ID, 
+		PLAID_SECRET,
+		PLAID_SECRET_SAND,
+		STRIPE_SECRET_KEY_SAND } = require('../spldconfig');
 
 /*
-console.log('finapi PLAID_CLIENT_ID', PLAID_CLIENT_ID);
-console.log('finapi PLAID_PUBLISHABLE_KEY', PLAID_PUBLISHABLE_KEY);
-console.log('finapi PLAID_SECRET', PLAID_SECRET);
-console.log('finapi STRIPE_SECRET_KEY', STRIPE_SECRET_KEY);
+console.log('finapi PLAID_CLIENT_ID', PLAID_CLIENT_ID); console.log('finapi PLAID_PUBLISHABLE_KEY', PLAID_PUBLISHABLE_KEY);
+console.log('finapi PLAID_SECRET', PLAID_SECRET); console.log('finapi STRIPE_SECRET_KEY', STRIPE_SECRET_KEY);
 */
-
-const stripe = require("stripe")(STRIPE_SECRET_KEY);
 
 var plaid = require('plaid');
 
-var plaidClient = new plaid.Client(PLAID_CLIENT_ID,
-                                   PLAID_SECRET ,
-                                   PLAID_PUBLISHABLE_KEY,
-                                   plaid.environments.development);
-                                   //plaid.environments.sandbox);
+/*
+
+const stripe = require("stripe")(STRIPE_SECRET_KEY);
+
+const plaidClient = new plaid.Client(PLAID_CLIENT_ID,
+                               PLAID_SECRET ,
+                               PLAID_PUBLISHABLE_KEY,
+                               plaid.environments.development);
+*/
 
 
-finapi.post('/test_payment_api', (req, response, next) => {
- 
-	//console.log('get_bank_acnt_tok', req.body);
-	//response.json(req.body);
+const stripe = require("stripe")(STRIPE_SECRET_KEY_SAND);
 
-	stripe.charges.create({
+const plaidClient = new plaid.Client(PLAID_CLIENT_ID,
+                               PLAID_SECRET_SAND,
+                               PLAID_PUBLISHABLE_KEY,
+                               plaid.environments.sandbox);
 
-	  amount: 200, // this is written in cents
-	  //application_fee: 
-	  currency: "usd",
-	  description: "test_1a",
-	  customer: 'cus_E0uJKIVOSctO2D',//'cus_DzdWJ1qDZm1poy', // Plaid generated customer ID
-	  //source: 'btok_1DY0gOFe8nlPJCfgaMHEKUii',
 
-	  destination: {
-	      amount: 100,
-	      account: 'acct_1DYsSBHb2WoeqvJO', //{CONNECTED_STRIPE_ACCOUNT_ID},
-      },
+finapi.post('/stake_balance', (req, res, next) => {
 
-	}, (err, charge) => {
-		console.log('charge success: ', charge)
-		console.log('err', err)
-		response.json(charge);
-	});
-
-    /*
-	console.log('store_plaid_customer_id',req.body);
-
-	var PLAID_LINK_PUBLIC_TOKEN = req.body.plaid_token;
-	var ACCOUNT_ID = req.body.account_ID;
-	//var USER_ID = req.user.id;
-
-	plaidClient.exchangePublicToken(PLAID_LINK_PUBLIC_TOKEN, function(err, res) {
-
-	  var accessToken = res.access_token;
-	  console.log('accessToken', accessToken)
-
-	  	plaidClient.createStripeToken(accessToken, ACCOUNT_ID, function(err, res) {
-
-	  		bankAccountToken = res.stripe_bank_account_token;
-
-	  		console.log('bankAccountToken', bankAccountToken)
-	  		response.json({'bankAccountToken':bankAccountToken})
-
-			stripe.customers.create({
-
-			  	source: bankAccountToken,
-			  	description: USER_ID
-
-			  },(customer_err, customer) => {
-
-				customer_id = customer.id;
-
-	        });
-	    });
-	});
-       */ 
+	console.log('/stake_balance', req.body);
+	console.log('========================');
 
 });
 
 finapi.post('/buyer_pay_seller', (req, res, next) => {
 
     console.log('/buyer_pay_seller', req.body);
+	console.log('========================');
+
+});
+
+finapi.post('/buyer_pay_seller_v1', (req, res, next) => {
+
+    console.log('/buyer_pay_seller_v1', req.body);
 
 	let buyer_id = req.body.balance.buyer_id;
 	let seller_id = req.body.balance.seller_id;
@@ -196,19 +163,28 @@ finapi.post('/get_connect_data', (req, res, next) => {
 	stripe.accounts.retrieve(
 	  req.body.stripe_connect_account_token,
 	  function(err, account) {
-        //console.log("retreived account",account)
-	    res.json({
-	      "first_name":account.legal_entity.first_name,
-		  "last_name":account.legal_entity.last_name,
-		  "dob_day":account.legal_entity.dob.day,
-		  "dob_month":account.legal_entity.dob.month,
-		  "dob_year":account.legal_entity.dob.year,
-		  "address_line1":account.legal_entity.address.line1,
-		  "address_city":account.legal_entity.address.city,
-		  "address_state":account.legal_entity.address.state,
-		  "address_postal_code":account.legal_entity.address.postal_code,
-		  "address_country":account.legal_entity.address.country,
-	    })
+        
+        if (err) {
+			console.log("get connect data has error", err)
+		    res.json({
+		      hasAccount:false,
+		    })			
+        } else {
+        	console.log("get connect data no error", account)
+		    res.json({
+		      hasAccount:true,
+		      first_name:account.legal_entity.first_name,
+			  last_name:account.legal_entity.last_name,
+			  dob_day:account.legal_entity.dob.day,
+			  dob_month:account.legal_entity.dob.month,
+			  dob_year:account.legal_entity.dob.year,
+			  address_line1:account.legal_entity.address.line1,
+			  address_city:account.legal_entity.address.city,
+			  address_state:account.legal_entity.address.state,
+			  address_postal_code:account.legal_entity.address.postal_code,
+			  address_country:account.legal_entity.address.country,
+		    })
+		}
 	  }
 	)
 });
@@ -286,18 +262,17 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 			  	type: "individual",
 			  	first_name: req.body.first_name,
 			  	last_name: req.body.last_name,
-
+			  	dob: {
+			  		day: req.body.dob_day,
+			  		month: req.body.dob_month,
+			  		year: req.body.dob_year,
+			  	},
 			    /*	
 			  	address: {
 			  		city: req.body.address_city,
 			  		line1: req.body.address_line1,
 			  		postal_code: req.body.address_postal_code,
 			  		state: req.body.address_state,
-			  	},
-			  	dob: {
-			  		day: req.body.dob_day,
-			  		month: req.body.dob_month,
-			  		year: req.body.dob_year,
 			  	},
 			  	*/
 			  	//ssn_last_4: req.body.ssn_last_4,
@@ -357,7 +332,65 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 
 });
 
+finapi.post('/test_payment_api', (req, response, next) => {
+ 
+	//console.log('get_bank_acnt_tok', req.body);
+	//response.json(req.body);
 
+	stripe.charges.create({
+
+	  amount: 200, // this is written in cents
+	  //application_fee: 
+	  currency: "usd",
+	  description: "test_1a",
+	  customer: 'cus_E0uJKIVOSctO2D',//'cus_DzdWJ1qDZm1poy', // Plaid generated customer ID
+	  //source: 'btok_1DY0gOFe8nlPJCfgaMHEKUii',
+
+	  destination: {
+	      amount: 100,
+	      account: 'acct_1DYsSBHb2WoeqvJO', //{CONNECTED_STRIPE_ACCOUNT_ID},
+      },
+
+	}, (err, charge) => {
+		console.log('charge success: ', charge)
+		console.log('err', err)
+		response.json(charge);
+	});
+
+    /*
+	console.log('store_plaid_customer_id',req.body);
+
+	var PLAID_LINK_PUBLIC_TOKEN = req.body.plaid_token;
+	var ACCOUNT_ID = req.body.account_ID;
+	//var USER_ID = req.user.id;
+
+	plaidClient.exchangePublicToken(PLAID_LINK_PUBLIC_TOKEN, function(err, res) {
+
+	  var accessToken = res.access_token;
+	  console.log('accessToken', accessToken)
+
+	  	plaidClient.createStripeToken(accessToken, ACCOUNT_ID, function(err, res) {
+
+	  		bankAccountToken = res.stripe_bank_account_token;
+
+	  		console.log('bankAccountToken', bankAccountToken)
+	  		response.json({'bankAccountToken':bankAccountToken})
+
+			stripe.customers.create({
+
+			  	source: bankAccountToken,
+			  	description: USER_ID
+
+			  },(customer_err, customer) => {
+
+				customer_id = customer.id;
+
+	        });
+	    });
+	});
+    */ 
+
+});
 
 module.exports = finapi;
 

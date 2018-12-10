@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { SideNav } from '../nav';
 
 interface SupportState {}
 
@@ -12,7 +13,8 @@ class Support extends React.Component<RouteComponentProps<{}>, SupportState> {
 
   render() {
     return (
-      <div>
+      <div className="dashboard-container">
+        <SideNav />
         Hello !! 
         Please email deepnetworkresearch [at] gmail [dot] com for questions.
         Thank you 

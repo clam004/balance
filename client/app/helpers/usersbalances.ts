@@ -35,8 +35,8 @@ export const editBalance = (IBalanceInfo: object): Promise<HttpResponse> => {
   return post('/api/edit_balance', IBalanceInfo);
 };
 
-export const toggleApprove = (balance_seller_approves:object): Promise<HttpResponse> => {
-  return post('/api/toggle_approve', balance_seller_approves);
+export const balanceApprove = (balance_seller_approves:object): Promise<HttpResponse> => {
+  return post('/api/balance_approve', balance_seller_approves);
 };
 
 export const toggleComplete = (balance_complete:object): Promise<HttpResponse> => {

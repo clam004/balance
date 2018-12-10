@@ -11,6 +11,7 @@ import { Buying_Balances,
          History, 
          MyAccount,
          MyAccount2,
+         MyAccount3,
          Arbitration } from './components/dashboard';
 
 import { BalanceCreatorSell, BalanceCreatorBuy, BalanceEditor } from './components/balance';
@@ -36,6 +37,7 @@ ReactDOM.render(
         <Route path="/edit" component={BalanceEditor} />
         <Route path="/myaccount" component={MyAccount} />
         <Route path="/myaccount2" component={MyAccount2} />
+        <Route path="/myaccount3" component={MyAccount3} />
         <Route path="/support" component={Support} />
         <Route path="/arbitrations" component={Arbitration} />
       </Switch>

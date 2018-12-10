@@ -14,6 +14,7 @@ import { HttpResponse, get, post, del } from '../../helpers/http';
 import { SideNav } from '../nav';
 
 import {Elements, StripeProvider} from 'react-stripe-elements';
+
 import CheckoutForm from './CheckoutForm';
 
 const STRIPE_PUBLIC_KEY = "pk_test_pj9vyeLEvE4TGmOk3mNLdSOo";

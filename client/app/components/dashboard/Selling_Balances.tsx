@@ -2,7 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
 
 import {  getBalances, 
-          toggleApprove, 
+          balanceApprove, 
           toggleComplete, 
           balanceDone,
           balanceDelete,
@@ -10,7 +10,7 @@ import {  getBalances,
           approveEdit,
           arbitrateBalance } from '../../helpers/usersbalances';  
 
-import { buyerPaySeller } from '../../helpers/transactions';
+import { buyerPaySeller, stakeBalance } from '../../helpers/transactions';
 
 import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
@@ -31,9 +31,10 @@ interface DashboardState {
   has_connect_account:boolean,
   has_customer_id:boolean,
   user_email:string,
-  balance_array_index_buyer_says_complete:number,
-  balance_array_index_buyer_says_arbitration:number,
-  balance_array_index_buyer_says_delete:number,
+  balance_id_buyer_says_complete:number,
+  balance_id_buyer_says_arbitration:number,
+  balance_id_buyer_says_delete:number,
+  balance_id_to_active:number,
   edit_list: Array<number>,
 }
 
@@ -50,9 +51,10 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
       has_connect_account:null,
       has_customer_id:null,
       user_email:null,
-      balance_array_index_buyer_says_complete:null,
-      balance_array_index_buyer_says_arbitration:null,
-      balance_array_index_buyer_says_delete:null,
+      balance_id_buyer_says_complete:null,
+      balance_id_buyer_says_arbitration:null,
+      balance_id_buyer_says_delete:null,
+      balance_id_to_active:null,
       edit_list:[]
     }
 
@@ -105,8 +107,9 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
   public toggleApproveState(index: number): void {
     let balance: IBalance[] = this.state.data.splice(index,1); 
     balance[0].seller_approves_contract = !balance[0].seller_approves_contract;
-    if (balance[0].seller_approves_contract) {
+    if (balance[0].buyer_approves_contract && balance[0].seller_approves_contract) {
       balance[0].state_string = 'active';
+      this.setState({balance_id_to_active:balance[0].id});
     }
     let balances: IBalance[] = [...this.state.data];
     balances.splice(index, 0, balance[0]);
@@ -245,7 +248,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
       // Decides what goes into the left part of the balance card 
       var participant_or_finish;
 
-      if (balance.id == this.state.balance_array_index_buyer_says_complete) {
+      if (balance.id == this.state.balance_id_buyer_says_complete) {
 
         participant_or_finish = (
 
@@ -283,7 +286,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
         )
 
-      } else if (balance.id == this.state.balance_array_index_buyer_says_arbitration) {
+      } else if (balance.id == this.state.balance_id_buyer_says_arbitration) {
 
         participant_or_finish = (
 
@@ -318,7 +321,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
         )
 
-      } else if (balance.id == this.state.balance_array_index_buyer_says_delete) {
+      } else if (balance.id == this.state.balance_id_buyer_says_delete) {
 
         participant_or_finish = (
 
@@ -349,10 +352,59 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
                   <button className="btn-primary"
                     onClick={() => {
-                      this.setState({balance_array_index_buyer_says_delete:null});
+                      this.setState({balance_id_buyer_says_delete:null});
                     }}
                   >
                    keep balance
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+        )
+
+      } else if (balance.id == this.state.balance_id_to_active) {
+
+        participant_or_finish = (
+
+          <div key={balance.id} className="balance-participants-card">
+            <div className="balance-participant-container">
+              <div className="balance-participant-details">
+                <div className="balance-goods">
+                  Are you sure you want to activate this balance?
+                </div>
+              </div>
+            </div>
+
+            <div className="balance-participant-container">
+              <div className="balance-participant-details">
+                <div className="balance-goods">
+
+                  <button className="btn-primary"
+                    onClick={() => {
+                      stakeBalance({balance});
+                      balanceApprove({
+                        id:balance.id, 
+                        seller_id:balance.seller_id,
+                        buyer_id:balance.buyer_id,
+                        seller_approves_contract:balance.seller_approves_contract,
+                        buyer_approves_contract:balance.buyer_approves_contract,
+                        seller_or_buyer:'seller',
+                      });
+                      this.setState({balance_id_to_active:null});
+                    }}
+                  >
+                   activate balance 
+                  </button>
+
+                  <button className="btn-primary"
+                    onClick={() => {
+                      this.setState({balance_id_to_active:null});
+                    }}
+                  >
+                   undo
                   </button>
 
                 </div>
@@ -403,14 +455,6 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
             <button className="btn-primary"
               onClick={() => {
-                toggleApprove({
-                  id:balance.id, 
-                  seller_id:balance.seller_id,
-                  buyer_id:balance.buyer_id,
-                  seller_approves_contract:balance.seller_approves_contract,
-                  buyer_approves_contract:balance.buyer_approves_contract,
-                  seller_or_buyer:'seller',
-                });
                 this.toggleApproveState(array_index);
               }}
             >
@@ -433,7 +477,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
             <button className="btn-primary"
               onClick={() => {
-                this.setState({balance_array_index_buyer_says_delete:balance.id});
+                this.setState({balance_id_buyer_says_delete:balance.id});
               }}
             >
              delete balance 
@@ -473,7 +517,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
             <button className="btn-primary"
               onClick={() => {
-                this.setState({balance_array_index_buyer_says_delete:balance.id});
+                this.setState({balance_id_buyer_says_delete:balance.id});
               }}
             >
              delete balance 
@@ -527,7 +571,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
             <button className="btn-primary"
               onClick={() => {
-                this.setState({balance_array_index_buyer_says_arbitration:balance.id});
+                this.setState({balance_id_buyer_says_arbitration:balance.id});
               }}
             >
              move balance to arbitration 
@@ -582,7 +626,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
             <button className="btn-primary"
               onClick={() => {
-                this.setState({balance_array_index_buyer_says_arbitration:balance.id});
+                this.setState({balance_id_buyer_says_arbitration:balance.id});
               }}
             >
              move balance to arbitration 

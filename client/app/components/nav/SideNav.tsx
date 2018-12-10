@@ -25,7 +25,7 @@ const SideNav = () => {
           <a href="/arbitrations">Arbitrations</a>
         </li>
         <li className="nav-item">
-          <Link to="/myaccount">My Account</Link>
+          <Link to="/myaccount3">My Account</Link>
         </li>
         <li className="nav-item">
           <a href="/support">Support</a>

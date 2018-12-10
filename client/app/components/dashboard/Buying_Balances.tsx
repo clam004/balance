@@ -2,7 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
 
 import {  getBalances, 
-          toggleApprove, 
+          balanceApprove, 
           toggleComplete, 
           balanceDone,
           balanceDelete,
@@ -10,7 +10,7 @@ import {  getBalances,
           approveEdit,
           arbitrateBalance } from '../../helpers/usersbalances';  
 
-import { buyerPaySeller } from '../../helpers/transactions';
+import { buyerPaySeller, stakeBalance } from '../../helpers/transactions';
 
 import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
@@ -31,8 +31,9 @@ interface DashboardState {
   has_connect_account:boolean,
   has_customer_id:boolean,
   user_email:string,
-  balance_array_index_buyer_says_arbitration:number,
-  balance_array_index_buyer_says_delete:number,
+  balance_id_buyer_says_arbitration:number,
+  balance_id_buyer_says_delete:number,
+  balance_id_to_active:number,
   edit_list: Array<number>,
 }
 
@@ -50,8 +51,9 @@ class Buying_Balances
       has_connect_account:null,
       has_customer_id:null,
       user_email:null,
-      balance_array_index_buyer_says_arbitration:null,
-      balance_array_index_buyer_says_delete:null,
+      balance_id_buyer_says_arbitration:null,
+      balance_id_buyer_says_delete:null,
+      balance_id_to_active:null,
       edit_list:[],
     }
 
@@ -108,6 +110,7 @@ class Buying_Balances
     balances.splice(index, 0, balance[0]);
     if (balance[0].buyer_approves_contract && balance[0].seller_approves_contract) {
       balance[0].state_string = 'active';
+      this.setState({balance_id_to_active:balance[0].id});
     }
     console.log("STATE: ", balance[0].state_string)
     this.setState({data:balances});
@@ -294,7 +297,7 @@ class Buying_Balances
 
         )
 
-      } else if (balance.id == this.state.balance_array_index_buyer_says_arbitration) {
+      } else if (balance.id == this.state.balance_id_buyer_says_arbitration) {
 
         participant_or_finish = (
 
@@ -329,7 +332,7 @@ class Buying_Balances
 
         )
 
-      } else if (balance.id == this.state.balance_array_index_buyer_says_delete) {
+      } else if (balance.id == this.state.balance_id_buyer_says_delete) {
 
         participant_or_finish = (
 
@@ -360,10 +363,59 @@ class Buying_Balances
 
                   <button className="btn-primary"
                     onClick={() => {
-                      this.setState({balance_array_index_buyer_says_delete:null});
+                      this.setState({balance_id_buyer_says_delete:null});
                     }}
                   >
                    keep balance
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+        )
+
+      } else if (balance.id == this.state.balance_id_to_active) {
+
+        participant_or_finish = (
+
+          <div key={balance.id} className="balance-participants-card">
+            <div className="balance-participant-container">
+              <div className="balance-participant-details">
+                <div className="balance-goods">
+                  Are you sure you want to activate this balance?
+                </div>
+              </div>
+            </div>
+
+            <div className="balance-participant-container">
+              <div className="balance-participant-details">
+                <div className="balance-goods">
+
+                  <button className="btn-primary"
+                    onClick={() => {
+                      stakeBalance({balance});
+                      balanceApprove({
+                        id:balance.id, 
+                        seller_id:balance.seller_id,
+                        buyer_id:balance.buyer_id,
+                        seller_approves_contract:balance.seller_approves_contract,
+                        buyer_approves_contract:balance.buyer_approves_contract,
+                        seller_or_buyer:'buyer',
+                      });
+                      this.setState({balance_id_to_active:null});
+                    }}
+                  >
+                   activate balance  
+                  </button>
+
+                  <button className="btn-primary"
+                    onClick={() => {
+                      this.setState({balance_id_to_active:null});
+                    }}
+                  >
+                   undo
                   </button>
 
                 </div>
@@ -420,7 +472,7 @@ class Buying_Balances
 
             <button className="btn-primary"
               onClick={() => {
-                this.setState({balance_array_index_buyer_says_delete:balance.id});
+                this.setState({balance_id_buyer_says_delete:balance.id});
               }}
             >
              delete balance 
@@ -450,14 +502,6 @@ class Buying_Balances
 
             <button className="btn-primary"
               onClick={() => {
-                toggleApprove({
-                  id:balance.id, 
-                  seller_id:balance.seller_id,
-                  buyer_id:balance.buyer_id,
-                  seller_approves_contract:balance.seller_approves_contract,
-                  buyer_approves_contract:balance.buyer_approves_contract,
-                  seller_or_buyer:'buyer',
-                });
                 this.toggleApproveState(array_index);
               }}
             >
@@ -480,7 +524,7 @@ class Buying_Balances
 
             <button className="btn-primary"
               onClick={() => {
-                this.setState({balance_array_index_buyer_says_delete:balance.id});
+                this.setState({balance_id_buyer_says_delete:balance.id});
               }}
             >
              delete balance 
@@ -532,7 +576,7 @@ class Buying_Balances
 
             <button className="btn-primary"
               onClick={() => {
-                this.setState({balance_array_index_buyer_says_arbitration:balance.id});
+                this.setState({balance_id_buyer_says_arbitration:balance.id});
               }}
             >
              move balance to arbitration 
@@ -588,7 +632,7 @@ class Buying_Balances
 
             <button className="btn-primary"
               onClick={() => {
-                this.setState({balance_array_index_buyer_says_arbitration:balance.id});
+                this.setState({balance_id_buyer_says_arbitration:balance.id});
               }}
             >
              move balance to arbitration 
