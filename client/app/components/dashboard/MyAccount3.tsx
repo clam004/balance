@@ -301,7 +301,7 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
     if (this.state.has_connect_account) {
       return (
         <div> 
-          Payment information has been submitted successfully. Account setup is COMPLETE. 
+          Payment information has been submitted
           <button 
           onClick={()=>this.setState({has_connect_account:false, has_customer_id:false})}
           className="btn-primary create-balance-btn"
@@ -335,7 +335,7 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
     //console.log('public_token: ' + public_token);
     //console.log('account ID: ' + metadata.account_id);
     //console.log('metadata: ' + metadata);
-    this.setState({account_error:"Sending Credentials . . .", 
+    this.setState({account_error:"Verifying Credentials, this could take a minute  . . . ", 
                    has_connect_account:true, 
                    verifying:true})
 
