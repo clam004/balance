@@ -184,18 +184,10 @@ class Arbitration extends React.Component<DashboardProps & RouteComponentProps<{
             }
 
               <section className="create-balance-container">
-                <Link to="/create">
-                  <button 
-                   className="btn-primary create-balance-btn"
-                   onClick={() => {
-                    localStorage.setItem("balance_id",null); 
-                   }}
-                  >
-                    <img src="assets/btn-logo-1.svg" />
-                    Create Balance
-                  </button>
-                </Link>
+
+
               </section>
+              
             </div>
           </main>
         </div>
@@ -217,13 +209,9 @@ class Arbitration extends React.Component<DashboardProps & RouteComponentProps<{
             No Balances in Arbitration
 
               <section className="create-balance-container">
-                <Link to="/create">
-                  <button className="btn-primary create-balance-btn">
-                    <img src="assets/btn-logo-1.svg" />
-                    Create Balance
-                  </button>
-                </Link>
+
               </section>
+
             </div>
           </main>
         </div>
