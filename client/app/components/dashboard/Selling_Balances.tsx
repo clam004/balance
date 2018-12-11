@@ -89,10 +89,13 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
         let has_customer_id = false;
         if (userdata[0].stripe_connect_account_token) {
           has_connect_account = true;
+        } else {
+          history.push('/myaccount3');
         }
         if (userdata[0].stripe_customer_id) {
           has_customer_id = true;
         }
+
         this.setState({
            user_id:userdata[0].id,
            has_connect_account:has_connect_account,
@@ -100,6 +103,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
            user_email:userdata[0].email, 
            isLoading:false
         }); 
+
       }
     });
   }
@@ -384,7 +388,11 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
                   <button className="btn-primary"
                     onClick={() => {
-                      stakeBalance({balance});
+                      stakeBalance({balance})
+                      .then(res => {
+                        console.log(res)
+                      })
+
                       balanceApprove({
                         id:balance.id, 
                         seller_id:balance.seller_id,
@@ -393,6 +401,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
                         buyer_approves_contract:balance.buyer_approves_contract,
                         seller_or_buyer:'seller',
                       });
+
                       this.setState({balance_id_to_active:null});
                     }}
                   >
@@ -774,9 +783,9 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
   public renderAccount(): JSX.Element {
 
-    if (this.state.has_connect_account && this.state.has_customer_id && this.state.data.length >0 ) {
+    if (this.state.has_connect_account && this.state.data.length >0 ) {
       return (<div> </div>);
-    } else if (!this.state.has_connect_account || !this.state.has_customer_id) {
+    } else if (!this.state.has_connect_account) {
       return (
         <div>
           Before starting a balance please go to My Account to set up your account  

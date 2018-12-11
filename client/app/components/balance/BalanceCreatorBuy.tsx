@@ -202,15 +202,17 @@ class BalanceCreator extends React.Component<
     const { history } = this.props;
     const balanceInfo = this.state.balance;
 
-    if (!balanceInfo.seller.hasOwnProperty('id')) {
-      return this.setState({ error: 'Select a seller',
-                             selected: BalanceStep.SELECT_USER });
-    } else if (balanceInfo.agreement.title && balanceInfo.agreement.buyer_obligation &&
-               balanceInfo.agreement.seller_obligation) {
+    if (balanceInfo.buyer.hasOwnProperty('id') &&
+       balanceInfo.agreement.title && 
+       balanceInfo.agreement.buyer_obligation &&
+       balanceInfo.agreement.seller_obligation &&
+       balanceInfo.buyer.stake &&
+       balanceInfo.seller.stake) {
       
       if (this.state.edit) {
+
         console.log("EDIT")
-        return updateBalance(balanceInfo)
+        updateBalance(balanceInfo)
         .then((balance_id) => {
           localStorage.setItem("balance_id", JSON.stringify(balance_id.id)); 
         })  
@@ -218,7 +220,8 @@ class BalanceCreator extends React.Component<
 
       } else {
 
-        return submitBalance(balanceInfo)
+        console.log("SUBMIT")
+        submitBalance(balanceInfo)
         .then((balance_id) => {
           localStorage.setItem("balance_id", JSON.stringify(balance_id.id)); 
         })  
@@ -226,9 +229,20 @@ class BalanceCreator extends React.Component<
 
       }
 
-    } else {
+    } else if (!balanceInfo.buyer.hasOwnProperty('id')) {
+
+      return this.setState({ error: 'Select a buyer', selected: BalanceStep.SELECT_USER });
+
+    } else if (!balanceInfo.agreement.title || !balanceInfo.agreement.buyer_obligation || 
+               !balanceInfo.agreement.seller_obligation){
+
       return this.setState({ error: 'The contract title, buyer and seller obligations are required',
                              selected: BalanceStep.SET_AGREEMENT });
+
+    } else if (!balanceInfo.buyer.stake || !balanceInfo.seller.stake) {
+
+      return this.setState({ error: 'the buyer and seller must place a non-zero stake, even if it is small',
+                             selected: BalanceStep.SET_STAKE });
     }
   }
 

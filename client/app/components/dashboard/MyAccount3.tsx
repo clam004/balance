@@ -41,7 +41,8 @@ interface AccountState {
   country: string,
   country_str:string,
   ssn_last_4: string,
-  account_error:string
+  account_error:string,
+  verifying:boolean,
 }
 
 class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>, AccountState> {
@@ -71,6 +72,7 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
       country_str:null,
       ssn_last_4:null,
       account_error:null,
+      verifying:false,
     }
     
     this.handleDepositSuccess = this.handleDepositSuccess.bind(this)
@@ -161,13 +163,17 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
       country,
       country_str,
       ssn_last_4,
-      isLoading 
+      isLoading,
+      verifying,
+      account_error, 
     } = this.state;
 
     var error_message;
 
-    if (this.state.account_error) {
-      error_message = <div>{this.state.account_error}</div>
+    if (account_error) {
+      error_message = (<div>{account_error}</div>)
+    } else if (verifying) {
+      error_message = (<div>Verifying account . . . </div>);
     } else {
      error_message = <div></div>
     } 
@@ -223,7 +229,7 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
           })
         }}
       />
-
+      <br/><br/>
       <h3>{error_message}</h3>
 
     </div>
@@ -238,7 +244,7 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
 
       return (
         <div>
-          Thank you 
+          You have agreed to the <Link to="https://stripe.com/us/legal"> Stripe Terms of Service. </Link> 
         </div>
       )
 
@@ -249,11 +255,18 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
        <div className="form-group"> 
 
           <h3> Terms of Service </h3>
-          To participate we need your account information. This is just for 
-          holding each party accountable. Simply entering your information 
+
+          Before participating in contracts we need you to fill in your 
+          information including name and date of birth and select a valid bank
+          account.
+
+          This is just for holding each party accountable. 
+          Simply entering your information or selecting a bank account 
           will not result in a charge. Your account will only be charged 
-          when you give permission, such as at the conclusion of an active
-          Balance contract. Balance contracts can only be made active with 
+          when you give permission, such as by approving a contract and
+          transfering stake amount or paying the seller at the conclusion 
+          of an active Balance contract. 
+          Balance contracts can only be made active with 
           your approval. 
           <br/><br/>
 
@@ -288,9 +301,7 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
     if (this.state.has_connect_account) {
       return (
         <div> 
-
           Payment information has been submitted successfully. Account setup is COMPLETE. 
-
           <button 
           onClick={()=>this.setState({has_connect_account:false, has_customer_id:false})}
           className="btn-primary create-balance-btn"
@@ -321,11 +332,12 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
 
   handleDepositSuccess(public_token, metadata) {
     // Send the public_token and account ID to your app server.
-    console.log('DEPOSIT')
-    console.log('public_token: ' + public_token);
-    console.log('account ID: ' + metadata.account_id);
+    //console.log('public_token: ' + public_token);
+    //console.log('account ID: ' + metadata.account_id);
     //console.log('metadata: ' + metadata);
-    this.setState({has_connect_account:true})
+    this.setState({account_error:"Sending Credentials . . .", 
+                   has_connect_account:true, 
+                   verifying:true})
 
     storeConnectAcctToken({ 
       plaid_token:public_token, 
@@ -348,14 +360,22 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
      console.log("storeConnectAcctToken", response)
 
      if (response.success) {
-      this.setState({has_connect_account:true})
+
+      this.setState({has_connect_account:true, 
+                     verifying:false,
+                     account_error:"Success !!!"
+                    })
       console.log("D success")
+
      } else {
+
       console.log("D fail", response, typeof(response))
       this.setState({
         has_connect_account:false,
         account_error:String(response),
+        verifying:false,
       })
+
      }
      
     })
@@ -390,6 +410,7 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
           <div className="main-header">
             <img className="main-logo" src="assets/logo-white.svg" />
             <h3> {user_alias} 's Account </h3>
+
           </div>
           
           <div className="user-info-container">

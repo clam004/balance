@@ -6,7 +6,8 @@ import { RouteComponentProps, Link } from 'react-router-dom';
 
 import { storeConnectAcctToken, 
          storeCustomerID,
-         getConnectData } from '../../helpers/transactions';  
+         getConnectData,
+         chargeCerditCard } from '../../helpers/transactions';  
 
 import { logout, getUserData, isLoggedIn } from '../../helpers/auth';
 import { HttpResponse, get, post, del } from '../../helpers/http';
@@ -284,12 +285,33 @@ class MyAccount2 extends React.Component<AccountProps & RouteComponentProps<{}>,
         <div>
           
           <label>
-            Handle Payment Source Account 
+            <div>
+              <h3> setup your payment method (buyer setup) </h3>
+              <br/><br/>
+              <StripeProvider apiKey={STRIPE_PUBLIC_KEY}>
+
+                  <Elements>
+                    <CheckoutForm onSubmitCard={this.handleCreditCard} />
+                  </Elements>
+
+              </StripeProvider>
+              <br/><br/>
+            </div>
           </label>
 
         </div>
       )
     }
+  }
+
+  public handleCreditCard(token): void {
+
+    //makeStripeCustomerID({token_id:token.id})
+    chargeCerditCard({token_id:token.id})
+    .then(res => {
+      console.log("Customer Response", res)
+    });
+
   }
 
   render() {

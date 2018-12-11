@@ -35,6 +35,10 @@ export const stakeBalance = (balance:object): Promise<HttpResponse> => {
   return post('/finapi/stake_balance', balance);
 };
 
+export const chargeCerditCard = (balance:object): Promise<HttpResponse> => {
+  return post('/finapi/charge_credit_card', balance);
+};
+
 /*
 
 export const makeStripeCustomerID = (stripe_token:object): Promise<HttpResponse> => {

@@ -128,9 +128,8 @@ class BalanceContractDetails extends React.Component<Props, State> {
           <div className="form-group">
             <label className="label-default"> Amount you will pay 
               (when both parties indicate the agreement is satisfied, 
-              this amount is sent from buyer to seller. The 1% transaction fee
-              is split equally. If the price is $10,
-              buyer is charged $10.05 and seller receives $9.95)
+              this amount is sent from buyer to seller. The 2% transaction fee
+              is split equally. If the price is $10, buyer is charged $10.10 and seller receives $9.90)
             </label>
             <input
               className="input-default full-width"
@@ -152,9 +151,7 @@ class BalanceContractDetails extends React.Component<Props, State> {
           <div className="form-group">
 
             <label className="label-default">
-            Time until payment from this moment
-            (please consider typical delays and time for buyer 
-            to evaluate the deliverable)
+            Time (starting from moment balance is submitted) until Due Date. 
             </label>
             <input
               type="number"

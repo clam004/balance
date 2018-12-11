@@ -37,7 +37,9 @@ class CheckoutForm extends Component {
         <button 
         onClick={this.submit}
         className="btn-primary create-balance-btn"
-        > Finish Buyer Setup </button>
+        > 
+        submit credit card 
+        </button>
       </div>
     );
   }

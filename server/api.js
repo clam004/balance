@@ -317,11 +317,8 @@ api.post('/balance_approve', (req, res, next) => {
 	console.log("/balance_approve", req.body)
 
 	var user_id = req.user.id;
-	var status;
 
 	if (user_id == req.body.seller_id) {
-
-		console.log(status)
 
 		knex('balances')
 		.where('id',req.body.id)
@@ -330,11 +327,9 @@ api.post('/balance_approve', (req, res, next) => {
 			seller_approves_contract: true,
 			updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
 		})
-		.then(response => {console.log(response)});
+		.then(res1 => {console.log(res1)});
 
 	} else if (user_id == req.body.buyer_id) {
-
-		console.log(status)
 
 		knex('balances')
 		.where('id',req.body.id)
@@ -343,83 +338,22 @@ api.post('/balance_approve', (req, res, next) => {
 			buyer_approves_contract: true,
 			updated_at:moment().format("YYYY-MM-DDTHH:mm:ss"),
 		})
-		.then(response => {console.log(response)});
+		.then(res2 => {console.log(res2)});
 	}
 
-	if (status == 'active') {
-		knex('actions')
-		.insert({
-			user_id1:req.body.buyer_id,
-			user_id2:req.body.seller_id,
-			action_int1:req.body.id,
-			action_string1:"activate balance",
-			action_string2:req.body.title,
-			action_time1:moment().format("YYYY-MM-DDTHH:mm:ss"),
-		})	
-		.then(response => {res.json(response)});
-	}
+	knex('actions')
+	.insert({
+		user_id1:req.body.buyer_id,
+		user_id2:req.body.seller_id,
+		action_int1:req.body.id,
+		action_string1:"activate balance",
+		action_string2:req.body.title,
+		action_time1:moment().format("YYYY-MM-DDTHH:mm:ss"),
+	})	
+	.then(response => {res.json(response)});
 
 });
 
-api.post('/toggle_approve', (req, res, next) => {
-	
-	console.log("/toggle_approve", req.body)
-
-	var user_id = req.user.id;
-	var status;
-
-	if (user_id == req.body.seller_id) {
-
-		if (!req.body.seller_approves_contract && req.body.buyer_approves_contract) {
-			status = 'active'
-		} else {
-			status = 'new'	
-		}
-
-		console.log(status)
-
-		knex('balances')
-		.where('id',req.body.id)
-		.update({
-			state_string:status,
-			seller_approves_contract: !req.body.seller_approves_contract,
-			updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
-		})
-		.then(response => {console.log(response)});
-
-	} else if (user_id == req.body.buyer_id) {
-
-		if (!req.body.buyer_approves_contract && req.body.seller_approves_contract) {
-			status = 'active'
-		} else {
-			status = 'new'
-		}
-
-		console.log(status)
-
-		knex('balances')
-		.where('id',req.body.id)
-		.update({
-			state_string:status,
-			buyer_approves_contract: !req.body.buyer_approves_contract,
-			updated_at:moment().format("YYYY-MM-DDTHH:mm:ss"),
-		})
-		.then(response => {console.log(response)});
-	}
-
-	if (status == 'active') {
-		knex('actions')
-		.insert({
-			user_id1:req.body.buyer_id,
-			user_id2:req.body.seller_id,
-			action_int1:req.body.id,
-			action_string1:"balances goes active",
-			action_time1:moment().format("YYYY-MM-DDTHH:mm:ss"),
-		})	
-		.then(response => {res.json(response)});
-	}
-
-});
 
 api.post('/toggle_complete', (req, res, next) => {
 
@@ -537,6 +471,68 @@ module.exports = api;
 
 
 	/*
+
+######### RETIRED FUNCTIONS ##################
+
+api.post('/toggle_approve', (req, res, next) => {
+	
+	console.log("/toggle_approve", req.body)
+
+	var user_id = req.user.id;
+	var status;
+
+	if (user_id == req.body.seller_id) {
+
+		if (!req.body.seller_approves_contract && req.body.buyer_approves_contract) {
+			status = 'active'
+		} else {
+			status = 'new'	
+		}
+
+		console.log(status)
+
+		knex('balances')
+		.where('id',req.body.id)
+		.update({
+			state_string:status,
+			seller_approves_contract: !req.body.seller_approves_contract,
+			updated_at:moment().format("YYYY-MM-DDTHH:mm:ss")
+		})
+		.then(response => {console.log(response)});
+
+	} else if (user_id == req.body.buyer_id) {
+
+		if (!req.body.buyer_approves_contract && req.body.seller_approves_contract) {
+			status = 'active'
+		} else {
+			status = 'new'
+		}
+
+		console.log(status)
+
+		knex('balances')
+		.where('id',req.body.id)
+		.update({
+			state_string:status,
+			buyer_approves_contract: !req.body.buyer_approves_contract,
+			updated_at:moment().format("YYYY-MM-DDTHH:mm:ss"),
+		})
+		.then(response => {console.log(response)});
+	}
+
+	if (status == 'active') {
+		knex('actions')
+		.insert({
+			user_id1:req.body.buyer_id,
+			user_id2:req.body.seller_id,
+			action_int1:req.body.id,
+			action_string1:"balances goes active",
+			action_time1:moment().format("YYYY-MM-DDTHH:mm:ss"),
+		})	
+		.then(response => {res.json(response)});
+	}
+
+});
 
 api.get('/balances/:id', (req,res)=>{
 	if(req.isAuthenticated()) {

@@ -49,14 +49,218 @@ const plaidClient = new plaid.Client(PLAID_CLIENT_ID,
 finapi.post('/stake_balance', (req, res, next) => {
 
 	console.log('/stake_balance', req.body);
-	console.log('========================');
 
+	let buyer_id = req.body.balance.buyer_id;
+	let seller_id = req.body.balance.seller_id;
+
+	let buyer_stake_amount = req.body.balance.buyer_stake_amount;
+	let buyer_stake_amount_cents = buyer_stake_amount * 100;
+	let buyer_stake_charge_amount = Math.round(buyer_stake_amount_cents * 1.000);
+
+	let seller_stake_amount = req.body.balance.seller_stake_amount;
+	let seller_stake_amount_cents = seller_stake_amount * 100;
+	let seller_stake_charge_amount = Math.round(seller_stake_amount_cents * 1.000);
+
+	let buyer_account_id;
+	let seller_account_id;
+	let buyer_response_token;
+	let seller_response_token;
+	let response;
+
+	var action_id;
+
+    knex('actions')
+    .insert({
+    	user_id1:buyer_id,
+    	user_id2:seller_id,
+    	action_time1:moment().format("YYYY-MM-DDTHH:mm:ss"),
+    	action_string1:'collecting stake from buyer and seller. balance_id in action_int1',
+    	action_int1:req.body.balance.id,
+    	action_decimal1:buyer_stake_amount,
+    	action_decimal2:seller_stake_amount,
+    })
+ 	.returning('id')
+	.then((id) => {
+
+		action_id = id[0];
+
+		knex('users').select(['stripe_connect_account_token'])
+	    .where('id', buyer_id)
+	    .then(buyer_info => {
+	    	buyer_account_id = buyer_info[0].stripe_connect_account_token;
+
+	    })
+	 	.then(() => {
+		    console.log("IDs")
+		    console.log(buyer_account_id)
+
+			stripe.charges.create({
+			  amount: buyer_stake_charge_amount,
+			  currency: "usd",
+			  description: req.body.balance.title + " balance "+req.body.balance.id+" buyer "+buyer_id+" seller "+seller_id,
+			  source: buyer_account_id, 
+			},(buyer_err, charge) => {
+
+				if (buyer_err) {
+					console.log('buyer_err ', buyer_err)
+					buyer_response_token = "requestId:" + buyer_err.requestId + ":";
+				} else {
+					console.log('charge: ', charge)
+					buyer_response_token = "charge.id:" + charge.id + ":charge.balance_transaction:" + charge.balance_transaction;
+				}
+
+				knex('users').select(['stripe_connect_account_token'])
+			    .where('id', seller_id)
+			    .then(seller_info => {
+			    	seller_account_id = seller_info[0].stripe_connect_account_token;
+			    })
+			 	.then(() => {
+				    console.log("IDs")
+				    console.log(seller_account_id)
+
+					stripe.charges.create({
+					  amount: seller_stake_charge_amount,
+					  currency: "usd",
+					  description: req.body.balance.title + " balance "+req.body.balance.id+" buyer "+buyer_id+" seller "+seller_id,
+					  source: seller_account_id, 
+					},(seller_err, charge) => {			
+
+						if (seller_err) {
+							console.log('seller_err: ', seller_err)
+							seller_response_token = "requestId:" + seller_err.requestId + ":";
+						} else {
+							console.log('charge: ', charge)
+							seller_response_token = "charge.id:" + charge.id + ":charge.balance_transaction:" + charge.balance_transaction;
+						}
+
+				     	response = "buyer_response_token___" + buyer_response_token + "___" + "buyer_response_token___" + seller_response_token;
+					    
+					    knex('actions')
+					    .where('id', action_id)
+					    .update({
+					    	action_time2:moment().format("YYYY-MM-DDTHH:mm:ss"),
+					    	action_string2:response,
+					    })
+					    .then(query => {
+
+					    	if (seller_err || buyer_err) {
+						    	res.json({bothStaked:false});
+					    	} else {
+						    	res.json({bothStaked:true});
+					    	}
+
+							console.log('========================');
+					    })
+					})
+			 	});
+			});
+	 	});
+	})
 });
 
 finapi.post('/buyer_pay_seller', (req, res, next) => {
 
     console.log('/buyer_pay_seller', req.body);
-	console.log('========================');
+
+	let buyer_id = req.body.balance.buyer_id;
+	let seller_id = req.body.balance.seller_id;
+	let balance_id = req.body.balance.id;
+
+	let action_id;
+	let buyer_account_id;
+	let seller_account_id;
+
+	let balance_price = req.body.balance.balance_price;
+	let balance_price_cents = balance_price * 100;
+
+	let buyer_stake_amount = req.body.balance.buyer_stake_amount;
+	let seller_stake_amount = req.body.balance.seller_stake_amount;
+	let buyer_stake_amount_cents = buyer_stake_amount * 100;
+	let seller_stake_amount_cents = seller_stake_amount * 100;
+
+	console.log('balance_price_cents', balance_price_cents);
+
+	let charge_amount = Math.round((balance_price_cents - buyer_stake_amount_cents) * 1.01);
+	let deposit_amount = Math.round((balance_price_cents + seller_stake_amount_cents) * (1 - 0.01));
+
+	console.log("charge_amount", charge_amount, "deposit_amount",deposit_amount)
+
+    knex('actions')
+    .insert({
+    	user_id1:buyer_id,
+    	user_id2:seller_id,
+    	action_time1:moment().format("YYYY-MM-DDTHH:mm:ss"),
+    	action_string1:'buyer to seller payment for delivered balance in USD, balance_id in action_int1',
+    	action_int1:balance_id,
+    	action_decimal1:charge_amount,
+    	action_decimal2:deposit_amount,
+    })
+ 	.returning('id')
+	.then((id) => {
+
+	    action_id = id[0]; //res.json({id:id[0]})
+
+		knex('users').select(['stripe_connect_account_token'])
+	    .where('id', buyer_id)
+	    .then(buyer_info => {
+
+	    	buyer_account_id = buyer_info[0].stripe_connect_account_token;
+
+			knex('users').select(['stripe_connect_account_token'])
+			.where('id', seller_id)
+			.then(seller_info => {
+
+				seller_account_id = seller_info[0].stripe_connect_account_token;
+
+				stripe.charges.create({
+				  amount: charge_amount,
+				  currency: "usd",
+				  source: buyer_account_id,
+				  description: req.body.balance.title + " balance "+req.body.balance.id+" buyer "+buyer_id+" seller "+seller_id,
+				  transfer_group: "balance_id: " + balance_id,
+				},(charge_err, charge) => {
+				  // asynchronously called
+					console.log("charge_err", charge_err)
+					console.log("charge", charge)
+				  	let charge_tokens = "charge.id:" + charge.id + ":charge.balance_transaction:" + charge.balance_transaction;
+
+					 stripe.transfers.create({
+					  amount: deposit_amount,
+					  currency: "usd",
+					  destination: seller_account_id,
+					  description: req.body.balance.title + " balance "+req.body.balance.id+" buyer "+buyer_id+" seller "+seller_id,
+					  transfer_group: "balance_id: " + balance_id,
+					},(transfer_err, transfer) => {
+					  // asynchronously called
+					    console.log("transfer_err", transfer_err)
+					    console.log("transfer", transfer)
+					    let transfer_tokens = "::transfer.id:" + transfer.id + ":transfer.balance_transaction:" + transfer.balance_transaction; 
+
+					    knex('actions')
+					    .where('id', action_id)
+					    .update({
+					    	action_time2:moment().format("YYYY-MM-DDTHH:mm:ss"),
+					    	action_string2:charge_tokens + transfer_tokens,
+					    })
+					    .then(query => {
+						    
+						    if (charge_err || transfer_err) {
+						    	res.json({success:false})
+						    } else {
+						    	res.json({success:true})
+						    }
+
+							console.log('========================');
+					    })
+
+					});
+				});
+
+			})
+
+		})
+
+    });
 
 });
 
@@ -276,7 +480,6 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 			  	},
 			  	*/
 			  	//ssn_last_4: req.body.ssn_last_4,
-
 			  },
 			  tos_acceptance: {
 			  	date: Math.round((new Date()).getTime() / 1000),
@@ -289,8 +492,8 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 			    console.log('connect_error', connect_error)
 
                 if (connect_error) {
-                	response.json(connect_error.message) 
-                	//response.json("error", connect_error.Error) connect_error
+                	//response.json(connect_error.message) 
+                	response.json(connect_error.message + " " + connect_error.param)
                 } else {
 
 				    stripe_connect_account_token = connect_account.id;
@@ -312,10 +515,12 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 							response.json(bank_err)
 						} else {
 
-							return knex('users')
+							knex('users')
 							.where('id', USER_ID)
 							.update({
 								stripe_connect_account_token:stripe_connect_account_token,
+								stripe_connect_bank_id:bank_account.id,
+								stripe_bank_account_token:bankAccountToken,
 							}).then(()=>{
 							   	response.json({"success":true})
 							})
@@ -332,64 +537,42 @@ finapi.post('/store_connect_account_token', (req, response, next) => {
 
 });
 
-finapi.post('/test_payment_api', (req, response, next) => {
+finapi.post('/charge_credit_card', (req, response, next) => {
  
-	//console.log('get_bank_acnt_tok', req.body);
-	//response.json(req.body);
+	console.log('/charge_credit_card', req.body);
 
-	stripe.charges.create({
+	let stripe_credit_token_id = req.body.token_id;
+	let customer_id;
 
-	  amount: 200, // this is written in cents
-	  //application_fee: 
-	  currency: "usd",
-	  description: "test_1a",
-	  customer: 'cus_E0uJKIVOSctO2D',//'cus_DzdWJ1qDZm1poy', // Plaid generated customer ID
-	  //source: 'btok_1DY0gOFe8nlPJCfgaMHEKUii',
+    stripe.customers.create({
+	  source: stripe_credit_token_id,
+	  email: req.user.email,
+    }, function(customer_err, customer) {
 
-	  destination: {
-	      amount: 100,
-	      account: 'acct_1DYsSBHb2WoeqvJO', //{CONNECTED_STRIPE_ACCOUNT_ID},
-      },
+		if (customer_err) {
+			console.log('customer_err', customer_err);
+		} else {
+			console.log('customer', customer);
 
-	}, (err, charge) => {
-		console.log('charge success: ', charge)
-		console.log('err', err)
-		response.json(charge);
+			customer_id = customer.id;
+
+			// Charge the Customer instead of the card:
+		  	stripe.charges.create({
+		    	amount: 1000,
+		    	currency: 'usd',
+		    	customer: customer_id,
+			}, function(err, charge) {
+
+				if (err) {
+					console.log('err', err);
+				} else {
+					console.log('charge', charge)
+					response.json({charge_id:charge.id})
+				}
+
+			});
+		}
 	});
-
-    /*
-	console.log('store_plaid_customer_id',req.body);
-
-	var PLAID_LINK_PUBLIC_TOKEN = req.body.plaid_token;
-	var ACCOUNT_ID = req.body.account_ID;
-	//var USER_ID = req.user.id;
-
-	plaidClient.exchangePublicToken(PLAID_LINK_PUBLIC_TOKEN, function(err, res) {
-
-	  var accessToken = res.access_token;
-	  console.log('accessToken', accessToken)
-
-	  	plaidClient.createStripeToken(accessToken, ACCOUNT_ID, function(err, res) {
-
-	  		bankAccountToken = res.stripe_bank_account_token;
-
-	  		console.log('bankAccountToken', bankAccountToken)
-	  		response.json({'bankAccountToken':bankAccountToken})
-
-			stripe.customers.create({
-
-			  	source: bankAccountToken,
-			  	description: USER_ID
-
-			  },(customer_err, customer) => {
-
-				customer_id = customer.id;
-
-	        });
-	    });
-	});
-    */ 
-
 });
 
 module.exports = finapi;

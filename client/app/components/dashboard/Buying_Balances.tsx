@@ -88,6 +88,8 @@ class Buying_Balances
         let has_customer_id = false;
         if (userdata[0].stripe_connect_account_token) {
           has_connect_account = true;
+        } else {
+          history.push('/myaccount3');
         }
         if (userdata[0].stripe_customer_id) {
           has_customer_id = true;
@@ -276,14 +278,13 @@ class Buying_Balances
               <div className="balance-participant-details">
                 <div className="balance-goods">
                   <button className="btn-primary"
-                    onClick={() => {
-                      balanceDone({balance})
-                      .then(res => {
-                        console.log(res)
-                      })     
+                    onClick={() => {   
                       buyerPaySeller({balance})
                       .then(res => {
-                        console.log(res)
+                        if (res.success) {
+                          balanceDone({balance})
+                          console.log("successfully paid balance")
+                        } 
                       })   
                       this.completeBalance(array_index); // removes the balance at index form the display array 
                     }}
@@ -395,16 +396,26 @@ class Buying_Balances
 
                   <button className="btn-primary"
                     onClick={() => {
-                      stakeBalance({balance});
-                      balanceApprove({
-                        id:balance.id, 
-                        seller_id:balance.seller_id,
-                        buyer_id:balance.buyer_id,
-                        seller_approves_contract:balance.seller_approves_contract,
-                        buyer_approves_contract:balance.buyer_approves_contract,
-                        seller_or_buyer:'buyer',
-                      });
-                      this.setState({balance_id_to_active:null});
+                      stakeBalance({balance})
+                      .then(res => {
+                        if (res.bothStaked) {
+                          console.log("Stakes successfully collected: ",res)
+                          balanceApprove({
+                            id:balance.id, 
+                            seller_id:balance.seller_id,
+                            buyer_id:balance.buyer_id,
+                            seller_approves_contract:balance.seller_approves_contract,
+                            buyer_approves_contract:balance.buyer_approves_contract,
+                            seller_or_buyer:'buyer',
+                          })
+                          .then(res => {console.log("approve balance", res)})
+                          this.setState({balance_id_to_active:null});
+                        } else {
+                          console.log("Error in Stakes: ", res)
+                          alert("both parties must have valid payment accounts")
+                          this.setState({balance_id_to_active:null});
+                        }
+                      })
                     }}
                   >
                    activate balance  
@@ -780,9 +791,9 @@ class Buying_Balances
 
   public renderAccount(): JSX.Element {
 
-    if (this.state.has_connect_account && this.state.has_customer_id && this.state.data.length >0 ) {
+    if (this.state.has_connect_account && this.state.data.length >0 ) {
       return (<div> </div>);
-    } else if (!this.state.has_connect_account || !this.state.has_customer_id) {
+    } else if (!this.state.has_connect_account) {
       return (
         <div>
           Before starting a balance please go to My Account to set up your account  
