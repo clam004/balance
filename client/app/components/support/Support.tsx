@@ -15,7 +15,8 @@ class Support extends React.Component<RouteComponentProps<{}>, SupportState> {
     return (
       <div className="dashboard-container">
         <SideNav />
-        Carson Made This Change, Vicki made this change, 
+        Carson Made This Change, Vicki made this change,
+        <br/> 
         Please email deepnetworkresearch [at] gmail [dot] com for questions.
         Thank you 
       </div>
