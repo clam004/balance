@@ -2,14 +2,24 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { SideNav } from '../nav';
 
-interface SupportState {}
+import {test_upload} from '../../helpers/usersbalances'; 
+
+interface SupportState {
+  
+}
 
 class Support extends React.Component<RouteComponentProps<{}>, SupportState> {
+
   constructor(props: RouteComponentProps<{}>) {
+
     super(props);
 
-    this.state = {};
+    this.state = {
+
+    };
+
   }
+
 
   render() {
     return (
@@ -21,6 +31,8 @@ class Support extends React.Component<RouteComponentProps<{}>, SupportState> {
 
         Please email deepnetworkresearch [at] gmail [dot] com for questions.
         Thank you 
+
+        <br/>
       </div>
     );
   }

@@ -9,6 +9,7 @@ const { template } = require('./helpers');
 const knex = require('./db/knex');
 const api = require('./api');
 const finapi = require('./finapi');
+const aws = require('./aws');
 const app = express();
 const env = process.env.NODE_ENV || 'dev';
 
@@ -58,8 +59,10 @@ app.use(passport.session());
 
 const home = (req, res) => res.send(template());
 
+
 app.use('/api', api);
 app.use('/finapi', finapi);
+app.use('/aws', aws);
 app.get('*', home);
 
 

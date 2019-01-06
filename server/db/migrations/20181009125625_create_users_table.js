@@ -7,6 +7,7 @@ exports.up = (knex, Promise) => {
     table.string('password').notNullable();
     table.string('salt').notNullable();
     table.string('username');
+    table.string('photo_url').defaultTo(null);
     table.integer('num_completed_balances').defaultTo(0);
     table.integer('num_arbitrated_balances').defaultTo(0);
     table.string('stripe_connect_account_token').defaultTo(null);

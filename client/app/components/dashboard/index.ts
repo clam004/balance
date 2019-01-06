@@ -5,6 +5,7 @@ import BalanceSummary from './BalanceSummary';
 import MyAccount from './MyAccount';
 import MyAccount2 from './MyAccount2';
 import MyAccount3 from './MyAccount3';
+import MyAccount4 from './MyAccount4';
 import Arbitration from './Arbitration';
 
 export { Buying_Balances, 
@@ -14,4 +15,5 @@ export { Buying_Balances,
 	     MyAccount, 
 	     MyAccount2,
 	     MyAccount3,
+	     MyAccount4,
 	     Arbitration };

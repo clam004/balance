@@ -1,3 +1,4 @@
 import Support from './Support';
+import Upload from './Upload';
 
-export { Support };
+export { Support, Upload };

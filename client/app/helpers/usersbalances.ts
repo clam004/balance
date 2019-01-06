@@ -15,6 +15,10 @@ export interface IBalanceInfo {
   }
 }
 
+export const test_upload = (data: object): Promise<HttpResponse> => {
+  return post('/aws/test-upload', data);
+};
+
 export const get_init_users = (user_id: object): Promise<HttpResponse> => {
   return post('/api/get_init_users', user_id);
 };

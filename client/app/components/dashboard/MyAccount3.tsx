@@ -41,6 +41,7 @@ interface AccountState {
   country: string,
   country_str:string,
   ssn_last_4: string,
+  photo_url: string,
   account_error:string,
   verifying:boolean,
 }
@@ -71,11 +72,12 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
       country:null,
       country_str:null,
       ssn_last_4:null,
+      photo_url:null,
       account_error:null,
       verifying:false,
     }
     
-    this.handleDepositSuccess = this.handleDepositSuccess.bind(this)
+    this.handleAccountSuccess = this.handleAccountSuccess.bind(this)
   }
  
   componentDidMount() {
@@ -296,7 +298,16 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
     }
   }
 
-  public renderGetReceiveAccount(): JSX.Element {
+  public renderUploads(): JSX.Element {
+
+  return (
+    <div>
+    </div>
+  );
+
+  }
+
+  public renderGetAccount(): JSX.Element {
 
     if (this.state.has_connect_account) {
       return (
@@ -306,7 +317,7 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
           onClick={()=>this.setState({has_connect_account:false, has_customer_id:false})}
           className="btn-primary create-balance-btn"
           > 
-          Update Payment Information
+          Change Bank Account
           </button>
         </div>
       )
@@ -322,7 +333,7 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
           product={["auth", "transactions"]}
           publicKey={this.state.pldpublickey}
           onExit={this.handleOnExit}
-          onSuccess={this.handleDepositSuccess}
+          onSuccess={this.handleAccountSuccess}
         >
           Setup your bank account 
         </PlaidLink>
@@ -330,7 +341,7 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
     }
   }
 
-  handleDepositSuccess(public_token, metadata) {
+  handleAccountSuccess(public_token, metadata) {
     // Send the public_token and account ID to your app server.
     //console.log('public_token: ' + public_token);
     //console.log('account ID: ' + metadata.account_id);
@@ -427,9 +438,17 @@ class MyAccount3 extends React.Component<AccountProps & RouteComponentProps<{}>,
 
           </div>
 
+          <br/><br/>
+
+          <div className="user-info-container">
+
+              {this.renderUploads()}
+
+          </div>
+
           <section className="create-balance-container">
 
-              {this.renderGetReceiveAccount()}
+              {this.renderGetAccount()}
 
           </section>
 

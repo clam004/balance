@@ -15,7 +15,7 @@ import { Buying_Balances,
          Arbitration } from './components/dashboard';
 
 import { BalanceCreatorSell, BalanceCreatorBuy, BalanceEditor } from './components/balance';
-import { Support } from './components/support';
+import { Support , Upload} from './components/support';
 import './App.less';
 
 ReactDOM.render(
@@ -39,6 +39,7 @@ ReactDOM.render(
         <Route path="/myaccount2" component={MyAccount2} />
         <Route path="/myaccount3" component={MyAccount3} />
         <Route path="/support" component={Support} />
+        <Route path="/upload" component={Upload} />
         <Route path="/arbitrations" component={Arbitration} />
       </Switch>
     </div>
