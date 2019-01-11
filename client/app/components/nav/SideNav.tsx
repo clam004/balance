@@ -13,10 +13,7 @@ const SideNav = () => {
       <ul className="side-nav-list">
         {/* TODO: make dynamic */}
         <li className="nav-item">
-          <Link to="/buying-balances">Buying Balances</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/selling-balances">Selling Balances</Link>
+          <Link to="/buying-balances">Current Balances</Link>
         </li>
         <li className="nav-item">
           <a href="/history">History</a>
@@ -25,7 +22,7 @@ const SideNav = () => {
           <a href="/arbitrations">Arbitrations</a>
         </li>
         <li className="nav-item">
-          <Link to="/myaccount3">My Account</Link>
+          <Link to="/myaccount">My Account</Link>
         </li>
         <li className="nav-item">
           <a href="/support">Support</a>
@@ -39,3 +36,9 @@ const SideNav = () => {
 };
 
 export default SideNav;
+
+/*
+<li className="nav-item">
+  <Link to="/buying-balances">Buying Balances</Link>
+</li>
+*/

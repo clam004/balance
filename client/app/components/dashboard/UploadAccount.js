@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-class MyAccount4 extends Component {
+class UploadAccount extends Component {
   constructor () {
     super();
     this.state = {
@@ -38,4 +38,4 @@ class MyAccount4 extends Component {
   }
 }
 
-export default MyAccount4;
+export default UploadAccount;

@@ -10,8 +10,9 @@ import { Buying_Balances,
          BalanceSummary, 
          History, 
          MyAccount,
-         MyAccount2,
-         MyAccount3,
+         CreditCard,
+         UploadAccount,
+         CurrentBalances,
          Arbitration } from './components/dashboard';
 
 import { BalanceCreatorSell, BalanceCreatorBuy, BalanceEditor } from './components/balance';
@@ -30,14 +31,15 @@ ReactDOM.render(
         <Route path="/signup-complete" component={SignUpComplete} />
         <Route path="/buying-balances" component={Buying_Balances} />
         <Route path="/selling-balances" component={Selling_Balances} />
+        <Route path="/current-balances" component={CurrentBalances} />
         <Route path="/balancesummary" component={BalanceSummary} />
         <Route path="/history" component={History} />
         <Route path="/create-buy" component={BalanceCreatorBuy} />
         <Route path="/create-sell" component={BalanceCreatorSell} />
         <Route path="/edit" component={BalanceEditor} />
         <Route path="/myaccount" component={MyAccount} />
-        <Route path="/myaccount2" component={MyAccount2} />
-        <Route path="/myaccount3" component={MyAccount3} />
+        <Route path="/creditcard" component={CreditCard} /> 
+        <Route path="/uploadaccount" component={UploadAccount} /> 
         <Route path="/support" component={Support} />
         <Route path="/upload" component={Upload} />
         <Route path="/arbitrations" component={Arbitration} />

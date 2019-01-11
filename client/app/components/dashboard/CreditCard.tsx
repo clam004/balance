@@ -18,7 +18,7 @@ import {Elements, StripeProvider} from 'react-stripe-elements';
 
 import CheckoutForm from './CheckoutForm';
 
-const STRIPE_PUBLIC_KEY = "pk_test_pj9vyeLEvE4TGmOk3mNLdSOo";
+const STRIPE_PUBLIC_KEY = 'pk_test_pj9vyeLEvE4TGmOk3mNLdSOo' // 'pk_live_pPMLqeBq8P6rEFHwEmiWHmjx'
 
 interface AccountProps extends RouteComponentProps<{}> {}
 
@@ -37,7 +37,7 @@ interface AccountState {
   account_error:string
 }
 
-class MyAccount2 extends React.Component<AccountProps & RouteComponentProps<{}>, AccountState> {
+class CreditCard extends React.Component<AccountProps & RouteComponentProps<{}>, AccountState> {
 
   constructor(props: AccountProps & RouteComponentProps<{}>) {
 
@@ -368,4 +368,4 @@ class MyAccount2 extends React.Component<AccountProps & RouteComponentProps<{}>,
   }
 }
 
-export default MyAccount2;
+export default CreditCard;

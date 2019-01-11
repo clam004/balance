@@ -64,7 +64,7 @@ class BalanceStakeDetails extends React.Component<Props, State> {
           </div>
 
           <div className="form-group">
-            <label className="label-default">Your Stake</label>
+            <label className="label-default">Buyer's Stake</label>
             <input
               className="input-default full-width"
               type="number"
@@ -83,9 +83,7 @@ class BalanceStakeDetails extends React.Component<Props, State> {
           </div>
 
           <div className="form-group">
-            <label className="label-default">
-              Seller's Proposed Stake (Optional)
-            </label>
+            <label className="label-default"> Seller's Stake </label>
             <input
               className="input-default full-width"
               type="number"

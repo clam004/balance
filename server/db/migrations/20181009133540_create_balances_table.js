@@ -30,7 +30,9 @@ exports.up = function(knex, Promise) {
     table.string('duration_units_prelim');
     table.timestamp('due_date_prelim');
     table.decimal('buyer_stake_amount',20,2);
-    table.decimal('seller_stake_amount',20,2);
+    table.decimal('seller_stake_amount',20,2); 
+    table.decimal('buyer_stake_amount_prelim',20,2);
+    table.decimal('seller_stake_amount_prelim',20,2); 
     table.timestamp('created_at');
     table.timestamp('updated_at');
     table.timestamp('completed_date').defaultTo(null);

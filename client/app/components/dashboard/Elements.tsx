@@ -5,6 +5,15 @@ import { Balance_Data } from './BalanceSummary';
 import * as moment from 'moment';
 import { logout, getUserData } from '../../helpers/auth';
 
+import {  getBalances, 
+          balanceApprove, 
+          toggleComplete, 
+          balanceDone,
+          balanceDelete,
+          archiveEdit,
+          approveEdit,
+          arbitrateBalance } from '../../helpers/usersbalances'; 
+
 interface IBalance {
   id:number,
   proposer_id:number,
@@ -17,6 +26,8 @@ interface IBalance {
   seller_email:string,
   buyer_stake_amount:number,
   seller_stake_amount:number,
+  buyer_stake_amount_prelim:number,
+  seller_stake_amount_prelim:number,
   balance_price:number,
   buyer_indicates_delivered:boolean,
   seller_indicates_delivered:boolean,
@@ -241,19 +252,12 @@ class BalanceData extends React.Component<Props, State> {
   };
 };
 
+
 export { BalanceData, BalanceParticipantDetails, IBalance };
 
 // export default CompleteBalanceDetails;
 
 /*
-
-interface CompleteProps {
-
-}
-
-interface CompleteState {
-
-}
 
 class CompleteBalanceDetails extends React.Component<CompleteProps, CompleteState> {
 
@@ -329,34 +333,34 @@ class CompleteBalanceDetails extends React.Component<CompleteProps, CompleteStat
 
 
 
-        <main className="main-container" 
-        >
-        </main>
-      <div className="new-balance-container">
-      <section className="new-balance-box">
-      <div style={{ paddingLeft: 16, paddingRight: 16 }}>
+  <main className="main-container" 
+  >
+  </main>
+  <div className="new-balance-container">
+  <section className="new-balance-box">
+  <div style={{ paddingLeft: 16, paddingRight: 16 }}>
 
-        <div className="balance-alert">
-          <div className="alert-text text-bold">Hi</div>
-          <div className="alert-description text-sm">
-            Balance
-          </div>
-          <div className="alert-action text-sm text-bold">Dismiss</div>
-        </div>
+    <div className="balance-alert">
+      <div className="alert-text text-bold">Hi</div>
+      <div className="alert-description text-sm">
+        Balance
+      </div>
+      <div className="alert-action text-sm text-bold">Dismiss</div>
+    </div>
 
-        <div className="form-group">
-          <label className="label-default">Contract Title</label>
-          <input
-            className="input-default full-width"
-            type="text"
-            placeholder="Contract Title"
-            //value={title || ""}
-            //onChange={e => this.setState({ title: e.target.value })}
-          />
-        </div>
-      </div>
-      </section>
-      </div>
+    <div className="form-group">
+      <label className="label-default">Contract Title</label>
+      <input
+        className="input-default full-width"
+        type="text"
+        placeholder="Contract Title"
+        //value={title || ""}
+        //onChange={e => this.setState({ title: e.target.value })}
+      />
+    </div>
+  </div>
+  </section>
+  </div>
 
 */
 

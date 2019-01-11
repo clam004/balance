@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
 
 import {  getBalances, 
@@ -18,29 +18,12 @@ import { BalanceParticipantDetails, IBalance } from './Elements';
 
 import './Dashboard.less';
 import '../balance/Balance.less';
-import * as moment from 'moment';
+import moment from 'moment';
 import { SideNav } from '../nav';
 
+class Selling_Balances extends React.Component {
 
-interface DashboardProps extends RouteComponentProps<{}> {}
-
-interface DashboardState {
-  data: Array<IBalance>, 
-  isLoading: boolean,
-  user_id:number,
-  has_connect_account:boolean,
-  has_customer_id:boolean,
-  user_email:string,
-  balance_id_buyer_says_complete:number,
-  balance_id_buyer_says_arbitration:number,
-  balance_id_buyer_says_delete:number,
-  balance_id_to_active:number,
-  edit_list: Array<number>,
-}
-
-class Selling_Balances extends React.Component<DashboardProps & RouteComponentProps<{}>, DashboardState> {
-
-  constructor(props: DashboardProps & RouteComponentProps<{}>) {
+  constructor(props) {
 
     super(props);
 
@@ -54,8 +37,9 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
       balance_id_buyer_says_complete:null,
       balance_id_buyer_says_arbitration:null,
       balance_id_buyer_says_delete:null,
-      balance_id_to_active:null,
-      edit_list:[]
+      show_activate_button_for_balance_id:null,
+      edit_list:[],
+      refresh:true,
     }
 
   }
@@ -72,14 +56,6 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
     })
     
     this.setState({ isLoading: true });
-
-    getBalances({buyer_or_seller_id:"seller_id"})
-    .then(data => {
-      console.log("data",data);
-      if (Array.isArray(data)) {
-        this.setState({data:data});     
-      }
-    });
     
     getUserData()
     .then(userdata => {  
@@ -90,7 +66,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
         if (userdata[0].stripe_connect_account_token) {
           has_connect_account = true;
         } else {
-          history.push('/myaccount3');
+          history.push('/myaccount');
         }
         if (userdata[0].stripe_customer_id) {
           has_customer_id = true;
@@ -106,21 +82,83 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
       }
     });
+
+  this.loadBalancesToData("seller_id")
+
+    this.interval = setInterval(() => {
+
+      if (this.state.refresh) {
+        this.loadBalancesToData("seller_id")
+      }
+
+    }, 10000);
+
   }
 
-  public toggleApproveState(index: number): void {
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  loadBalancesToData(buyer_or_seller_id) {
+    getBalances({buyer_or_seller_id:buyer_or_seller_id})
+    .then(data => {
+      if (Array.isArray(data)) {
+        this.setState({
+          data:data,
+        });     
+      }
+    });
+  }
+
+  approveState1(index) {
+
     let balance: IBalance[] = this.state.data.splice(index,1); 
-    balance[0].seller_approves_contract = !balance[0].seller_approves_contract;
-    if (balance[0].buyer_approves_contract && balance[0].seller_approves_contract) {
-      balance[0].state_string = 'active';
-      this.setState({balance_id_to_active:balance[0].id});
-    }
+    this.setState({show_activate_button_for_balance_id:balance[0].id});
     let balances: IBalance[] = [...this.state.data];
     balances.splice(index, 0, balance[0]);
     this.setState({data:balances});
+
   }
 
-  public toggleSellerSaysCompleteState(index: number): void {
+  approveState2(index) {
+
+    console.log("waiting for stakes to complete")
+    let balance_array: IBalance[] = this.state.data.splice(index,1);
+    let balance = balance_array[0]
+    balance.seller_approves_contract = true;
+    balance.state_string = 'active';  
+    let balances: IBalance[] = [...this.state.data];
+    balances.splice(index, 0, balance);
+    this.setState({data:balances, show_activate_button_for_balance_id:null});
+
+    stakeBalance({balance})
+    .then(res => {
+      if (res.bothStaked) {
+        console.log("Stakes successfully collected: ",res)       
+
+        balanceApprove({
+          id:balance.id, 
+          seller_id:balance.seller_id,
+          buyer_id:balance.buyer_id,
+          seller_approves_contract:balance.seller_approves_contract,
+          buyer_approves_contract:balance.buyer_approves_contract,
+          seller_or_buyer:'seller',
+        })
+        .then(res => {console.log("approve balance", res)})
+
+        this.setState({show_activate_button_for_balance_id:null});
+
+      } else {
+        console.log("Error in Stakes: ", res)
+        alert("both parties must have valid payment accounts")
+        this.setState({show_activate_button_for_balance_id:null});
+      }
+      this.setState({refresh:true})
+    })
+    
+  }
+
+  toggleSellerSaysCompleteState(index) {
     let balance: IBalance[] = this.state.data.splice(index,1); 
     balance[0].seller_indicates_delivered = !balance[0].seller_indicates_delivered; 
     let balances: IBalance[] = [...this.state.data];
@@ -128,17 +166,17 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
     this.setState({data:balances});
   }
 
-  public completeBalance(index: number): void {
+  completeBalance(index) {
     let balance: IBalance[] = this.state.data.splice(index,1); 
     const balances: IBalance[] = [...this.state.data]
     this.setState({data:balances});
   }
 
-  public remove(array, element) {
+  remove(array, element) {
     return array.filter(el => el !== element);
   }
 
-  public toggleSeeEdit(index: number): void {
+  toggleSeeEdit(index) {
 
     let edit_list = this.state.edit_list;
     var edit_list_includes_index = edit_list.includes(index);
@@ -165,13 +203,17 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
       balance[0].seller_obligation = balance[0].seller_obligation_prelim; 
       balance[0].balance_price = balance[0].balance_price_prelim; 
       balance[0].due_date = balance[0].due_date_prelim; 
+      balance[0].buyer_stake_amount = balance[0].buyer_stake_amount_prelim;
+      balance[0].seller_stake_amount = balance[0].seller_stake_amount_prelim;
 
       balance[0].title_prelim = balance_temp[0].title; 
       balance[0].balance_description_prelim = balance_temp[0].balance_description; 
       balance[0].buyer_obligation_prelim = balance_temp[0].buyer_obligation; 
       balance[0].seller_obligation_prelim = balance_temp[0].seller_obligation; 
       balance[0].balance_price_prelim = balance_temp[0].balance_price; 
-      balance[0].due_date_prelim = balance_temp[0].due_date; 
+      balance[0].due_date_prelim = balance_temp[0].due_date;
+      balance[0].buyer_stake_amount_prelim = balance_temp[0].buyer_stake_amount;
+      balance[0].seller_stake_amount_prelim = balance_temp[0].seller_stake_amount; 
 
       // re-render the page 
       let balances: IBalance[] = [...this.state.data];
@@ -188,6 +230,8 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
       balance[0].seller_obligation = balance[0].seller_obligation_prelim; 
       balance[0].balance_price = balance[0].balance_price_prelim; 
       balance[0].due_date = balance[0].due_date_prelim; 
+      balance[0].buyer_stake_amount = balance[0].buyer_stake_amount_prelim;
+      balance[0].seller_stake_amount = balance[0].seller_stake_amount_prelim;
 
       balance[0].title_prelim = balance_temp[0].title; 
       balance[0].balance_description_prelim = balance_temp[0].balance_description; 
@@ -195,6 +239,8 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
       balance[0].seller_obligation_prelim = balance_temp[0].seller_obligation; 
       balance[0].balance_price_prelim = balance_temp[0].balance_price; 
       balance[0].due_date_prelim = balance_temp[0].due_date; 
+      balance[0].buyer_stake_amount_prelim = balance_temp[0].buyer_stake_amount;
+      balance[0].seller_stake_amount_prelim = balance_temp[0].seller_stake_amount;
 
       // re-render the page 
       let balances: IBalance[] = [...this.state.data];
@@ -205,7 +251,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
     
   }
 
-  public rejectEdits(index: number): void {
+  rejectEdits(index) {
 
     let balance: IBalance[] = this.state.data.splice(index,1);
 
@@ -223,16 +269,18 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
     balance[0].seller_obligation = balance[0].seller_obligation_prelim; 
     balance[0].balance_price = balance[0].balance_price_prelim; 
     balance[0].due_date = balance[0].due_date_prelim; 
+    balance[0].buyer_stake_amount = balance[0].buyer_stake_amount_prelim;
+    balance[0].seller_stake_amount = balance[0].seller_stake_amount_prelim;
 
     let balances: IBalance[] = [...this.state.data];
     balances.splice(index, 0, balance[0]);
     this.setState({data:balances});
   }
 
-  public acceptEdits(index: number): void {
+  acceptEdits(index) {
     let balance: IBalance[] = this.state.data.splice(index,1);
 
-    if (balance[0].seller_approves_contract && balance[0].seller_approves_contract) {
+    if (balance[0].buyer_approves_contract && balance[0].seller_approves_contract) {
       balance[0].state_string = "active";
     } else {
       balance[0].state_string = "new";
@@ -245,8 +293,13 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
     this.setState({data:balances});    
   }
 
-  public renderBalance(): JSX.Element[] {
+  renderBalance() {
 
+  if (this.state.data.length == 0) {
+
+    return (<div> No active or pending buying balances </div>);
+    
+  } else {
     
     return this.state.data.map((balance, array_index) => {
       // Decides what goes into the left part of the balance card 
@@ -279,6 +332,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
                       balanceDone({balance}); // moves balance to history so buyer can't double pay. 
                       buyerPaySeller({balance});
                       this.completeBalance(array_index);
+                      this.setState({refresh:true})
                     }}
                   >
                    Finish Balance
@@ -314,6 +368,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
                     onClick={() => {
                       arbitrateBalance({balance});
                       this.completeBalance(array_index);
+                      this.setState({refresh:true})
                     }}
                   >
                    Move Balance to Arbitration 
@@ -349,6 +404,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
                         console.log('deleted',res)
                       })
                       this.completeBalance(array_index);
+                      this.setState({refresh:true})
                     }}
                   >
                    delete this balance
@@ -357,6 +413,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
                   <button className="btn-primary"
                     onClick={() => {
                       this.setState({balance_id_buyer_says_delete:null});
+                      this.setState({refresh:true})
                     }}
                   >
                    keep balance
@@ -369,7 +426,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
         )
 
-      } else if (balance.id == this.state.balance_id_to_active) {
+      } else if (balance.id == this.state.show_activate_button_for_balance_id) {
 
         participant_or_finish = (
 
@@ -388,29 +445,16 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
                   <button className="btn-primary"
                     onClick={() => {
-                      stakeBalance({balance})
-                      .then(res => {
-                        console.log(res)
-                      })
-
-                      balanceApprove({
-                        id:balance.id, 
-                        seller_id:balance.seller_id,
-                        buyer_id:balance.buyer_id,
-                        seller_approves_contract:balance.seller_approves_contract,
-                        buyer_approves_contract:balance.buyer_approves_contract,
-                        seller_or_buyer:'seller',
-                      });
-
-                      this.setState({balance_id_to_active:null});
+                      this.approveState2(array_index)
                     }}
                   >
-                   activate balance 
+                   Activate Balance 
                   </button>
 
                   <button className="btn-primary"
                     onClick={() => {
-                      this.setState({balance_id_to_active:null});
+                      this.setState({show_activate_button_for_balance_id:null});
+                      this.setState({refresh:true})
                     }}
                   >
                    undo
@@ -439,14 +483,20 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
       //////////////// SELLER's VIEW ///////////////////
 
-      console.log(balance.title, balance.seller_approves_contract, balance.buyer_approves_contract, balance.buyer_indicates_delivered, balance.seller_indicates_delivered)
+      console.log('balance.title',balance.title, 
+                  'balance.seller_approves_contract', balance.seller_approves_contract, 
+                   'balance.buyer_approves_contract', balance.buyer_approves_contract, 
+                   'balance.buyer_indicates_delivered', balance.buyer_indicates_delivered, 
+                   'balance.seller_indicates_delivered', balance.seller_indicates_delivered,
+                   'balance.proposer_id', balance.proposer_id)
+
       // 1. Buyer approves and seller is has not decided yet, balance.seller_approves_contract
       // = null denotes they neither agree nor disagree, the decision has to be made. 
       // TODO: there needs to be a confirm state to remind the seller that if they confirm, the balance will go into active mode
       // which is a state that can only go to completion and arbitration and can only be modified with agreement with both parties.
-
-      if (balance.seller_approves_contract == null && balance.buyer_approves_contract == true &&
-          balance.buyer_indicates_delivered == false && balance.seller_indicates_delivered == false) {
+      if ((balance.seller_approves_contract == null && balance.buyer_approves_contract == true &&
+           balance.buyer_indicates_delivered == false && balance.seller_indicates_delivered == false) 
+           && !(balance.proposer_id == user_id && balance.state_string == 'proposed_edit')) {
 
         lower_right_buttons = (
 
@@ -464,7 +514,8 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
             <button className="btn-primary"
               onClick={() => {
-                this.toggleApproveState(array_index);
+                this.approveState1(array_index);
+                this.setState({refresh:false})
               }}
             >
              confirm you agree with terms
@@ -487,6 +538,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
             <button className="btn-primary"
               onClick={() => {
                 this.setState({balance_id_buyer_says_delete:balance.id});
+                this.setState({refresh:true})
               }}
             >
              delete balance 
@@ -498,7 +550,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
       // 2. Seller approves and buyer has not indicated yet 
 
       } else if (balance.seller_approves_contract == true && balance.buyer_approves_contract == null &&
-          balance.buyer_indicates_delivered == false && balance.seller_indicates_delivered == false) {
+                 balance.buyer_indicates_delivered == false && balance.seller_indicates_delivered == false) {
 
         lower_right_buttons = (
 
@@ -527,6 +579,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
             <button className="btn-primary"
               onClick={() => {
                 this.setState({balance_id_buyer_says_delete:balance.id});
+                this.setState({refresh:true})
               }}
             >
              delete balance 
@@ -614,6 +667,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
                                 completed_boolean:balance.seller_indicates_delivered, 
                                 seller_or_buyer:'seller'});
                 this.toggleSellerSaysCompleteState(array_index);
+                this.setState({refresh:true})
               }}
             >
              undo completed & delivered 
@@ -647,7 +701,8 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
       
       var header;
 
-      console.log(balance.state_string, balance.proposer_id, balance.buyer_id)
+      console.log('balance.state_string, balance.proposer_id, balance.buyer_id',
+                   balance.state_string, balance.proposer_id, balance.buyer_id)
 
       if (balance.state_string == 'active') {
 
@@ -686,6 +741,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
              className="btn-primary create-balance-btn"
              onClick={() => {
               this.toggleSeeEdit(array_index);
+              this.setState({refresh:false})
              }}
             >
               see new poposed edits 
@@ -707,6 +763,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
              className="btn-primary create-balance-btn"
              onClick={() => {
               this.toggleSeeEdit(array_index);
+              this.setState({refresh:true})
              }}
             >
               return to original contract
@@ -718,7 +775,7 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
         lower_right_buttons = (
           <div className="balance-agreement-text">
             <button 
-             className="btn-primary create-balance-btn"
+             className="btn-primary"
              onClick={() => {
               this.rejectEdits(array_index);
              }}
@@ -727,9 +784,10 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
             </button>
 
             <button 
-             className="btn-primary create-balance-btn"
+             className="btn-primary"
              onClick={() => {
               this.acceptEdits(array_index);
+              this.setState({refresh:true})
              }}
             >
               accept edits
@@ -752,62 +810,49 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 
       // put together balance, participant_or_finish, agreement_button, completed_button 
 
-      return (
+        return (
 
-        <section key={balance.id} className="balance-section">
-            {header}
-          <div className="balance-cards-container">
-            {participant_or_finish}
-          <div className="balance-agreement-container">
+          <section key={balance.id} className="balance-section">
+              {header}
+            <div className="balance-cards-container">
+              {participant_or_finish}
+            <div className="balance-agreement-container">
 
 
 
-              <h5 className="balance-agreement-header">{balance.title}</h5>
-              <div className="balance-agreement-text">
-                {balance.balance_description} {' '}
-              </div>
-              <div className="balance-agreement-text">
-                <span className="text-bold">due {' '} {moment(balance.due_date, moment.ISO_8601).fromNow()}</span>
-              </div>
-              <div className="balance-agreement-price">${balance.balance_price}</div>
-              
-              {lower_right_buttons}    
+                <h5 className="balance-agreement-header">{balance.title}</h5>
+                <div className="balance-agreement-text">
+                  {balance.balance_description} {' '}
+                </div>
+                <div className="balance-agreement-text">
+                  <span className="text-bold">due {' '} {moment(balance.due_date, moment.ISO_8601).fromNow()}</span>
+                </div>
+                <div className="balance-agreement-price">${balance.balance_price}</div>
+                
+                {lower_right_buttons}    
 
-          </div>
-          </div>
-        </section>
-      );
-
-    }); // end of this.state.data.map((balance, array_index)
-  }
-
-  public renderAccount(): JSX.Element {
-
-    if (this.state.has_connect_account && this.state.data.length >0 ) {
-      return (<div> </div>);
-    } else if (!this.state.has_connect_account) {
-      return (
-        <div>
-          Before starting a balance please go to My Account to set up your account  
-        </div>
-      );
-    } else if (this.state.data.length == 0) {
-      return (<div> No active or pending balances </div>);
+            </div>
+            </div>
+          </section>
+        );
+      }); // end of this.state.data.map((balance, array_index)
     }
   }
 
   render() {
 
-    console.log('state at render ', this.state)
+    console.log('data at render ', this.state.data)
 
     const { data, isLoading} = this.state;
     
     var user_email = this.state.user_email 
 
-    var user_alias = "You"
+    var user_alias;
 
     if (user_email) {
       user_alias = user_email.substr(0, user_email.indexOf('@')); 
+    } else {
+      user_alias = "You"
     }
 
     return (
@@ -821,11 +866,19 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
             <h3> Current Balances with {user_alias} as Seller</h3>
           </div>
 
-          <div>
-            { this.renderAccount() }
-          </div>
-
           <section className="create-balance-container">
+            <Link to="/buying-balances">
+              <button 
+               className="btn-primary create-balance-btn"
+               onClick={() => {
+                //
+               }}
+              >
+                Buyer
+                <img src="assets/switch_right.png" />
+                Seller
+              </button>
+            </Link>
             <Link to="/create-sell">
               <button 
                className="btn-primary create-balance-btn"
@@ -853,7 +906,3 @@ class Selling_Balances extends React.Component<DashboardProps & RouteComponentPr
 }
 
 export default Selling_Balances;
-
-/*
-
-*/

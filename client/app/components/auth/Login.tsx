@@ -48,7 +48,7 @@ class Login extends React.Component<
         let num_completed_balances = result.num_completed_balances;
         localStorage.setItem("num_completed_balances", JSON.stringify(num_completed_balances));
       })
-      .then(() => history.push('/myaccount3'))
+      .then(() => history.push('/myaccount'))
       .catch(err => {
         this.setState({ error: 'Invalid credentials' });
       });

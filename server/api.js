@@ -11,6 +11,9 @@ const config = require('./db/knexfile.js')[env];
 const knex = require('knex')(config);
 const moment = require('moment');
 
+// For testing
+api.get('/ping', (req, res) => res.json({ message: 'pong'}));
+
 const logout = (req, res) => {
   //console.log( req.user)
   req.logout(); 
@@ -52,9 +55,11 @@ api.post('/approve_edit', (req, res, next) => {
  		buyer_obligation:req.body.buyer_obligation,
  		seller_obligation:req.body.seller_obligation,
  		balance_price:req.body.balance_price,
+ 		buyer_stake_amount:req.body.buyer_stake_amount,
+ 		seller_stake_amount:req.body.seller_stake_amount,
  		due_date:req.body.due_date,
-		seller_approves_contract:true,
-		buyer_approves_contract:true,
+		seller_approves_contract:req.body.seller_approves_contract,
+		buyer_approves_contract:req.body.buyer_approves_contract,
 		updated_at:moment().format("YYYY-MM-DDTHH:mm:ss"),
 	})
  	.then((response)=>{
@@ -98,9 +103,6 @@ api.post('/archive_edit', (req, res, next) => {
 	 	
  	})
 });
-
-// For testing
-api.get('/ping', (req, res) => res.json({ message: 'pong'}));
 
 api.post('/get_incomplete_balances_by_id', (req, res, next) => {
 
@@ -301,6 +303,8 @@ api.post('/edit_balance', (req, res, next) => {
  		buyer_obligation_prelim:req.body.agreement.buyer_obligation,
  		seller_obligation_prelim:req.body.agreement.seller_obligation,
  		balance_price_prelim:req.body.agreement.payment,
+ 		buyer_stake_amount_prelim:req.body.buyer.stake,
+ 		seller_stake_amount_prelim:req.body.seller.stake,
  		duration_prelim:req.body.agreement.duration,
  		duration_units_prelim:req.body.agreement.duration_units,
  		due_date_prelim:new_due_date,
