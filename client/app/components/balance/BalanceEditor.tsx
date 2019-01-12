@@ -72,7 +72,7 @@ class BalanceEditor extends React.Component<BalanceCreatorProps & RouteComponent
       selected: null,
       error:null,
       edit:false,
-      balance_state_string:null,
+      balance_state_string:"active", 
       other_balancer_email:null,
 
       balance: {

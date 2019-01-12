@@ -549,8 +549,9 @@ class Selling_Balances extends React.Component {
 
       // 2. Seller approves and buyer has not indicated yet 
 
-      } else if (balance.seller_approves_contract == true && balance.buyer_approves_contract == null &&
-                 balance.buyer_indicates_delivered == false && balance.seller_indicates_delivered == false) {
+      } else if ((balance.seller_approves_contract == true && balance.buyer_approves_contract == null &&
+                  balance.buyer_indicates_delivered == false && balance.seller_indicates_delivered == false)
+                  || (balance.proposer_id == user_id && balance.state_string == 'proposed_edit')) {
 
         lower_right_buttons = (
 

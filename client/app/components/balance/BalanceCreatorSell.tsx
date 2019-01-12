@@ -127,12 +127,11 @@ class BalanceCreator extends React.Component<
        
         console.log("balance_data", balance_data[0])
         
-        const initUser = {  email:balance_data[0].seller_email,
-                            id:balance_data[0].seller_id,
+        const initUser = {  email:balance_data[0].buyer_email,
+                            id:balance_data[0].buyer_id,
                           };
         
         this.handleUpdateBalance({buyer:initUser})
-
         
         const initAgreement = {  title:balance_data[0].title,
                                  buyer_obligation:balance_data[0].buyer_obligation,
@@ -156,7 +155,7 @@ class BalanceCreator extends React.Component<
 
   handleUpdateBalance(updates: any) {
     const { balance } = this.state;
-    console.log("updates", updates)
+    //console.log("updates", updates)
     // TODO: connect to API
     this.setState({
       balance: merge({}, balance, updates),
@@ -248,7 +247,7 @@ class BalanceCreator extends React.Component<
 
   render() {
 
-    console.log(this.state)
+    //console.log(this.state)
 
     const { balance, selected } = this.state;
     const { buyer, seller, agreement } = balance;

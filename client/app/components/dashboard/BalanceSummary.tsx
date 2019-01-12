@@ -124,6 +124,7 @@ class BalanceSummary extends React.Component<DashboardProps & RouteComponentProp
     }
     
     const { balance_data, isLoading } = this.state;
+    const { history } = this.props;
 
     if (isLoading || balance_data == null) { 
 
@@ -165,16 +166,23 @@ class BalanceSummary extends React.Component<DashboardProps & RouteComponentProp
                   </button>
 
 
-                <Link to="/create">
+
                   <button className="btn-primary create-balance-btn"
                     onClick={() => {
                       console.log("clicked edit balance")
+
+                      if (user_email == balance_data.buyer_email) {
+                        history.push('create-buy');
+                      } else {
+                        history.push('create-sell');
+                      }
+
                     }}       
                   >
                     <img src="assets/btn-logo-1.svg" />
                     Edit Balance
                   </button>
-                </Link>
+
 
                 <Link to="/myaccount">
                   <button className="btn-primary create-balance-btn"
